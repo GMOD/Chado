@@ -4,12 +4,12 @@
 
    DROP TABLE audit_tableinfo;
    CREATE TABLE audit_tableinfo ( 
-       tableinfo_id bigint, 
+       tableinfo_id integer, 
        name varchar(30), 
        primary_key_column varchar(30), 
        is_view integer, 
-       view_on_table_id bigint, 
-       superclass_table_id bigint, 
+       view_on_table_id integer, 
+       superclass_table_id integer, 
        is_updateable integer, 
        modification_date date, 
        transaction_date timestamp not null default now(),
@@ -20,12 +20,12 @@
    CREATE OR REPLACE FUNCTION audit_update_delete_tableinfo() RETURNS trigger AS
    '
    DECLARE
-       tableinfo_id_var bigint; 
+       tableinfo_id_var integer; 
        name_var varchar(30); 
        primary_key_column_var varchar(30); 
        is_view_var integer; 
-       view_on_table_id_var bigint; 
-       superclass_table_id_var bigint; 
+       view_on_table_id_var integer; 
+       superclass_table_id_var integer; 
        is_updateable_var integer; 
        modification_date_var date; 
        
@@ -86,7 +86,7 @@
 
    DROP TABLE audit_db;
    CREATE TABLE audit_db ( 
-       db_id bigint, 
+       db_id integer, 
        name varchar(255), 
        description varchar(255), 
        urlprefix varchar(255), 
@@ -99,7 +99,7 @@
    CREATE OR REPLACE FUNCTION audit_update_delete_db() RETURNS trigger AS
    '
    DECLARE
-       db_id_var bigint; 
+       db_id_var integer; 
        name_var varchar(255); 
        description_var varchar(255); 
        urlprefix_var varchar(255); 
@@ -153,9 +153,9 @@
 
    DROP TABLE audit_dbxref;
    CREATE TABLE audit_dbxref ( 
-       dbxref_id bigint, 
-       db_id bigint, 
-       accession varchar(255), 
+       dbxref_id integer, 
+       db_id integer, 
+       accession varchar(1024), 
        version varchar(255), 
        description text, 
        transaction_date timestamp not null default now(),
@@ -166,9 +166,9 @@
    CREATE OR REPLACE FUNCTION audit_update_delete_dbxref() RETURNS trigger AS
    '
    DECLARE
-       dbxref_id_var bigint; 
-       db_id_var bigint; 
-       accession_var varchar(255); 
+       dbxref_id_var integer; 
+       db_id_var integer; 
+       accession_var varchar(1024); 
        version_var varchar(255); 
        description_var text; 
        
@@ -220,7 +220,7 @@
 
    DROP TABLE audit_cv;
    CREATE TABLE audit_cv ( 
-       cv_id bigint, 
+       cv_id integer, 
        name varchar(255), 
        definition text, 
        transaction_date timestamp not null default now(),
@@ -231,7 +231,7 @@
    CREATE OR REPLACE FUNCTION audit_update_delete_cv() RETURNS trigger AS
    '
    DECLARE
-       cv_id_var bigint; 
+       cv_id_var integer; 
        name_var varchar(255); 
        definition_var text; 
        
@@ -277,11 +277,11 @@
 
    DROP TABLE audit_cvterm;
    CREATE TABLE audit_cvterm ( 
-       cvterm_id bigint, 
-       cv_id bigint, 
+       cvterm_id integer, 
+       cv_id integer, 
        name varchar(1024), 
        definition text, 
-       dbxref_id bigint, 
+       dbxref_id integer, 
        is_obsolete integer, 
        is_relationshiptype integer, 
        transaction_date timestamp not null default now(),
@@ -292,11 +292,11 @@
    CREATE OR REPLACE FUNCTION audit_update_delete_cvterm() RETURNS trigger AS
    '
    DECLARE
-       cvterm_id_var bigint; 
-       cv_id_var bigint; 
+       cvterm_id_var integer; 
+       cv_id_var integer; 
        name_var varchar(1024); 
        definition_var text; 
-       dbxref_id_var bigint; 
+       dbxref_id_var integer; 
        is_obsolete_var integer; 
        is_relationshiptype_var integer; 
        
@@ -354,10 +354,10 @@
 
    DROP TABLE audit_cvterm_relationship;
    CREATE TABLE audit_cvterm_relationship ( 
-       cvterm_relationship_id bigint, 
-       type_id bigint, 
-       subject_id bigint, 
-       object_id bigint, 
+       cvterm_relationship_id integer, 
+       type_id integer, 
+       subject_id integer, 
+       object_id integer, 
        transaction_date timestamp not null default now(),
        transaction_type char(1) not null
    );
@@ -366,10 +366,10 @@
    CREATE OR REPLACE FUNCTION audit_update_delete_cvterm_relationship() RETURNS trigger AS
    '
    DECLARE
-       cvterm_relationship_id_var bigint; 
-       type_id_var bigint; 
-       subject_id_var bigint; 
-       object_id_var bigint; 
+       cvterm_relationship_id_var integer; 
+       type_id_var integer; 
+       subject_id_var integer; 
+       object_id_var integer; 
        
        transaction_type_var char;
    BEGIN
@@ -416,11 +416,11 @@
 
    DROP TABLE audit_cvtermpath;
    CREATE TABLE audit_cvtermpath ( 
-       cvtermpath_id bigint, 
-       type_id bigint, 
-       subject_id bigint, 
-       object_id bigint, 
-       cv_id bigint, 
+       cvtermpath_id integer, 
+       type_id integer, 
+       subject_id integer, 
+       object_id integer, 
+       cv_id integer, 
        pathdistance integer, 
        transaction_date timestamp not null default now(),
        transaction_type char(1) not null
@@ -430,11 +430,11 @@
    CREATE OR REPLACE FUNCTION audit_update_delete_cvtermpath() RETURNS trigger AS
    '
    DECLARE
-       cvtermpath_id_var bigint; 
-       type_id_var bigint; 
-       subject_id_var bigint; 
-       object_id_var bigint; 
-       cv_id_var bigint; 
+       cvtermpath_id_var integer; 
+       type_id_var integer; 
+       subject_id_var integer; 
+       object_id_var integer; 
+       cv_id_var integer; 
        pathdistance_var integer; 
        
        transaction_type_var char;
@@ -488,10 +488,10 @@
 
    DROP TABLE audit_cvtermsynonym;
    CREATE TABLE audit_cvtermsynonym ( 
-       cvtermsynonym_id bigint, 
-       cvterm_id bigint, 
+       cvtermsynonym_id integer, 
+       cvterm_id integer, 
        synonym varchar(1024), 
-       type_id bigint, 
+       type_id integer, 
        transaction_date timestamp not null default now(),
        transaction_type char(1) not null
    );
@@ -500,10 +500,10 @@
    CREATE OR REPLACE FUNCTION audit_update_delete_cvtermsynonym() RETURNS trigger AS
    '
    DECLARE
-       cvtermsynonym_id_var bigint; 
-       cvterm_id_var bigint; 
+       cvtermsynonym_id_var integer; 
+       cvterm_id_var integer; 
        synonym_var varchar(1024); 
-       type_id_var bigint; 
+       type_id_var integer; 
        
        transaction_type_var char;
    BEGIN
@@ -550,9 +550,9 @@
 
    DROP TABLE audit_cvterm_dbxref;
    CREATE TABLE audit_cvterm_dbxref ( 
-       cvterm_dbxref_id bigint, 
-       cvterm_id bigint, 
-       dbxref_id bigint, 
+       cvterm_dbxref_id integer, 
+       cvterm_id integer, 
+       dbxref_id integer, 
        is_for_definition integer, 
        transaction_date timestamp not null default now(),
        transaction_type char(1) not null
@@ -562,9 +562,9 @@
    CREATE OR REPLACE FUNCTION audit_update_delete_cvterm_dbxref() RETURNS trigger AS
    '
    DECLARE
-       cvterm_dbxref_id_var bigint; 
-       cvterm_id_var bigint; 
-       dbxref_id_var bigint; 
+       cvterm_dbxref_id_var integer; 
+       cvterm_id_var integer; 
+       dbxref_id_var integer; 
        is_for_definition_var integer; 
        
        transaction_type_var char;
@@ -612,9 +612,9 @@
 
    DROP TABLE audit_cvtermprop;
    CREATE TABLE audit_cvtermprop ( 
-       cvtermprop_id bigint, 
-       cvterm_id bigint, 
-       type_id bigint, 
+       cvtermprop_id integer, 
+       cvterm_id integer, 
+       type_id integer, 
        value text, 
        rank integer, 
        transaction_date timestamp not null default now(),
@@ -625,9 +625,9 @@
    CREATE OR REPLACE FUNCTION audit_update_delete_cvtermprop() RETURNS trigger AS
    '
    DECLARE
-       cvtermprop_id_var bigint; 
-       cvterm_id_var bigint; 
-       type_id_var bigint; 
+       cvtermprop_id_var integer; 
+       cvterm_id_var integer; 
+       type_id_var integer; 
        value_var text; 
        rank_var integer; 
        
@@ -679,9 +679,9 @@
 
    DROP TABLE audit_dbxrefprop;
    CREATE TABLE audit_dbxrefprop ( 
-       dbxrefprop_id bigint, 
-       dbxref_id bigint, 
-       type_id bigint, 
+       dbxrefprop_id integer, 
+       dbxref_id integer, 
+       type_id integer, 
        value text, 
        rank integer, 
        transaction_date timestamp not null default now(),
@@ -692,9 +692,9 @@
    CREATE OR REPLACE FUNCTION audit_update_delete_dbxrefprop() RETURNS trigger AS
    '
    DECLARE
-       dbxrefprop_id_var bigint; 
-       dbxref_id_var bigint; 
-       type_id_var bigint; 
+       dbxrefprop_id_var integer; 
+       dbxref_id_var integer; 
+       type_id_var integer; 
        value_var text; 
        rank_var integer; 
        
@@ -746,9 +746,9 @@
 
    DROP TABLE audit_cvprop;
    CREATE TABLE audit_cvprop ( 
-       cvprop_id bigint, 
-       cv_id bigint, 
-       type_id bigint, 
+       cvprop_id integer, 
+       cv_id integer, 
+       type_id integer, 
        value text, 
        rank integer, 
        transaction_date timestamp not null default now(),
@@ -759,9 +759,9 @@
    CREATE OR REPLACE FUNCTION audit_update_delete_cvprop() RETURNS trigger AS
    '
    DECLARE
-       cvprop_id_var bigint; 
-       cv_id_var bigint; 
-       type_id_var bigint; 
+       cvprop_id_var integer; 
+       cv_id_var integer; 
+       type_id_var integer; 
        value_var text; 
        rank_var integer; 
        
@@ -813,8 +813,8 @@
 
    DROP TABLE audit_chadoprop;
    CREATE TABLE audit_chadoprop ( 
-       chadoprop_id bigint, 
-       type_id bigint, 
+       chadoprop_id integer, 
+       type_id integer, 
        value text, 
        rank integer, 
        transaction_date timestamp not null default now(),
@@ -825,8 +825,8 @@
    CREATE OR REPLACE FUNCTION audit_update_delete_chadoprop() RETURNS trigger AS
    '
    DECLARE
-       chadoprop_id_var bigint; 
-       type_id_var bigint; 
+       chadoprop_id_var integer; 
+       type_id_var integer; 
        value_var text; 
        rank_var integer; 
        
@@ -873,9 +873,267 @@
        EXECUTE PROCEDURE audit_update_delete_chadoprop ();
 
 
+   DROP TABLE audit_dbprop;
+   CREATE TABLE audit_dbprop ( 
+       dbprop_id integer, 
+       db_id integer, 
+       type_id integer, 
+       value text, 
+       rank integer, 
+       transaction_date timestamp not null default now(),
+       transaction_type char(1) not null
+   );
+   GRANT ALL on audit_dbprop to PUBLIC;
+
+   CREATE OR REPLACE FUNCTION audit_update_delete_dbprop() RETURNS trigger AS
+   '
+   DECLARE
+       dbprop_id_var integer; 
+       db_id_var integer; 
+       type_id_var integer; 
+       value_var text; 
+       rank_var integer; 
+       
+       transaction_type_var char;
+   BEGIN
+       dbprop_id_var = OLD.dbprop_id;
+       db_id_var = OLD.db_id;
+       type_id_var = OLD.type_id;
+       value_var = OLD.value;
+       rank_var = OLD.rank;
+       
+       IF TG_OP = ''DELETE'' THEN
+           transaction_type_var = ''D'';
+       ELSE
+           transaction_type_var = ''U'';
+       END IF;
+
+       INSERT INTO audit_dbprop ( 
+             dbprop_id, 
+             db_id, 
+             type_id, 
+             value, 
+             rank, 
+             transaction_type
+       ) VALUES ( 
+             dbprop_id_var, 
+             db_id_var, 
+             type_id_var, 
+             value_var, 
+             rank_var, 
+             transaction_type_var
+       );
+
+       IF TG_OP = ''DELETE'' THEN
+           return OLD;
+       ELSE
+           return NEW;
+       END IF;
+   END
+   '
+   LANGUAGE plpgsql; 
+
+   DROP TRIGGER dbprop_audit_ud ON dbprop;
+   CREATE TRIGGER dbprop_audit_ud
+       BEFORE UPDATE OR DELETE ON dbprop
+       FOR EACH ROW
+       EXECUTE PROCEDURE audit_update_delete_dbprop ();
+
+
+   DROP TABLE audit_contact;
+   CREATE TABLE audit_contact ( 
+       contact_id integer, 
+       type_id integer, 
+       name varchar(255), 
+       description varchar(255), 
+       transaction_date timestamp not null default now(),
+       transaction_type char(1) not null
+   );
+   GRANT ALL on audit_contact to PUBLIC;
+
+   CREATE OR REPLACE FUNCTION audit_update_delete_contact() RETURNS trigger AS
+   '
+   DECLARE
+       contact_id_var integer; 
+       type_id_var integer; 
+       name_var varchar(255); 
+       description_var varchar(255); 
+       
+       transaction_type_var char;
+   BEGIN
+       contact_id_var = OLD.contact_id;
+       type_id_var = OLD.type_id;
+       name_var = OLD.name;
+       description_var = OLD.description;
+       
+       IF TG_OP = ''DELETE'' THEN
+           transaction_type_var = ''D'';
+       ELSE
+           transaction_type_var = ''U'';
+       END IF;
+
+       INSERT INTO audit_contact ( 
+             contact_id, 
+             type_id, 
+             name, 
+             description, 
+             transaction_type
+       ) VALUES ( 
+             contact_id_var, 
+             type_id_var, 
+             name_var, 
+             description_var, 
+             transaction_type_var
+       );
+
+       IF TG_OP = ''DELETE'' THEN
+           return OLD;
+       ELSE
+           return NEW;
+       END IF;
+   END
+   '
+   LANGUAGE plpgsql; 
+
+   DROP TRIGGER contact_audit_ud ON contact;
+   CREATE TRIGGER contact_audit_ud
+       BEFORE UPDATE OR DELETE ON contact
+       FOR EACH ROW
+       EXECUTE PROCEDURE audit_update_delete_contact ();
+
+
+   DROP TABLE audit_contactprop;
+   CREATE TABLE audit_contactprop ( 
+       contactprop_id integer, 
+       contact_id integer, 
+       type_id integer, 
+       value text, 
+       rank integer, 
+       transaction_date timestamp not null default now(),
+       transaction_type char(1) not null
+   );
+   GRANT ALL on audit_contactprop to PUBLIC;
+
+   CREATE OR REPLACE FUNCTION audit_update_delete_contactprop() RETURNS trigger AS
+   '
+   DECLARE
+       contactprop_id_var integer; 
+       contact_id_var integer; 
+       type_id_var integer; 
+       value_var text; 
+       rank_var integer; 
+       
+       transaction_type_var char;
+   BEGIN
+       contactprop_id_var = OLD.contactprop_id;
+       contact_id_var = OLD.contact_id;
+       type_id_var = OLD.type_id;
+       value_var = OLD.value;
+       rank_var = OLD.rank;
+       
+       IF TG_OP = ''DELETE'' THEN
+           transaction_type_var = ''D'';
+       ELSE
+           transaction_type_var = ''U'';
+       END IF;
+
+       INSERT INTO audit_contactprop ( 
+             contactprop_id, 
+             contact_id, 
+             type_id, 
+             value, 
+             rank, 
+             transaction_type
+       ) VALUES ( 
+             contactprop_id_var, 
+             contact_id_var, 
+             type_id_var, 
+             value_var, 
+             rank_var, 
+             transaction_type_var
+       );
+
+       IF TG_OP = ''DELETE'' THEN
+           return OLD;
+       ELSE
+           return NEW;
+       END IF;
+   END
+   '
+   LANGUAGE plpgsql; 
+
+   DROP TRIGGER contactprop_audit_ud ON contactprop;
+   CREATE TRIGGER contactprop_audit_ud
+       BEFORE UPDATE OR DELETE ON contactprop
+       FOR EACH ROW
+       EXECUTE PROCEDURE audit_update_delete_contactprop ();
+
+
+   DROP TABLE audit_contact_relationship;
+   CREATE TABLE audit_contact_relationship ( 
+       contact_relationship_id integer, 
+       type_id integer, 
+       subject_id integer, 
+       object_id integer, 
+       transaction_date timestamp not null default now(),
+       transaction_type char(1) not null
+   );
+   GRANT ALL on audit_contact_relationship to PUBLIC;
+
+   CREATE OR REPLACE FUNCTION audit_update_delete_contact_relationship() RETURNS trigger AS
+   '
+   DECLARE
+       contact_relationship_id_var integer; 
+       type_id_var integer; 
+       subject_id_var integer; 
+       object_id_var integer; 
+       
+       transaction_type_var char;
+   BEGIN
+       contact_relationship_id_var = OLD.contact_relationship_id;
+       type_id_var = OLD.type_id;
+       subject_id_var = OLD.subject_id;
+       object_id_var = OLD.object_id;
+       
+       IF TG_OP = ''DELETE'' THEN
+           transaction_type_var = ''D'';
+       ELSE
+           transaction_type_var = ''U'';
+       END IF;
+
+       INSERT INTO audit_contact_relationship ( 
+             contact_relationship_id, 
+             type_id, 
+             subject_id, 
+             object_id, 
+             transaction_type
+       ) VALUES ( 
+             contact_relationship_id_var, 
+             type_id_var, 
+             subject_id_var, 
+             object_id_var, 
+             transaction_type_var
+       );
+
+       IF TG_OP = ''DELETE'' THEN
+           return OLD;
+       ELSE
+           return NEW;
+       END IF;
+   END
+   '
+   LANGUAGE plpgsql; 
+
+   DROP TRIGGER contact_relationship_audit_ud ON contact_relationship;
+   CREATE TRIGGER contact_relationship_audit_ud
+       BEFORE UPDATE OR DELETE ON contact_relationship
+       FOR EACH ROW
+       EXECUTE PROCEDURE audit_update_delete_contact_relationship ();
+
+
    DROP TABLE audit_pub;
    CREATE TABLE audit_pub ( 
-       pub_id bigint, 
+       pub_id integer, 
        title text, 
        volumetitle text, 
        volume varchar(255), 
@@ -885,7 +1143,7 @@
        pages varchar(255), 
        miniref varchar(255), 
        uniquename text, 
-       type_id bigint, 
+       type_id integer, 
        is_obsolete boolean, 
        publisher varchar(255), 
        pubplace varchar(255), 
@@ -897,7 +1155,7 @@
    CREATE OR REPLACE FUNCTION audit_update_delete_pub() RETURNS trigger AS
    '
    DECLARE
-       pub_id_var bigint; 
+       pub_id_var integer; 
        title_var text; 
        volumetitle_var text; 
        volume_var varchar(255); 
@@ -907,7 +1165,7 @@
        pages_var varchar(255); 
        miniref_var varchar(255); 
        uniquename_var text; 
-       type_id_var bigint; 
+       type_id_var integer; 
        is_obsolete_var boolean; 
        publisher_var varchar(255); 
        pubplace_var varchar(255); 
@@ -987,10 +1245,10 @@
 
    DROP TABLE audit_pub_relationship;
    CREATE TABLE audit_pub_relationship ( 
-       pub_relationship_id bigint, 
-       subject_id bigint, 
-       object_id bigint, 
-       type_id bigint, 
+       pub_relationship_id integer, 
+       subject_id integer, 
+       object_id integer, 
+       type_id integer, 
        transaction_date timestamp not null default now(),
        transaction_type char(1) not null
    );
@@ -999,10 +1257,10 @@
    CREATE OR REPLACE FUNCTION audit_update_delete_pub_relationship() RETURNS trigger AS
    '
    DECLARE
-       pub_relationship_id_var bigint; 
-       subject_id_var bigint; 
-       object_id_var bigint; 
-       type_id_var bigint; 
+       pub_relationship_id_var integer; 
+       subject_id_var integer; 
+       object_id_var integer; 
+       type_id_var integer; 
        
        transaction_type_var char;
    BEGIN
@@ -1049,9 +1307,9 @@
 
    DROP TABLE audit_pub_dbxref;
    CREATE TABLE audit_pub_dbxref ( 
-       pub_dbxref_id bigint, 
-       pub_id bigint, 
-       dbxref_id bigint, 
+       pub_dbxref_id integer, 
+       pub_id integer, 
+       dbxref_id integer, 
        is_current boolean, 
        transaction_date timestamp not null default now(),
        transaction_type char(1) not null
@@ -1061,9 +1319,9 @@
    CREATE OR REPLACE FUNCTION audit_update_delete_pub_dbxref() RETURNS trigger AS
    '
    DECLARE
-       pub_dbxref_id_var bigint; 
-       pub_id_var bigint; 
-       dbxref_id_var bigint; 
+       pub_dbxref_id_var integer; 
+       pub_id_var integer; 
+       dbxref_id_var integer; 
        is_current_var boolean; 
        
        transaction_type_var char;
@@ -1111,8 +1369,8 @@
 
    DROP TABLE audit_pubauthor;
    CREATE TABLE audit_pubauthor ( 
-       pubauthor_id bigint, 
-       pub_id bigint, 
+       pubauthor_id integer, 
+       pub_id integer, 
        rank integer, 
        editor boolean, 
        surname varchar(100), 
@@ -1126,8 +1384,8 @@
    CREATE OR REPLACE FUNCTION audit_update_delete_pubauthor() RETURNS trigger AS
    '
    DECLARE
-       pubauthor_id_var bigint; 
-       pub_id_var bigint; 
+       pubauthor_id_var integer; 
+       pub_id_var integer; 
        rank_var integer; 
        editor_var boolean; 
        surname_var varchar(100); 
@@ -1188,9 +1446,9 @@
 
    DROP TABLE audit_pubprop;
    CREATE TABLE audit_pubprop ( 
-       pubprop_id bigint, 
-       pub_id bigint, 
-       type_id bigint, 
+       pubprop_id integer, 
+       pub_id integer, 
+       type_id integer, 
        value text, 
        rank integer, 
        transaction_date timestamp not null default now(),
@@ -1201,9 +1459,9 @@
    CREATE OR REPLACE FUNCTION audit_update_delete_pubprop() RETURNS trigger AS
    '
    DECLARE
-       pubprop_id_var bigint; 
-       pub_id_var bigint; 
-       type_id_var bigint; 
+       pubprop_id_var integer; 
+       pub_id_var integer; 
+       type_id_var integer; 
        value_var text; 
        rank_var integer; 
        
@@ -1253,13 +1511,72 @@
        EXECUTE PROCEDURE audit_update_delete_pubprop ();
 
 
+   DROP TABLE audit_pubauthor_contact;
+   CREATE TABLE audit_pubauthor_contact ( 
+       pubauthor_contact_id integer, 
+       contact_id integer, 
+       pubauthor_id integer, 
+       transaction_date timestamp not null default now(),
+       transaction_type char(1) not null
+   );
+   GRANT ALL on audit_pubauthor_contact to PUBLIC;
+
+   CREATE OR REPLACE FUNCTION audit_update_delete_pubauthor_contact() RETURNS trigger AS
+   '
+   DECLARE
+       pubauthor_contact_id_var integer; 
+       contact_id_var integer; 
+       pubauthor_id_var integer; 
+       
+       transaction_type_var char;
+   BEGIN
+       pubauthor_contact_id_var = OLD.pubauthor_contact_id;
+       contact_id_var = OLD.contact_id;
+       pubauthor_id_var = OLD.pubauthor_id;
+       
+       IF TG_OP = ''DELETE'' THEN
+           transaction_type_var = ''D'';
+       ELSE
+           transaction_type_var = ''U'';
+       END IF;
+
+       INSERT INTO audit_pubauthor_contact ( 
+             pubauthor_contact_id, 
+             contact_id, 
+             pubauthor_id, 
+             transaction_type
+       ) VALUES ( 
+             pubauthor_contact_id_var, 
+             contact_id_var, 
+             pubauthor_id_var, 
+             transaction_type_var
+       );
+
+       IF TG_OP = ''DELETE'' THEN
+           return OLD;
+       ELSE
+           return NEW;
+       END IF;
+   END
+   '
+   LANGUAGE plpgsql; 
+
+   DROP TRIGGER pubauthor_contact_audit_ud ON pubauthor_contact;
+   CREATE TRIGGER pubauthor_contact_audit_ud
+       BEFORE UPDATE OR DELETE ON pubauthor_contact
+       FOR EACH ROW
+       EXECUTE PROCEDURE audit_update_delete_pubauthor_contact ();
+
+
    DROP TABLE audit_organism;
    CREATE TABLE audit_organism ( 
-       organism_id bigint, 
+       organism_id integer, 
        abbreviation varchar(255), 
        genus varchar(255), 
        species varchar(255), 
        common_name varchar(255), 
+       infraspecific_name varchar(1024), 
+       type_id integer, 
        comment text, 
        transaction_date timestamp not null default now(),
        transaction_type char(1) not null
@@ -1269,11 +1586,13 @@
    CREATE OR REPLACE FUNCTION audit_update_delete_organism() RETURNS trigger AS
    '
    DECLARE
-       organism_id_var bigint; 
+       organism_id_var integer; 
        abbreviation_var varchar(255); 
        genus_var varchar(255); 
        species_var varchar(255); 
        common_name_var varchar(255); 
+       infraspecific_name_var varchar(1024); 
+       type_id_var integer; 
        comment_var text; 
        
        transaction_type_var char;
@@ -1283,6 +1602,8 @@
        genus_var = OLD.genus;
        species_var = OLD.species;
        common_name_var = OLD.common_name;
+       infraspecific_name_var = OLD.infraspecific_name;
+       type_id_var = OLD.type_id;
        comment_var = OLD.comment;
        
        IF TG_OP = ''DELETE'' THEN
@@ -1297,6 +1618,8 @@
              genus, 
              species, 
              common_name, 
+             infraspecific_name, 
+             type_id, 
              comment, 
              transaction_type
        ) VALUES ( 
@@ -1305,6 +1628,8 @@
              genus_var, 
              species_var, 
              common_name_var, 
+             infraspecific_name_var, 
+             type_id_var, 
              comment_var, 
              transaction_type_var
        );
@@ -1327,9 +1652,9 @@
 
    DROP TABLE audit_organism_dbxref;
    CREATE TABLE audit_organism_dbxref ( 
-       organism_dbxref_id bigint, 
-       organism_id bigint, 
-       dbxref_id bigint, 
+       organism_dbxref_id integer, 
+       organism_id integer, 
+       dbxref_id integer, 
        transaction_date timestamp not null default now(),
        transaction_type char(1) not null
    );
@@ -1338,9 +1663,9 @@
    CREATE OR REPLACE FUNCTION audit_update_delete_organism_dbxref() RETURNS trigger AS
    '
    DECLARE
-       organism_dbxref_id_var bigint; 
-       organism_id_var bigint; 
-       dbxref_id_var bigint; 
+       organism_dbxref_id_var integer; 
+       organism_id_var integer; 
+       dbxref_id_var integer; 
        
        transaction_type_var char;
    BEGIN
@@ -1384,9 +1709,9 @@
 
    DROP TABLE audit_organismprop;
    CREATE TABLE audit_organismprop ( 
-       organismprop_id bigint, 
-       organism_id bigint, 
-       type_id bigint, 
+       organismprop_id integer, 
+       organism_id integer, 
+       type_id integer, 
        value text, 
        rank integer, 
        transaction_date timestamp not null default now(),
@@ -1397,9 +1722,9 @@
    CREATE OR REPLACE FUNCTION audit_update_delete_organismprop() RETURNS trigger AS
    '
    DECLARE
-       organismprop_id_var bigint; 
-       organism_id_var bigint; 
-       type_id_var bigint; 
+       organismprop_id_var integer; 
+       organism_id_var integer; 
+       type_id_var integer; 
        value_var text; 
        rank_var integer; 
        
@@ -1449,17 +1774,342 @@
        EXECUTE PROCEDURE audit_update_delete_organismprop ();
 
 
+   DROP TABLE audit_organismprop_pub;
+   CREATE TABLE audit_organismprop_pub ( 
+       organismprop_pub_id integer, 
+       organismprop_id integer, 
+       pub_id integer, 
+       value text, 
+       rank integer, 
+       transaction_date timestamp not null default now(),
+       transaction_type char(1) not null
+   );
+   GRANT ALL on audit_organismprop_pub to PUBLIC;
+
+   CREATE OR REPLACE FUNCTION audit_update_delete_organismprop_pub() RETURNS trigger AS
+   '
+   DECLARE
+       organismprop_pub_id_var integer; 
+       organismprop_id_var integer; 
+       pub_id_var integer; 
+       value_var text; 
+       rank_var integer; 
+       
+       transaction_type_var char;
+   BEGIN
+       organismprop_pub_id_var = OLD.organismprop_pub_id;
+       organismprop_id_var = OLD.organismprop_id;
+       pub_id_var = OLD.pub_id;
+       value_var = OLD.value;
+       rank_var = OLD.rank;
+       
+       IF TG_OP = ''DELETE'' THEN
+           transaction_type_var = ''D'';
+       ELSE
+           transaction_type_var = ''U'';
+       END IF;
+
+       INSERT INTO audit_organismprop_pub ( 
+             organismprop_pub_id, 
+             organismprop_id, 
+             pub_id, 
+             value, 
+             rank, 
+             transaction_type
+       ) VALUES ( 
+             organismprop_pub_id_var, 
+             organismprop_id_var, 
+             pub_id_var, 
+             value_var, 
+             rank_var, 
+             transaction_type_var
+       );
+
+       IF TG_OP = ''DELETE'' THEN
+           return OLD;
+       ELSE
+           return NEW;
+       END IF;
+   END
+   '
+   LANGUAGE plpgsql; 
+
+   DROP TRIGGER organismprop_pub_audit_ud ON organismprop_pub;
+   CREATE TRIGGER organismprop_pub_audit_ud
+       BEFORE UPDATE OR DELETE ON organismprop_pub
+       FOR EACH ROW
+       EXECUTE PROCEDURE audit_update_delete_organismprop_pub ();
+
+
+   DROP TABLE audit_organism_pub;
+   CREATE TABLE audit_organism_pub ( 
+       organism_pub_id integer, 
+       organism_id integer, 
+       pub_id integer, 
+       transaction_date timestamp not null default now(),
+       transaction_type char(1) not null
+   );
+   GRANT ALL on audit_organism_pub to PUBLIC;
+
+   CREATE OR REPLACE FUNCTION audit_update_delete_organism_pub() RETURNS trigger AS
+   '
+   DECLARE
+       organism_pub_id_var integer; 
+       organism_id_var integer; 
+       pub_id_var integer; 
+       
+       transaction_type_var char;
+   BEGIN
+       organism_pub_id_var = OLD.organism_pub_id;
+       organism_id_var = OLD.organism_id;
+       pub_id_var = OLD.pub_id;
+       
+       IF TG_OP = ''DELETE'' THEN
+           transaction_type_var = ''D'';
+       ELSE
+           transaction_type_var = ''U'';
+       END IF;
+
+       INSERT INTO audit_organism_pub ( 
+             organism_pub_id, 
+             organism_id, 
+             pub_id, 
+             transaction_type
+       ) VALUES ( 
+             organism_pub_id_var, 
+             organism_id_var, 
+             pub_id_var, 
+             transaction_type_var
+       );
+
+       IF TG_OP = ''DELETE'' THEN
+           return OLD;
+       ELSE
+           return NEW;
+       END IF;
+   END
+   '
+   LANGUAGE plpgsql; 
+
+   DROP TRIGGER organism_pub_audit_ud ON organism_pub;
+   CREATE TRIGGER organism_pub_audit_ud
+       BEFORE UPDATE OR DELETE ON organism_pub
+       FOR EACH ROW
+       EXECUTE PROCEDURE audit_update_delete_organism_pub ();
+
+
+   DROP TABLE audit_organism_cvterm;
+   CREATE TABLE audit_organism_cvterm ( 
+       organism_cvterm_id integer, 
+       organism_id integer, 
+       cvterm_id integer, 
+       rank integer, 
+       pub_id integer, 
+       transaction_date timestamp not null default now(),
+       transaction_type char(1) not null
+   );
+   GRANT ALL on audit_organism_cvterm to PUBLIC;
+
+   CREATE OR REPLACE FUNCTION audit_update_delete_organism_cvterm() RETURNS trigger AS
+   '
+   DECLARE
+       organism_cvterm_id_var integer; 
+       organism_id_var integer; 
+       cvterm_id_var integer; 
+       rank_var integer; 
+       pub_id_var integer; 
+       
+       transaction_type_var char;
+   BEGIN
+       organism_cvterm_id_var = OLD.organism_cvterm_id;
+       organism_id_var = OLD.organism_id;
+       cvterm_id_var = OLD.cvterm_id;
+       rank_var = OLD.rank;
+       pub_id_var = OLD.pub_id;
+       
+       IF TG_OP = ''DELETE'' THEN
+           transaction_type_var = ''D'';
+       ELSE
+           transaction_type_var = ''U'';
+       END IF;
+
+       INSERT INTO audit_organism_cvterm ( 
+             organism_cvterm_id, 
+             organism_id, 
+             cvterm_id, 
+             rank, 
+             pub_id, 
+             transaction_type
+       ) VALUES ( 
+             organism_cvterm_id_var, 
+             organism_id_var, 
+             cvterm_id_var, 
+             rank_var, 
+             pub_id_var, 
+             transaction_type_var
+       );
+
+       IF TG_OP = ''DELETE'' THEN
+           return OLD;
+       ELSE
+           return NEW;
+       END IF;
+   END
+   '
+   LANGUAGE plpgsql; 
+
+   DROP TRIGGER organism_cvterm_audit_ud ON organism_cvterm;
+   CREATE TRIGGER organism_cvterm_audit_ud
+       BEFORE UPDATE OR DELETE ON organism_cvterm
+       FOR EACH ROW
+       EXECUTE PROCEDURE audit_update_delete_organism_cvterm ();
+
+
+   DROP TABLE audit_organism_cvtermprop;
+   CREATE TABLE audit_organism_cvtermprop ( 
+       organism_cvtermprop_id integer, 
+       organism_cvterm_id integer, 
+       type_id integer, 
+       value text, 
+       rank integer, 
+       transaction_date timestamp not null default now(),
+       transaction_type char(1) not null
+   );
+   GRANT ALL on audit_organism_cvtermprop to PUBLIC;
+
+   CREATE OR REPLACE FUNCTION audit_update_delete_organism_cvtermprop() RETURNS trigger AS
+   '
+   DECLARE
+       organism_cvtermprop_id_var integer; 
+       organism_cvterm_id_var integer; 
+       type_id_var integer; 
+       value_var text; 
+       rank_var integer; 
+       
+       transaction_type_var char;
+   BEGIN
+       organism_cvtermprop_id_var = OLD.organism_cvtermprop_id;
+       organism_cvterm_id_var = OLD.organism_cvterm_id;
+       type_id_var = OLD.type_id;
+       value_var = OLD.value;
+       rank_var = OLD.rank;
+       
+       IF TG_OP = ''DELETE'' THEN
+           transaction_type_var = ''D'';
+       ELSE
+           transaction_type_var = ''U'';
+       END IF;
+
+       INSERT INTO audit_organism_cvtermprop ( 
+             organism_cvtermprop_id, 
+             organism_cvterm_id, 
+             type_id, 
+             value, 
+             rank, 
+             transaction_type
+       ) VALUES ( 
+             organism_cvtermprop_id_var, 
+             organism_cvterm_id_var, 
+             type_id_var, 
+             value_var, 
+             rank_var, 
+             transaction_type_var
+       );
+
+       IF TG_OP = ''DELETE'' THEN
+           return OLD;
+       ELSE
+           return NEW;
+       END IF;
+   END
+   '
+   LANGUAGE plpgsql; 
+
+   DROP TRIGGER organism_cvtermprop_audit_ud ON organism_cvtermprop;
+   CREATE TRIGGER organism_cvtermprop_audit_ud
+       BEFORE UPDATE OR DELETE ON organism_cvtermprop
+       FOR EACH ROW
+       EXECUTE PROCEDURE audit_update_delete_organism_cvtermprop ();
+
+
+   DROP TABLE audit_organism_relationship;
+   CREATE TABLE audit_organism_relationship ( 
+       organism_relationship_id integer, 
+       subject_id integer, 
+       object_id integer, 
+       type_id integer, 
+       rank integer, 
+       transaction_date timestamp not null default now(),
+       transaction_type char(1) not null
+   );
+   GRANT ALL on audit_organism_relationship to PUBLIC;
+
+   CREATE OR REPLACE FUNCTION audit_update_delete_organism_relationship() RETURNS trigger AS
+   '
+   DECLARE
+       organism_relationship_id_var integer; 
+       subject_id_var integer; 
+       object_id_var integer; 
+       type_id_var integer; 
+       rank_var integer; 
+       
+       transaction_type_var char;
+   BEGIN
+       organism_relationship_id_var = OLD.organism_relationship_id;
+       subject_id_var = OLD.subject_id;
+       object_id_var = OLD.object_id;
+       type_id_var = OLD.type_id;
+       rank_var = OLD.rank;
+       
+       IF TG_OP = ''DELETE'' THEN
+           transaction_type_var = ''D'';
+       ELSE
+           transaction_type_var = ''U'';
+       END IF;
+
+       INSERT INTO audit_organism_relationship ( 
+             organism_relationship_id, 
+             subject_id, 
+             object_id, 
+             type_id, 
+             rank, 
+             transaction_type
+       ) VALUES ( 
+             organism_relationship_id_var, 
+             subject_id_var, 
+             object_id_var, 
+             type_id_var, 
+             rank_var, 
+             transaction_type_var
+       );
+
+       IF TG_OP = ''DELETE'' THEN
+           return OLD;
+       ELSE
+           return NEW;
+       END IF;
+   END
+   '
+   LANGUAGE plpgsql; 
+
+   DROP TRIGGER organism_relationship_audit_ud ON organism_relationship;
+   CREATE TRIGGER organism_relationship_audit_ud
+       BEFORE UPDATE OR DELETE ON organism_relationship
+       FOR EACH ROW
+       EXECUTE PROCEDURE audit_update_delete_organism_relationship ();
+
+
    DROP TABLE audit_feature;
    CREATE TABLE audit_feature ( 
-       feature_id bigint, 
-       dbxref_id bigint, 
-       organism_id bigint, 
+       feature_id integer, 
+       dbxref_id integer, 
+       organism_id integer, 
        name varchar(255), 
        uniquename text, 
        residues text, 
        seqlen integer, 
        md5checksum char(32), 
-       type_id bigint, 
+       type_id integer, 
        is_analysis boolean, 
        is_obsolete boolean, 
        timeaccessioned timestamp, 
@@ -1472,15 +2122,15 @@
    CREATE OR REPLACE FUNCTION audit_update_delete_feature() RETURNS trigger AS
    '
    DECLARE
-       feature_id_var bigint; 
-       dbxref_id_var bigint; 
-       organism_id_var bigint; 
+       feature_id_var integer; 
+       dbxref_id_var integer; 
+       organism_id_var integer; 
        name_var varchar(255); 
        uniquename_var text; 
        residues_var text; 
        seqlen_var integer; 
        md5checksum_var char(32); 
-       type_id_var bigint; 
+       type_id_var integer; 
        is_analysis_var boolean; 
        is_obsolete_var boolean; 
        timeaccessioned_var timestamp; 
@@ -1558,9 +2208,9 @@
 
    DROP TABLE audit_featureloc;
    CREATE TABLE audit_featureloc ( 
-       featureloc_id bigint, 
-       feature_id bigint, 
-       srcfeature_id bigint, 
+       featureloc_id integer, 
+       feature_id integer, 
+       srcfeature_id integer, 
        fmin integer, 
        is_fmin_partial boolean, 
        fmax integer, 
@@ -1578,9 +2228,9 @@
    CREATE OR REPLACE FUNCTION audit_update_delete_featureloc() RETURNS trigger AS
    '
    DECLARE
-       featureloc_id_var bigint; 
-       feature_id_var bigint; 
-       srcfeature_id_var bigint; 
+       featureloc_id_var integer; 
+       feature_id_var integer; 
+       srcfeature_id_var integer; 
        fmin_var integer; 
        is_fmin_partial_var boolean; 
        fmax_var integer; 
@@ -1660,9 +2310,9 @@
 
    DROP TABLE audit_featureloc_pub;
    CREATE TABLE audit_featureloc_pub ( 
-       featureloc_pub_id bigint, 
-       featureloc_id bigint, 
-       pub_id bigint, 
+       featureloc_pub_id integer, 
+       featureloc_id integer, 
+       pub_id integer, 
        transaction_date timestamp not null default now(),
        transaction_type char(1) not null
    );
@@ -1671,9 +2321,9 @@
    CREATE OR REPLACE FUNCTION audit_update_delete_featureloc_pub() RETURNS trigger AS
    '
    DECLARE
-       featureloc_pub_id_var bigint; 
-       featureloc_id_var bigint; 
-       pub_id_var bigint; 
+       featureloc_pub_id_var integer; 
+       featureloc_id_var integer; 
+       pub_id_var integer; 
        
        transaction_type_var char;
    BEGIN
@@ -1717,9 +2367,9 @@
 
    DROP TABLE audit_feature_pub;
    CREATE TABLE audit_feature_pub ( 
-       feature_pub_id bigint, 
-       feature_id bigint, 
-       pub_id bigint, 
+       feature_pub_id integer, 
+       feature_id integer, 
+       pub_id integer, 
        transaction_date timestamp not null default now(),
        transaction_type char(1) not null
    );
@@ -1728,9 +2378,9 @@
    CREATE OR REPLACE FUNCTION audit_update_delete_feature_pub() RETURNS trigger AS
    '
    DECLARE
-       feature_pub_id_var bigint; 
-       feature_id_var bigint; 
-       pub_id_var bigint; 
+       feature_pub_id_var integer; 
+       feature_id_var integer; 
+       pub_id_var integer; 
        
        transaction_type_var char;
    BEGIN
@@ -1774,9 +2424,9 @@
 
    DROP TABLE audit_feature_pubprop;
    CREATE TABLE audit_feature_pubprop ( 
-       feature_pubprop_id bigint, 
-       feature_pub_id bigint, 
-       type_id bigint, 
+       feature_pubprop_id integer, 
+       feature_pub_id integer, 
+       type_id integer, 
        value text, 
        rank integer, 
        transaction_date timestamp not null default now(),
@@ -1787,9 +2437,9 @@
    CREATE OR REPLACE FUNCTION audit_update_delete_feature_pubprop() RETURNS trigger AS
    '
    DECLARE
-       feature_pubprop_id_var bigint; 
-       feature_pub_id_var bigint; 
-       type_id_var bigint; 
+       feature_pubprop_id_var integer; 
+       feature_pub_id_var integer; 
+       type_id_var integer; 
        value_var text; 
        rank_var integer; 
        
@@ -1841,9 +2491,9 @@
 
    DROP TABLE audit_featureprop;
    CREATE TABLE audit_featureprop ( 
-       featureprop_id bigint, 
-       feature_id bigint, 
-       type_id bigint, 
+       featureprop_id integer, 
+       feature_id integer, 
+       type_id integer, 
        value text, 
        rank integer, 
        transaction_date timestamp not null default now(),
@@ -1854,9 +2504,9 @@
    CREATE OR REPLACE FUNCTION audit_update_delete_featureprop() RETURNS trigger AS
    '
    DECLARE
-       featureprop_id_var bigint; 
-       feature_id_var bigint; 
-       type_id_var bigint; 
+       featureprop_id_var integer; 
+       feature_id_var integer; 
+       type_id_var integer; 
        value_var text; 
        rank_var integer; 
        
@@ -1908,9 +2558,9 @@
 
    DROP TABLE audit_featureprop_pub;
    CREATE TABLE audit_featureprop_pub ( 
-       featureprop_pub_id bigint, 
-       featureprop_id bigint, 
-       pub_id bigint, 
+       featureprop_pub_id integer, 
+       featureprop_id integer, 
+       pub_id integer, 
        transaction_date timestamp not null default now(),
        transaction_type char(1) not null
    );
@@ -1919,9 +2569,9 @@
    CREATE OR REPLACE FUNCTION audit_update_delete_featureprop_pub() RETURNS trigger AS
    '
    DECLARE
-       featureprop_pub_id_var bigint; 
-       featureprop_id_var bigint; 
-       pub_id_var bigint; 
+       featureprop_pub_id_var integer; 
+       featureprop_id_var integer; 
+       pub_id_var integer; 
        
        transaction_type_var char;
    BEGIN
@@ -1965,9 +2615,9 @@
 
    DROP TABLE audit_feature_dbxref;
    CREATE TABLE audit_feature_dbxref ( 
-       feature_dbxref_id bigint, 
-       feature_id bigint, 
-       dbxref_id bigint, 
+       feature_dbxref_id integer, 
+       feature_id integer, 
+       dbxref_id integer, 
        is_current boolean, 
        transaction_date timestamp not null default now(),
        transaction_type char(1) not null
@@ -1977,9 +2627,9 @@
    CREATE OR REPLACE FUNCTION audit_update_delete_feature_dbxref() RETURNS trigger AS
    '
    DECLARE
-       feature_dbxref_id_var bigint; 
-       feature_id_var bigint; 
-       dbxref_id_var bigint; 
+       feature_dbxref_id_var integer; 
+       feature_id_var integer; 
+       dbxref_id_var integer; 
        is_current_var boolean; 
        
        transaction_type_var char;
@@ -2027,10 +2677,10 @@
 
    DROP TABLE audit_feature_relationship;
    CREATE TABLE audit_feature_relationship ( 
-       feature_relationship_id bigint, 
-       subject_id bigint, 
-       object_id bigint, 
-       type_id bigint, 
+       feature_relationship_id integer, 
+       subject_id integer, 
+       object_id integer, 
+       type_id integer, 
        value text, 
        rank integer, 
        transaction_date timestamp not null default now(),
@@ -2041,10 +2691,10 @@
    CREATE OR REPLACE FUNCTION audit_update_delete_feature_relationship() RETURNS trigger AS
    '
    DECLARE
-       feature_relationship_id_var bigint; 
-       subject_id_var bigint; 
-       object_id_var bigint; 
-       type_id_var bigint; 
+       feature_relationship_id_var integer; 
+       subject_id_var integer; 
+       object_id_var integer; 
+       type_id_var integer; 
        value_var text; 
        rank_var integer; 
        
@@ -2099,9 +2749,9 @@
 
    DROP TABLE audit_feature_relationship_pub;
    CREATE TABLE audit_feature_relationship_pub ( 
-       feature_relationship_pub_id bigint, 
-       feature_relationship_id bigint, 
-       pub_id bigint, 
+       feature_relationship_pub_id integer, 
+       feature_relationship_id integer, 
+       pub_id integer, 
        transaction_date timestamp not null default now(),
        transaction_type char(1) not null
    );
@@ -2110,9 +2760,9 @@
    CREATE OR REPLACE FUNCTION audit_update_delete_feature_relationship_pub() RETURNS trigger AS
    '
    DECLARE
-       feature_relationship_pub_id_var bigint; 
-       feature_relationship_id_var bigint; 
-       pub_id_var bigint; 
+       feature_relationship_pub_id_var integer; 
+       feature_relationship_id_var integer; 
+       pub_id_var integer; 
        
        transaction_type_var char;
    BEGIN
@@ -2156,9 +2806,9 @@
 
    DROP TABLE audit_feature_relationshipprop;
    CREATE TABLE audit_feature_relationshipprop ( 
-       feature_relationshipprop_id bigint, 
-       feature_relationship_id bigint, 
-       type_id bigint, 
+       feature_relationshipprop_id integer, 
+       feature_relationship_id integer, 
+       type_id integer, 
        value text, 
        rank integer, 
        transaction_date timestamp not null default now(),
@@ -2169,9 +2819,9 @@
    CREATE OR REPLACE FUNCTION audit_update_delete_feature_relationshipprop() RETURNS trigger AS
    '
    DECLARE
-       feature_relationshipprop_id_var bigint; 
-       feature_relationship_id_var bigint; 
-       type_id_var bigint; 
+       feature_relationshipprop_id_var integer; 
+       feature_relationship_id_var integer; 
+       type_id_var integer; 
        value_var text; 
        rank_var integer; 
        
@@ -2223,9 +2873,9 @@
 
    DROP TABLE audit_feature_relationshipprop_pub;
    CREATE TABLE audit_feature_relationshipprop_pub ( 
-       feature_relationshipprop_pub_id bigint, 
-       feature_relationshipprop_id bigint, 
-       pub_id bigint, 
+       feature_relationshipprop_pub_id integer, 
+       feature_relationshipprop_id integer, 
+       pub_id integer, 
        transaction_date timestamp not null default now(),
        transaction_type char(1) not null
    );
@@ -2234,9 +2884,9 @@
    CREATE OR REPLACE FUNCTION audit_update_delete_feature_relationshipprop_pub() RETURNS trigger AS
    '
    DECLARE
-       feature_relationshipprop_pub_id_var bigint; 
-       feature_relationshipprop_id_var bigint; 
-       pub_id_var bigint; 
+       feature_relationshipprop_pub_id_var integer; 
+       feature_relationshipprop_id_var integer; 
+       pub_id_var integer; 
        
        transaction_type_var char;
    BEGIN
@@ -2280,10 +2930,10 @@
 
    DROP TABLE audit_feature_cvterm;
    CREATE TABLE audit_feature_cvterm ( 
-       feature_cvterm_id bigint, 
-       feature_id bigint, 
-       cvterm_id bigint, 
-       pub_id bigint, 
+       feature_cvterm_id integer, 
+       feature_id integer, 
+       cvterm_id integer, 
+       pub_id integer, 
        is_not boolean, 
        rank integer, 
        transaction_date timestamp not null default now(),
@@ -2294,10 +2944,10 @@
    CREATE OR REPLACE FUNCTION audit_update_delete_feature_cvterm() RETURNS trigger AS
    '
    DECLARE
-       feature_cvterm_id_var bigint; 
-       feature_id_var bigint; 
-       cvterm_id_var bigint; 
-       pub_id_var bigint; 
+       feature_cvterm_id_var integer; 
+       feature_id_var integer; 
+       cvterm_id_var integer; 
+       pub_id_var integer; 
        is_not_var boolean; 
        rank_var integer; 
        
@@ -2352,9 +3002,9 @@
 
    DROP TABLE audit_feature_cvtermprop;
    CREATE TABLE audit_feature_cvtermprop ( 
-       feature_cvtermprop_id bigint, 
-       feature_cvterm_id bigint, 
-       type_id bigint, 
+       feature_cvtermprop_id integer, 
+       feature_cvterm_id integer, 
+       type_id integer, 
        value text, 
        rank integer, 
        transaction_date timestamp not null default now(),
@@ -2365,9 +3015,9 @@
    CREATE OR REPLACE FUNCTION audit_update_delete_feature_cvtermprop() RETURNS trigger AS
    '
    DECLARE
-       feature_cvtermprop_id_var bigint; 
-       feature_cvterm_id_var bigint; 
-       type_id_var bigint; 
+       feature_cvtermprop_id_var integer; 
+       feature_cvterm_id_var integer; 
+       type_id_var integer; 
        value_var text; 
        rank_var integer; 
        
@@ -2419,9 +3069,9 @@
 
    DROP TABLE audit_feature_cvterm_dbxref;
    CREATE TABLE audit_feature_cvterm_dbxref ( 
-       feature_cvterm_dbxref_id bigint, 
-       feature_cvterm_id bigint, 
-       dbxref_id bigint, 
+       feature_cvterm_dbxref_id integer, 
+       feature_cvterm_id integer, 
+       dbxref_id integer, 
        transaction_date timestamp not null default now(),
        transaction_type char(1) not null
    );
@@ -2430,9 +3080,9 @@
    CREATE OR REPLACE FUNCTION audit_update_delete_feature_cvterm_dbxref() RETURNS trigger AS
    '
    DECLARE
-       feature_cvterm_dbxref_id_var bigint; 
-       feature_cvterm_id_var bigint; 
-       dbxref_id_var bigint; 
+       feature_cvterm_dbxref_id_var integer; 
+       feature_cvterm_id_var integer; 
+       dbxref_id_var integer; 
        
        transaction_type_var char;
    BEGIN
@@ -2476,9 +3126,9 @@
 
    DROP TABLE audit_feature_cvterm_pub;
    CREATE TABLE audit_feature_cvterm_pub ( 
-       feature_cvterm_pub_id bigint, 
-       feature_cvterm_id bigint, 
-       pub_id bigint, 
+       feature_cvterm_pub_id integer, 
+       feature_cvterm_id integer, 
+       pub_id integer, 
        transaction_date timestamp not null default now(),
        transaction_type char(1) not null
    );
@@ -2487,9 +3137,9 @@
    CREATE OR REPLACE FUNCTION audit_update_delete_feature_cvterm_pub() RETURNS trigger AS
    '
    DECLARE
-       feature_cvterm_pub_id_var bigint; 
-       feature_cvterm_id_var bigint; 
-       pub_id_var bigint; 
+       feature_cvterm_pub_id_var integer; 
+       feature_cvterm_id_var integer; 
+       pub_id_var integer; 
        
        transaction_type_var char;
    BEGIN
@@ -2533,9 +3183,9 @@
 
    DROP TABLE audit_synonym;
    CREATE TABLE audit_synonym ( 
-       synonym_id bigint, 
+       synonym_id integer, 
        name varchar(255), 
-       type_id bigint, 
+       type_id integer, 
        synonym_sgml varchar(255), 
        transaction_date timestamp not null default now(),
        transaction_type char(1) not null
@@ -2545,9 +3195,9 @@
    CREATE OR REPLACE FUNCTION audit_update_delete_synonym() RETURNS trigger AS
    '
    DECLARE
-       synonym_id_var bigint; 
+       synonym_id_var integer; 
        name_var varchar(255); 
-       type_id_var bigint; 
+       type_id_var integer; 
        synonym_sgml_var varchar(255); 
        
        transaction_type_var char;
@@ -2595,10 +3245,10 @@
 
    DROP TABLE audit_feature_synonym;
    CREATE TABLE audit_feature_synonym ( 
-       feature_synonym_id bigint, 
-       synonym_id bigint, 
-       feature_id bigint, 
-       pub_id bigint, 
+       feature_synonym_id integer, 
+       synonym_id integer, 
+       feature_id integer, 
+       pub_id integer, 
        is_current boolean, 
        is_internal boolean, 
        transaction_date timestamp not null default now(),
@@ -2609,10 +3259,10 @@
    CREATE OR REPLACE FUNCTION audit_update_delete_feature_synonym() RETURNS trigger AS
    '
    DECLARE
-       feature_synonym_id_var bigint; 
-       synonym_id_var bigint; 
-       feature_id_var bigint; 
-       pub_id_var bigint; 
+       feature_synonym_id_var integer; 
+       synonym_id_var integer; 
+       feature_id_var integer; 
+       pub_id_var integer; 
        is_current_var boolean; 
        is_internal_var boolean; 
        
@@ -2665,9 +3315,66 @@
        EXECUTE PROCEDURE audit_update_delete_feature_synonym ();
 
 
+   DROP TABLE audit_feature_contact;
+   CREATE TABLE audit_feature_contact ( 
+       feature_contact_id integer, 
+       feature_id integer, 
+       contact_id integer, 
+       transaction_date timestamp not null default now(),
+       transaction_type char(1) not null
+   );
+   GRANT ALL on audit_feature_contact to PUBLIC;
+
+   CREATE OR REPLACE FUNCTION audit_update_delete_feature_contact() RETURNS trigger AS
+   '
+   DECLARE
+       feature_contact_id_var integer; 
+       feature_id_var integer; 
+       contact_id_var integer; 
+       
+       transaction_type_var char;
+   BEGIN
+       feature_contact_id_var = OLD.feature_contact_id;
+       feature_id_var = OLD.feature_id;
+       contact_id_var = OLD.contact_id;
+       
+       IF TG_OP = ''DELETE'' THEN
+           transaction_type_var = ''D'';
+       ELSE
+           transaction_type_var = ''U'';
+       END IF;
+
+       INSERT INTO audit_feature_contact ( 
+             feature_contact_id, 
+             feature_id, 
+             contact_id, 
+             transaction_type
+       ) VALUES ( 
+             feature_contact_id_var, 
+             feature_id_var, 
+             contact_id_var, 
+             transaction_type_var
+       );
+
+       IF TG_OP = ''DELETE'' THEN
+           return OLD;
+       ELSE
+           return NEW;
+       END IF;
+   END
+   '
+   LANGUAGE plpgsql; 
+
+   DROP TRIGGER feature_contact_audit_ud ON feature_contact;
+   CREATE TRIGGER feature_contact_audit_ud
+       BEFORE UPDATE OR DELETE ON feature_contact
+       FOR EACH ROW
+       EXECUTE PROCEDURE audit_update_delete_feature_contact ();
+
+
    DROP TABLE audit_gencode;
    CREATE TABLE audit_gencode ( 
-       gencode_id bigint, 
+       gencode_id integer, 
        organismstr VARCHAR, 
        transaction_date timestamp not null default now(),
        transaction_type char(1) not null
@@ -2677,7 +3384,7 @@
    CREATE OR REPLACE FUNCTION audit_update_delete_gencode() RETURNS trigger AS
    '
    DECLARE
-       gencode_id_var bigint; 
+       gencode_id_var integer; 
        organismstr_var VARCHAR; 
        
        transaction_type_var char;
@@ -2719,7 +3426,7 @@
 
    DROP TABLE audit_gencode_codon_aa;
    CREATE TABLE audit_gencode_codon_aa ( 
-       gencode_id bigint, 
+       gencode_id integer, 
        codon char(3), 
        aa char(1), 
        transaction_date timestamp not null default now(),
@@ -2730,7 +3437,7 @@
    CREATE OR REPLACE FUNCTION audit_update_delete_gencode_codon_aa() RETURNS trigger AS
    '
    DECLARE
-       gencode_id_var bigint; 
+       gencode_id_var integer; 
        codon_var char(3); 
        aa_var char(1); 
        
@@ -2776,7 +3483,7 @@
 
    DROP TABLE audit_gencode_startcodon;
    CREATE TABLE audit_gencode_startcodon ( 
-       gencode_id bigint, 
+       gencode_id integer, 
        codon char(3), 
        transaction_date timestamp not null default now(),
        transaction_type char(1) not null
@@ -2786,7 +3493,7 @@
    CREATE OR REPLACE FUNCTION audit_update_delete_gencode_startcodon() RETURNS trigger AS
    '
    DECLARE
-       gencode_id_var bigint; 
+       gencode_id_var integer; 
        codon_var char(3); 
        
        transaction_type_var char;
@@ -2828,7 +3535,7 @@
 
    DROP TABLE audit_analysis;
    CREATE TABLE audit_analysis ( 
-       analysis_id bigint, 
+       analysis_id integer, 
        name varchar(255), 
        description text, 
        program varchar(255), 
@@ -2846,7 +3553,7 @@
    CREATE OR REPLACE FUNCTION audit_update_delete_analysis() RETURNS trigger AS
    '
    DECLARE
-       analysis_id_var bigint; 
+       analysis_id_var integer; 
        name_var varchar(255); 
        description_var text; 
        program_var varchar(255); 
@@ -2920,9 +3627,9 @@
 
    DROP TABLE audit_analysisprop;
    CREATE TABLE audit_analysisprop ( 
-       analysisprop_id bigint, 
-       analysis_id bigint, 
-       type_id bigint, 
+       analysisprop_id integer, 
+       analysis_id integer, 
+       type_id integer, 
        value text, 
        rank integer, 
        transaction_date timestamp not null default now(),
@@ -2933,9 +3640,9 @@
    CREATE OR REPLACE FUNCTION audit_update_delete_analysisprop() RETURNS trigger AS
    '
    DECLARE
-       analysisprop_id_var bigint; 
-       analysis_id_var bigint; 
-       type_id_var bigint; 
+       analysisprop_id_var integer; 
+       analysis_id_var integer; 
+       type_id_var integer; 
        value_var text; 
        rank_var integer; 
        
@@ -2987,9 +3694,9 @@
 
    DROP TABLE audit_analysisfeature;
    CREATE TABLE audit_analysisfeature ( 
-       analysisfeature_id bigint, 
-       feature_id bigint, 
-       analysis_id bigint, 
+       analysisfeature_id integer, 
+       feature_id integer, 
+       analysis_id integer, 
        rawscore float, 
        normscore float, 
        significance float, 
@@ -3002,9 +3709,9 @@
    CREATE OR REPLACE FUNCTION audit_update_delete_analysisfeature() RETURNS trigger AS
    '
    DECLARE
-       analysisfeature_id_var bigint; 
-       feature_id_var bigint; 
-       analysis_id_var bigint; 
+       analysisfeature_id_var integer; 
+       feature_id_var integer; 
+       analysis_id_var integer; 
        rawscore_var float; 
        normscore_var float; 
        significance_var float; 
@@ -3064,9 +3771,9 @@
 
    DROP TABLE audit_analysisfeatureprop;
    CREATE TABLE audit_analysisfeatureprop ( 
-       analysisfeatureprop_id bigint, 
-       analysisfeature_id bigint, 
-       type_id bigint, 
+       analysisfeatureprop_id integer, 
+       analysisfeature_id integer, 
+       type_id integer, 
        value text, 
        rank integer, 
        transaction_date timestamp not null default now(),
@@ -3077,9 +3784,9 @@
    CREATE OR REPLACE FUNCTION audit_update_delete_analysisfeatureprop() RETURNS trigger AS
    '
    DECLARE
-       analysisfeatureprop_id_var bigint; 
-       analysisfeature_id_var bigint; 
-       type_id_var bigint; 
+       analysisfeatureprop_id_var integer; 
+       analysisfeature_id_var integer; 
+       type_id_var integer; 
        value_var text; 
        rank_var integer; 
        
@@ -3129,16 +3836,274 @@
        EXECUTE PROCEDURE audit_update_delete_analysisfeatureprop ();
 
 
+   DROP TABLE audit_analysis_dbxref;
+   CREATE TABLE audit_analysis_dbxref ( 
+       analysis_dbxref_id integer, 
+       analysis_id integer, 
+       dbxref_id integer, 
+       is_current boolean, 
+       transaction_date timestamp not null default now(),
+       transaction_type char(1) not null
+   );
+   GRANT ALL on audit_analysis_dbxref to PUBLIC;
+
+   CREATE OR REPLACE FUNCTION audit_update_delete_analysis_dbxref() RETURNS trigger AS
+   '
+   DECLARE
+       analysis_dbxref_id_var integer; 
+       analysis_id_var integer; 
+       dbxref_id_var integer; 
+       is_current_var boolean; 
+       
+       transaction_type_var char;
+   BEGIN
+       analysis_dbxref_id_var = OLD.analysis_dbxref_id;
+       analysis_id_var = OLD.analysis_id;
+       dbxref_id_var = OLD.dbxref_id;
+       is_current_var = OLD.is_current;
+       
+       IF TG_OP = ''DELETE'' THEN
+           transaction_type_var = ''D'';
+       ELSE
+           transaction_type_var = ''U'';
+       END IF;
+
+       INSERT INTO audit_analysis_dbxref ( 
+             analysis_dbxref_id, 
+             analysis_id, 
+             dbxref_id, 
+             is_current, 
+             transaction_type
+       ) VALUES ( 
+             analysis_dbxref_id_var, 
+             analysis_id_var, 
+             dbxref_id_var, 
+             is_current_var, 
+             transaction_type_var
+       );
+
+       IF TG_OP = ''DELETE'' THEN
+           return OLD;
+       ELSE
+           return NEW;
+       END IF;
+   END
+   '
+   LANGUAGE plpgsql; 
+
+   DROP TRIGGER analysis_dbxref_audit_ud ON analysis_dbxref;
+   CREATE TRIGGER analysis_dbxref_audit_ud
+       BEFORE UPDATE OR DELETE ON analysis_dbxref
+       FOR EACH ROW
+       EXECUTE PROCEDURE audit_update_delete_analysis_dbxref ();
+
+
+   DROP TABLE audit_analysis_cvterm;
+   CREATE TABLE audit_analysis_cvterm ( 
+       analysis_cvterm_id integer, 
+       analysis_id integer, 
+       cvterm_id integer, 
+       is_not boolean, 
+       rank integer, 
+       transaction_date timestamp not null default now(),
+       transaction_type char(1) not null
+   );
+   GRANT ALL on audit_analysis_cvterm to PUBLIC;
+
+   CREATE OR REPLACE FUNCTION audit_update_delete_analysis_cvterm() RETURNS trigger AS
+   '
+   DECLARE
+       analysis_cvterm_id_var integer; 
+       analysis_id_var integer; 
+       cvterm_id_var integer; 
+       is_not_var boolean; 
+       rank_var integer; 
+       
+       transaction_type_var char;
+   BEGIN
+       analysis_cvterm_id_var = OLD.analysis_cvterm_id;
+       analysis_id_var = OLD.analysis_id;
+       cvterm_id_var = OLD.cvterm_id;
+       is_not_var = OLD.is_not;
+       rank_var = OLD.rank;
+       
+       IF TG_OP = ''DELETE'' THEN
+           transaction_type_var = ''D'';
+       ELSE
+           transaction_type_var = ''U'';
+       END IF;
+
+       INSERT INTO audit_analysis_cvterm ( 
+             analysis_cvterm_id, 
+             analysis_id, 
+             cvterm_id, 
+             is_not, 
+             rank, 
+             transaction_type
+       ) VALUES ( 
+             analysis_cvterm_id_var, 
+             analysis_id_var, 
+             cvterm_id_var, 
+             is_not_var, 
+             rank_var, 
+             transaction_type_var
+       );
+
+       IF TG_OP = ''DELETE'' THEN
+           return OLD;
+       ELSE
+           return NEW;
+       END IF;
+   END
+   '
+   LANGUAGE plpgsql; 
+
+   DROP TRIGGER analysis_cvterm_audit_ud ON analysis_cvterm;
+   CREATE TRIGGER analysis_cvterm_audit_ud
+       BEFORE UPDATE OR DELETE ON analysis_cvterm
+       FOR EACH ROW
+       EXECUTE PROCEDURE audit_update_delete_analysis_cvterm ();
+
+
+   DROP TABLE audit_analysis_relationship;
+   CREATE TABLE audit_analysis_relationship ( 
+       analysis_relationship_id integer, 
+       subject_id integer, 
+       object_id integer, 
+       type_id integer, 
+       value text, 
+       rank integer, 
+       transaction_date timestamp not null default now(),
+       transaction_type char(1) not null
+   );
+   GRANT ALL on audit_analysis_relationship to PUBLIC;
+
+   CREATE OR REPLACE FUNCTION audit_update_delete_analysis_relationship() RETURNS trigger AS
+   '
+   DECLARE
+       analysis_relationship_id_var integer; 
+       subject_id_var integer; 
+       object_id_var integer; 
+       type_id_var integer; 
+       value_var text; 
+       rank_var integer; 
+       
+       transaction_type_var char;
+   BEGIN
+       analysis_relationship_id_var = OLD.analysis_relationship_id;
+       subject_id_var = OLD.subject_id;
+       object_id_var = OLD.object_id;
+       type_id_var = OLD.type_id;
+       value_var = OLD.value;
+       rank_var = OLD.rank;
+       
+       IF TG_OP = ''DELETE'' THEN
+           transaction_type_var = ''D'';
+       ELSE
+           transaction_type_var = ''U'';
+       END IF;
+
+       INSERT INTO audit_analysis_relationship ( 
+             analysis_relationship_id, 
+             subject_id, 
+             object_id, 
+             type_id, 
+             value, 
+             rank, 
+             transaction_type
+       ) VALUES ( 
+             analysis_relationship_id_var, 
+             subject_id_var, 
+             object_id_var, 
+             type_id_var, 
+             value_var, 
+             rank_var, 
+             transaction_type_var
+       );
+
+       IF TG_OP = ''DELETE'' THEN
+           return OLD;
+       ELSE
+           return NEW;
+       END IF;
+   END
+   '
+   LANGUAGE plpgsql; 
+
+   DROP TRIGGER analysis_relationship_audit_ud ON analysis_relationship;
+   CREATE TRIGGER analysis_relationship_audit_ud
+       BEFORE UPDATE OR DELETE ON analysis_relationship
+       FOR EACH ROW
+       EXECUTE PROCEDURE audit_update_delete_analysis_relationship ();
+
+
+   DROP TABLE audit_analysis_pub;
+   CREATE TABLE audit_analysis_pub ( 
+       analysis_pub_id integer, 
+       analysis_id integer, 
+       pub_id integer, 
+       transaction_date timestamp not null default now(),
+       transaction_type char(1) not null
+   );
+   GRANT ALL on audit_analysis_pub to PUBLIC;
+
+   CREATE OR REPLACE FUNCTION audit_update_delete_analysis_pub() RETURNS trigger AS
+   '
+   DECLARE
+       analysis_pub_id_var integer; 
+       analysis_id_var integer; 
+       pub_id_var integer; 
+       
+       transaction_type_var char;
+   BEGIN
+       analysis_pub_id_var = OLD.analysis_pub_id;
+       analysis_id_var = OLD.analysis_id;
+       pub_id_var = OLD.pub_id;
+       
+       IF TG_OP = ''DELETE'' THEN
+           transaction_type_var = ''D'';
+       ELSE
+           transaction_type_var = ''U'';
+       END IF;
+
+       INSERT INTO audit_analysis_pub ( 
+             analysis_pub_id, 
+             analysis_id, 
+             pub_id, 
+             transaction_type
+       ) VALUES ( 
+             analysis_pub_id_var, 
+             analysis_id_var, 
+             pub_id_var, 
+             transaction_type_var
+       );
+
+       IF TG_OP = ''DELETE'' THEN
+           return OLD;
+       ELSE
+           return NEW;
+       END IF;
+   END
+   '
+   LANGUAGE plpgsql; 
+
+   DROP TRIGGER analysis_pub_audit_ud ON analysis_pub;
+   CREATE TRIGGER analysis_pub_audit_ud
+       BEFORE UPDATE OR DELETE ON analysis_pub
+       FOR EACH ROW
+       EXECUTE PROCEDURE audit_update_delete_analysis_pub ();
+
+
    DROP TABLE audit_phenotype;
    CREATE TABLE audit_phenotype ( 
-       phenotype_id bigint, 
+       phenotype_id integer, 
        uniquename text, 
        name text, 
-       observable_id bigint, 
-       attr_id bigint, 
+       observable_id integer, 
+       attr_id integer, 
        value text, 
-       cvalue_id bigint, 
-       assay_id bigint, 
+       cvalue_id integer, 
+       assay_id integer, 
        transaction_date timestamp not null default now(),
        transaction_type char(1) not null
    );
@@ -3147,14 +4112,14 @@
    CREATE OR REPLACE FUNCTION audit_update_delete_phenotype() RETURNS trigger AS
    '
    DECLARE
-       phenotype_id_var bigint; 
+       phenotype_id_var integer; 
        uniquename_var text; 
        name_var text; 
-       observable_id_var bigint; 
-       attr_id_var bigint; 
+       observable_id_var integer; 
+       attr_id_var integer; 
        value_var text; 
-       cvalue_id_var bigint; 
-       assay_id_var bigint; 
+       cvalue_id_var integer; 
+       assay_id_var integer; 
        
        transaction_type_var char;
    BEGIN
@@ -3213,9 +4178,9 @@
 
    DROP TABLE audit_phenotype_cvterm;
    CREATE TABLE audit_phenotype_cvterm ( 
-       phenotype_cvterm_id bigint, 
-       phenotype_id bigint, 
-       cvterm_id bigint, 
+       phenotype_cvterm_id integer, 
+       phenotype_id integer, 
+       cvterm_id integer, 
        rank integer, 
        transaction_date timestamp not null default now(),
        transaction_type char(1) not null
@@ -3225,9 +4190,9 @@
    CREATE OR REPLACE FUNCTION audit_update_delete_phenotype_cvterm() RETURNS trigger AS
    '
    DECLARE
-       phenotype_cvterm_id_var bigint; 
-       phenotype_id_var bigint; 
-       cvterm_id_var bigint; 
+       phenotype_cvterm_id_var integer; 
+       phenotype_id_var integer; 
+       cvterm_id_var integer; 
        rank_var integer; 
        
        transaction_type_var char;
@@ -3275,9 +4240,9 @@
 
    DROP TABLE audit_feature_phenotype;
    CREATE TABLE audit_feature_phenotype ( 
-       feature_phenotype_id bigint, 
-       feature_id bigint, 
-       phenotype_id bigint, 
+       feature_phenotype_id integer, 
+       feature_id integer, 
+       phenotype_id integer, 
        transaction_date timestamp not null default now(),
        transaction_type char(1) not null
    );
@@ -3286,9 +4251,9 @@
    CREATE OR REPLACE FUNCTION audit_update_delete_feature_phenotype() RETURNS trigger AS
    '
    DECLARE
-       feature_phenotype_id_var bigint; 
-       feature_id_var bigint; 
-       phenotype_id_var bigint; 
+       feature_phenotype_id_var integer; 
+       feature_id_var integer; 
+       phenotype_id_var integer; 
        
        transaction_type_var char;
    BEGIN
@@ -3330,13 +4295,80 @@
        EXECUTE PROCEDURE audit_update_delete_feature_phenotype ();
 
 
+   DROP TABLE audit_phenotypeprop;
+   CREATE TABLE audit_phenotypeprop ( 
+       phenotypeprop_id integer, 
+       phenotype_id integer, 
+       type_id integer, 
+       value text, 
+       rank integer, 
+       transaction_date timestamp not null default now(),
+       transaction_type char(1) not null
+   );
+   GRANT ALL on audit_phenotypeprop to PUBLIC;
+
+   CREATE OR REPLACE FUNCTION audit_update_delete_phenotypeprop() RETURNS trigger AS
+   '
+   DECLARE
+       phenotypeprop_id_var integer; 
+       phenotype_id_var integer; 
+       type_id_var integer; 
+       value_var text; 
+       rank_var integer; 
+       
+       transaction_type_var char;
+   BEGIN
+       phenotypeprop_id_var = OLD.phenotypeprop_id;
+       phenotype_id_var = OLD.phenotype_id;
+       type_id_var = OLD.type_id;
+       value_var = OLD.value;
+       rank_var = OLD.rank;
+       
+       IF TG_OP = ''DELETE'' THEN
+           transaction_type_var = ''D'';
+       ELSE
+           transaction_type_var = ''U'';
+       END IF;
+
+       INSERT INTO audit_phenotypeprop ( 
+             phenotypeprop_id, 
+             phenotype_id, 
+             type_id, 
+             value, 
+             rank, 
+             transaction_type
+       ) VALUES ( 
+             phenotypeprop_id_var, 
+             phenotype_id_var, 
+             type_id_var, 
+             value_var, 
+             rank_var, 
+             transaction_type_var
+       );
+
+       IF TG_OP = ''DELETE'' THEN
+           return OLD;
+       ELSE
+           return NEW;
+       END IF;
+   END
+   '
+   LANGUAGE plpgsql; 
+
+   DROP TRIGGER phenotypeprop_audit_ud ON phenotypeprop;
+   CREATE TRIGGER phenotypeprop_audit_ud
+       BEFORE UPDATE OR DELETE ON phenotypeprop
+       FOR EACH ROW
+       EXECUTE PROCEDURE audit_update_delete_phenotypeprop ();
+
+
    DROP TABLE audit_genotype;
    CREATE TABLE audit_genotype ( 
-       genotype_id bigint, 
+       genotype_id integer, 
        name text, 
        uniquename text, 
-       description varchar(255), 
-       type_id bigint, 
+       description text, 
+       type_id integer, 
        transaction_date timestamp not null default now(),
        transaction_type char(1) not null
    );
@@ -3345,11 +4377,11 @@
    CREATE OR REPLACE FUNCTION audit_update_delete_genotype() RETURNS trigger AS
    '
    DECLARE
-       genotype_id_var bigint; 
+       genotype_id_var integer; 
        name_var text; 
        uniquename_var text; 
-       description_var varchar(255); 
-       type_id_var bigint; 
+       description_var text; 
+       type_id_var integer; 
        
        transaction_type_var char;
    BEGIN
@@ -3399,13 +4431,13 @@
 
    DROP TABLE audit_feature_genotype;
    CREATE TABLE audit_feature_genotype ( 
-       feature_genotype_id bigint, 
-       feature_id bigint, 
-       genotype_id bigint, 
-       chromosome_id bigint, 
+       feature_genotype_id integer, 
+       feature_id integer, 
+       genotype_id integer, 
+       chromosome_id integer, 
        rank integer, 
        cgroup integer, 
-       cvterm_id bigint, 
+       cvterm_id integer, 
        transaction_date timestamp not null default now(),
        transaction_type char(1) not null
    );
@@ -3414,13 +4446,13 @@
    CREATE OR REPLACE FUNCTION audit_update_delete_feature_genotype() RETURNS trigger AS
    '
    DECLARE
-       feature_genotype_id_var bigint; 
-       feature_id_var bigint; 
-       genotype_id_var bigint; 
-       chromosome_id_var bigint; 
+       feature_genotype_id_var integer; 
+       feature_id_var integer; 
+       genotype_id_var integer; 
+       chromosome_id_var integer; 
        rank_var integer; 
        cgroup_var integer; 
-       cvterm_id_var bigint; 
+       cvterm_id_var integer; 
        
        transaction_type_var char;
    BEGIN
@@ -3476,7 +4508,7 @@
 
    DROP TABLE audit_environment;
    CREATE TABLE audit_environment ( 
-       environment_id bigint, 
+       environment_id integer, 
        uniquename text, 
        description text, 
        transaction_date timestamp not null default now(),
@@ -3487,7 +4519,7 @@
    CREATE OR REPLACE FUNCTION audit_update_delete_environment() RETURNS trigger AS
    '
    DECLARE
-       environment_id_var bigint; 
+       environment_id_var integer; 
        uniquename_var text; 
        description_var text; 
        
@@ -3533,9 +4565,9 @@
 
    DROP TABLE audit_environment_cvterm;
    CREATE TABLE audit_environment_cvterm ( 
-       environment_cvterm_id bigint, 
-       environment_id bigint, 
-       cvterm_id bigint, 
+       environment_cvterm_id integer, 
+       environment_id integer, 
+       cvterm_id integer, 
        transaction_date timestamp not null default now(),
        transaction_type char(1) not null
    );
@@ -3544,9 +4576,9 @@
    CREATE OR REPLACE FUNCTION audit_update_delete_environment_cvterm() RETURNS trigger AS
    '
    DECLARE
-       environment_cvterm_id_var bigint; 
-       environment_id_var bigint; 
-       cvterm_id_var bigint; 
+       environment_cvterm_id_var integer; 
+       environment_id_var integer; 
+       cvterm_id_var integer; 
        
        transaction_type_var char;
    BEGIN
@@ -3590,12 +4622,12 @@
 
    DROP TABLE audit_phenstatement;
    CREATE TABLE audit_phenstatement ( 
-       phenstatement_id bigint, 
-       genotype_id bigint, 
-       environment_id bigint, 
-       phenotype_id bigint, 
-       type_id bigint, 
-       pub_id bigint, 
+       phenstatement_id integer, 
+       genotype_id integer, 
+       environment_id integer, 
+       phenotype_id integer, 
+       type_id integer, 
+       pub_id integer, 
        transaction_date timestamp not null default now(),
        transaction_type char(1) not null
    );
@@ -3604,12 +4636,12 @@
    CREATE OR REPLACE FUNCTION audit_update_delete_phenstatement() RETURNS trigger AS
    '
    DECLARE
-       phenstatement_id_var bigint; 
-       genotype_id_var bigint; 
-       environment_id_var bigint; 
-       phenotype_id_var bigint; 
-       type_id_var bigint; 
-       pub_id_var bigint; 
+       phenstatement_id_var integer; 
+       genotype_id_var integer; 
+       environment_id_var integer; 
+       phenotype_id_var integer; 
+       type_id_var integer; 
+       pub_id_var integer; 
        
        transaction_type_var char;
    BEGIN
@@ -3662,12 +4694,12 @@
 
    DROP TABLE audit_phendesc;
    CREATE TABLE audit_phendesc ( 
-       phendesc_id bigint, 
-       genotype_id bigint, 
-       environment_id bigint, 
+       phendesc_id integer, 
+       genotype_id integer, 
+       environment_id integer, 
        description text, 
-       type_id bigint, 
-       pub_id bigint, 
+       type_id integer, 
+       pub_id integer, 
        transaction_date timestamp not null default now(),
        transaction_type char(1) not null
    );
@@ -3676,12 +4708,12 @@
    CREATE OR REPLACE FUNCTION audit_update_delete_phendesc() RETURNS trigger AS
    '
    DECLARE
-       phendesc_id_var bigint; 
-       genotype_id_var bigint; 
-       environment_id_var bigint; 
+       phendesc_id_var integer; 
+       genotype_id_var integer; 
+       environment_id_var integer; 
        description_var text; 
-       type_id_var bigint; 
-       pub_id_var bigint; 
+       type_id_var integer; 
+       pub_id_var integer; 
        
        transaction_type_var char;
    BEGIN
@@ -3734,15 +4766,15 @@
 
    DROP TABLE audit_phenotype_comparison;
    CREATE TABLE audit_phenotype_comparison ( 
-       phenotype_comparison_id bigint, 
-       genotype1_id bigint, 
-       environment1_id bigint, 
-       genotype2_id bigint, 
-       environment2_id bigint, 
-       phenotype1_id bigint, 
-       phenotype2_id bigint, 
-       pub_id bigint, 
-       organism_id bigint, 
+       phenotype_comparison_id integer, 
+       genotype1_id integer, 
+       environment1_id integer, 
+       genotype2_id integer, 
+       environment2_id integer, 
+       phenotype1_id integer, 
+       phenotype2_id integer, 
+       pub_id integer, 
+       organism_id integer, 
        transaction_date timestamp not null default now(),
        transaction_type char(1) not null
    );
@@ -3751,15 +4783,15 @@
    CREATE OR REPLACE FUNCTION audit_update_delete_phenotype_comparison() RETURNS trigger AS
    '
    DECLARE
-       phenotype_comparison_id_var bigint; 
-       genotype1_id_var bigint; 
-       environment1_id_var bigint; 
-       genotype2_id_var bigint; 
-       environment2_id_var bigint; 
-       phenotype1_id_var bigint; 
-       phenotype2_id_var bigint; 
-       pub_id_var bigint; 
-       organism_id_var bigint; 
+       phenotype_comparison_id_var integer; 
+       genotype1_id_var integer; 
+       environment1_id_var integer; 
+       genotype2_id_var integer; 
+       environment2_id_var integer; 
+       phenotype1_id_var integer; 
+       phenotype2_id_var integer; 
+       pub_id_var integer; 
+       organism_id_var integer; 
        
        transaction_type_var char;
    BEGIN
@@ -3821,10 +4853,10 @@
 
    DROP TABLE audit_phenotype_comparison_cvterm;
    CREATE TABLE audit_phenotype_comparison_cvterm ( 
-       phenotype_comparison_cvterm_id bigint, 
-       phenotype_comparison_id bigint, 
-       cvterm_id bigint, 
-       pub_id bigint, 
+       phenotype_comparison_cvterm_id integer, 
+       phenotype_comparison_id integer, 
+       cvterm_id integer, 
+       pub_id integer, 
        rank integer, 
        transaction_date timestamp not null default now(),
        transaction_type char(1) not null
@@ -3834,10 +4866,10 @@
    CREATE OR REPLACE FUNCTION audit_update_delete_phenotype_comparison_cvterm() RETURNS trigger AS
    '
    DECLARE
-       phenotype_comparison_cvterm_id_var bigint; 
-       phenotype_comparison_id_var bigint; 
-       cvterm_id_var bigint; 
-       pub_id_var bigint; 
+       phenotype_comparison_cvterm_id_var integer; 
+       phenotype_comparison_id_var integer; 
+       cvterm_id_var integer; 
+       pub_id_var integer; 
        rank_var integer; 
        
        transaction_type_var char;
@@ -3888,9 +4920,9 @@
 
    DROP TABLE audit_genotypeprop;
    CREATE TABLE audit_genotypeprop ( 
-       genotypeprop_id bigint, 
-       genotype_id bigint, 
-       type_id bigint, 
+       genotypeprop_id integer, 
+       genotype_id integer, 
+       type_id integer, 
        value text, 
        rank integer, 
        transaction_date timestamp not null default now(),
@@ -3901,9 +4933,9 @@
    CREATE OR REPLACE FUNCTION audit_update_delete_genotypeprop() RETURNS trigger AS
    '
    DECLARE
-       genotypeprop_id_var bigint; 
-       genotype_id_var bigint; 
-       type_id_var bigint; 
+       genotypeprop_id_var integer; 
+       genotype_id_var integer; 
+       type_id_var integer; 
        value_var text; 
        rank_var integer; 
        
@@ -3955,10 +4987,10 @@
 
    DROP TABLE audit_featuremap;
    CREATE TABLE audit_featuremap ( 
-       featuremap_id bigint, 
+       featuremap_id integer, 
        name varchar(255), 
        description text, 
-       unittype_id bigint, 
+       unittype_id integer, 
        transaction_date timestamp not null default now(),
        transaction_type char(1) not null
    );
@@ -3967,10 +4999,10 @@
    CREATE OR REPLACE FUNCTION audit_update_delete_featuremap() RETURNS trigger AS
    '
    DECLARE
-       featuremap_id_var bigint; 
+       featuremap_id_var integer; 
        name_var varchar(255); 
        description_var text; 
-       unittype_id_var bigint; 
+       unittype_id_var integer; 
        
        transaction_type_var char;
    BEGIN
@@ -4017,13 +5049,13 @@
 
    DROP TABLE audit_featurerange;
    CREATE TABLE audit_featurerange ( 
-       featurerange_id bigint, 
-       featuremap_id bigint, 
-       feature_id bigint, 
-       leftstartf_id bigint, 
-       leftendf_id bigint, 
-       rightstartf_id bigint, 
-       rightendf_id bigint, 
+       featurerange_id integer, 
+       featuremap_id integer, 
+       feature_id integer, 
+       leftstartf_id integer, 
+       leftendf_id integer, 
+       rightstartf_id integer, 
+       rightendf_id integer, 
        rangestr varchar(255), 
        transaction_date timestamp not null default now(),
        transaction_type char(1) not null
@@ -4033,13 +5065,13 @@
    CREATE OR REPLACE FUNCTION audit_update_delete_featurerange() RETURNS trigger AS
    '
    DECLARE
-       featurerange_id_var bigint; 
-       featuremap_id_var bigint; 
-       feature_id_var bigint; 
-       leftstartf_id_var bigint; 
-       leftendf_id_var bigint; 
-       rightstartf_id_var bigint; 
-       rightendf_id_var bigint; 
+       featurerange_id_var integer; 
+       featuremap_id_var integer; 
+       feature_id_var integer; 
+       leftstartf_id_var integer; 
+       leftendf_id_var integer; 
+       rightstartf_id_var integer; 
+       rightendf_id_var integer; 
        rangestr_var varchar(255); 
        
        transaction_type_var char;
@@ -4099,10 +5131,10 @@
 
    DROP TABLE audit_featurepos;
    CREATE TABLE audit_featurepos ( 
-       featurepos_id bigint, 
-       featuremap_id bigint, 
-       feature_id bigint, 
-       map_feature_id bigint, 
+       featurepos_id integer, 
+       featuremap_id integer, 
+       feature_id integer, 
+       map_feature_id integer, 
        mappos float, 
        transaction_date timestamp not null default now(),
        transaction_type char(1) not null
@@ -4112,10 +5144,10 @@
    CREATE OR REPLACE FUNCTION audit_update_delete_featurepos() RETURNS trigger AS
    '
    DECLARE
-       featurepos_id_var bigint; 
-       featuremap_id_var bigint; 
-       feature_id_var bigint; 
-       map_feature_id_var bigint; 
+       featurepos_id_var integer; 
+       featuremap_id_var integer; 
+       feature_id_var integer; 
+       map_feature_id_var integer; 
        mappos_var float; 
        
        transaction_type_var char;
@@ -4164,11 +5196,78 @@
        EXECUTE PROCEDURE audit_update_delete_featurepos ();
 
 
+   DROP TABLE audit_featureposprop;
+   CREATE TABLE audit_featureposprop ( 
+       featureposprop_id integer, 
+       featurepos_id integer, 
+       type_id integer, 
+       value text, 
+       rank integer, 
+       transaction_date timestamp not null default now(),
+       transaction_type char(1) not null
+   );
+   GRANT ALL on audit_featureposprop to PUBLIC;
+
+   CREATE OR REPLACE FUNCTION audit_update_delete_featureposprop() RETURNS trigger AS
+   '
+   DECLARE
+       featureposprop_id_var integer; 
+       featurepos_id_var integer; 
+       type_id_var integer; 
+       value_var text; 
+       rank_var integer; 
+       
+       transaction_type_var char;
+   BEGIN
+       featureposprop_id_var = OLD.featureposprop_id;
+       featurepos_id_var = OLD.featurepos_id;
+       type_id_var = OLD.type_id;
+       value_var = OLD.value;
+       rank_var = OLD.rank;
+       
+       IF TG_OP = ''DELETE'' THEN
+           transaction_type_var = ''D'';
+       ELSE
+           transaction_type_var = ''U'';
+       END IF;
+
+       INSERT INTO audit_featureposprop ( 
+             featureposprop_id, 
+             featurepos_id, 
+             type_id, 
+             value, 
+             rank, 
+             transaction_type
+       ) VALUES ( 
+             featureposprop_id_var, 
+             featurepos_id_var, 
+             type_id_var, 
+             value_var, 
+             rank_var, 
+             transaction_type_var
+       );
+
+       IF TG_OP = ''DELETE'' THEN
+           return OLD;
+       ELSE
+           return NEW;
+       END IF;
+   END
+   '
+   LANGUAGE plpgsql; 
+
+   DROP TRIGGER featureposprop_audit_ud ON featureposprop;
+   CREATE TRIGGER featureposprop_audit_ud
+       BEFORE UPDATE OR DELETE ON featureposprop
+       FOR EACH ROW
+       EXECUTE PROCEDURE audit_update_delete_featureposprop ();
+
+
    DROP TABLE audit_featuremap_pub;
    CREATE TABLE audit_featuremap_pub ( 
-       featuremap_pub_id bigint, 
-       featuremap_id bigint, 
-       pub_id bigint, 
+       featuremap_pub_id integer, 
+       featuremap_id integer, 
+       pub_id integer, 
        transaction_date timestamp not null default now(),
        transaction_type char(1) not null
    );
@@ -4177,9 +5276,9 @@
    CREATE OR REPLACE FUNCTION audit_update_delete_featuremap_pub() RETURNS trigger AS
    '
    DECLARE
-       featuremap_pub_id_var bigint; 
-       featuremap_id_var bigint; 
-       pub_id_var bigint; 
+       featuremap_pub_id_var integer; 
+       featuremap_id_var integer; 
+       pub_id_var integer; 
        
        transaction_type_var char;
    BEGIN
@@ -4221,13 +5320,256 @@
        EXECUTE PROCEDURE audit_update_delete_featuremap_pub ();
 
 
+   DROP TABLE audit_featuremapprop;
+   CREATE TABLE audit_featuremapprop ( 
+       featuremapprop_id integer, 
+       featuremap_id integer, 
+       type_id integer, 
+       value text, 
+       rank integer, 
+       transaction_date timestamp not null default now(),
+       transaction_type char(1) not null
+   );
+   GRANT ALL on audit_featuremapprop to PUBLIC;
+
+   CREATE OR REPLACE FUNCTION audit_update_delete_featuremapprop() RETURNS trigger AS
+   '
+   DECLARE
+       featuremapprop_id_var integer; 
+       featuremap_id_var integer; 
+       type_id_var integer; 
+       value_var text; 
+       rank_var integer; 
+       
+       transaction_type_var char;
+   BEGIN
+       featuremapprop_id_var = OLD.featuremapprop_id;
+       featuremap_id_var = OLD.featuremap_id;
+       type_id_var = OLD.type_id;
+       value_var = OLD.value;
+       rank_var = OLD.rank;
+       
+       IF TG_OP = ''DELETE'' THEN
+           transaction_type_var = ''D'';
+       ELSE
+           transaction_type_var = ''U'';
+       END IF;
+
+       INSERT INTO audit_featuremapprop ( 
+             featuremapprop_id, 
+             featuremap_id, 
+             type_id, 
+             value, 
+             rank, 
+             transaction_type
+       ) VALUES ( 
+             featuremapprop_id_var, 
+             featuremap_id_var, 
+             type_id_var, 
+             value_var, 
+             rank_var, 
+             transaction_type_var
+       );
+
+       IF TG_OP = ''DELETE'' THEN
+           return OLD;
+       ELSE
+           return NEW;
+       END IF;
+   END
+   '
+   LANGUAGE plpgsql; 
+
+   DROP TRIGGER featuremapprop_audit_ud ON featuremapprop;
+   CREATE TRIGGER featuremapprop_audit_ud
+       BEFORE UPDATE OR DELETE ON featuremapprop
+       FOR EACH ROW
+       EXECUTE PROCEDURE audit_update_delete_featuremapprop ();
+
+
+   DROP TABLE audit_featuremap_contact;
+   CREATE TABLE audit_featuremap_contact ( 
+       featuremap_contact_id integer, 
+       featuremap_id integer, 
+       contact_id integer, 
+       transaction_date timestamp not null default now(),
+       transaction_type char(1) not null
+   );
+   GRANT ALL on audit_featuremap_contact to PUBLIC;
+
+   CREATE OR REPLACE FUNCTION audit_update_delete_featuremap_contact() RETURNS trigger AS
+   '
+   DECLARE
+       featuremap_contact_id_var integer; 
+       featuremap_id_var integer; 
+       contact_id_var integer; 
+       
+       transaction_type_var char;
+   BEGIN
+       featuremap_contact_id_var = OLD.featuremap_contact_id;
+       featuremap_id_var = OLD.featuremap_id;
+       contact_id_var = OLD.contact_id;
+       
+       IF TG_OP = ''DELETE'' THEN
+           transaction_type_var = ''D'';
+       ELSE
+           transaction_type_var = ''U'';
+       END IF;
+
+       INSERT INTO audit_featuremap_contact ( 
+             featuremap_contact_id, 
+             featuremap_id, 
+             contact_id, 
+             transaction_type
+       ) VALUES ( 
+             featuremap_contact_id_var, 
+             featuremap_id_var, 
+             contact_id_var, 
+             transaction_type_var
+       );
+
+       IF TG_OP = ''DELETE'' THEN
+           return OLD;
+       ELSE
+           return NEW;
+       END IF;
+   END
+   '
+   LANGUAGE plpgsql; 
+
+   DROP TRIGGER featuremap_contact_audit_ud ON featuremap_contact;
+   CREATE TRIGGER featuremap_contact_audit_ud
+       BEFORE UPDATE OR DELETE ON featuremap_contact
+       FOR EACH ROW
+       EXECUTE PROCEDURE audit_update_delete_featuremap_contact ();
+
+
+   DROP TABLE audit_featuremap_dbxref;
+   CREATE TABLE audit_featuremap_dbxref ( 
+       featuremap_dbxref_id integer, 
+       featuremap_id integer, 
+       dbxref_id integer, 
+       is_current boolean, 
+       transaction_date timestamp not null default now(),
+       transaction_type char(1) not null
+   );
+   GRANT ALL on audit_featuremap_dbxref to PUBLIC;
+
+   CREATE OR REPLACE FUNCTION audit_update_delete_featuremap_dbxref() RETURNS trigger AS
+   '
+   DECLARE
+       featuremap_dbxref_id_var integer; 
+       featuremap_id_var integer; 
+       dbxref_id_var integer; 
+       is_current_var boolean; 
+       
+       transaction_type_var char;
+   BEGIN
+       featuremap_dbxref_id_var = OLD.featuremap_dbxref_id;
+       featuremap_id_var = OLD.featuremap_id;
+       dbxref_id_var = OLD.dbxref_id;
+       is_current_var = OLD.is_current;
+       
+       IF TG_OP = ''DELETE'' THEN
+           transaction_type_var = ''D'';
+       ELSE
+           transaction_type_var = ''U'';
+       END IF;
+
+       INSERT INTO audit_featuremap_dbxref ( 
+             featuremap_dbxref_id, 
+             featuremap_id, 
+             dbxref_id, 
+             is_current, 
+             transaction_type
+       ) VALUES ( 
+             featuremap_dbxref_id_var, 
+             featuremap_id_var, 
+             dbxref_id_var, 
+             is_current_var, 
+             transaction_type_var
+       );
+
+       IF TG_OP = ''DELETE'' THEN
+           return OLD;
+       ELSE
+           return NEW;
+       END IF;
+   END
+   '
+   LANGUAGE plpgsql; 
+
+   DROP TRIGGER featuremap_dbxref_audit_ud ON featuremap_dbxref;
+   CREATE TRIGGER featuremap_dbxref_audit_ud
+       BEFORE UPDATE OR DELETE ON featuremap_dbxref
+       FOR EACH ROW
+       EXECUTE PROCEDURE audit_update_delete_featuremap_dbxref ();
+
+
+   DROP TABLE audit_featuremap_organism;
+   CREATE TABLE audit_featuremap_organism ( 
+       featuremap_organism_id integer, 
+       featuremap_id integer, 
+       organism_id integer, 
+       transaction_date timestamp not null default now(),
+       transaction_type char(1) not null
+   );
+   GRANT ALL on audit_featuremap_organism to PUBLIC;
+
+   CREATE OR REPLACE FUNCTION audit_update_delete_featuremap_organism() RETURNS trigger AS
+   '
+   DECLARE
+       featuremap_organism_id_var integer; 
+       featuremap_id_var integer; 
+       organism_id_var integer; 
+       
+       transaction_type_var char;
+   BEGIN
+       featuremap_organism_id_var = OLD.featuremap_organism_id;
+       featuremap_id_var = OLD.featuremap_id;
+       organism_id_var = OLD.organism_id;
+       
+       IF TG_OP = ''DELETE'' THEN
+           transaction_type_var = ''D'';
+       ELSE
+           transaction_type_var = ''U'';
+       END IF;
+
+       INSERT INTO audit_featuremap_organism ( 
+             featuremap_organism_id, 
+             featuremap_id, 
+             organism_id, 
+             transaction_type
+       ) VALUES ( 
+             featuremap_organism_id_var, 
+             featuremap_id_var, 
+             organism_id_var, 
+             transaction_type_var
+       );
+
+       IF TG_OP = ''DELETE'' THEN
+           return OLD;
+       ELSE
+           return NEW;
+       END IF;
+   END
+   '
+   LANGUAGE plpgsql; 
+
+   DROP TRIGGER featuremap_organism_audit_ud ON featuremap_organism;
+   CREATE TRIGGER featuremap_organism_audit_ud
+       BEFORE UPDATE OR DELETE ON featuremap_organism
+       FOR EACH ROW
+       EXECUTE PROCEDURE audit_update_delete_featuremap_organism ();
+
+
    DROP TABLE audit_phylotree;
    CREATE TABLE audit_phylotree ( 
-       phylotree_id bigint, 
-       dbxref_id bigint, 
+       phylotree_id integer, 
+       dbxref_id integer, 
        name varchar(255), 
-       type_id bigint, 
-       analysis_id bigint, 
+       type_id integer, 
+       analysis_id integer, 
        comment text, 
        transaction_date timestamp not null default now(),
        transaction_type char(1) not null
@@ -4237,11 +5579,11 @@
    CREATE OR REPLACE FUNCTION audit_update_delete_phylotree() RETURNS trigger AS
    '
    DECLARE
-       phylotree_id_var bigint; 
-       dbxref_id_var bigint; 
+       phylotree_id_var integer; 
+       dbxref_id_var integer; 
        name_var varchar(255); 
-       type_id_var bigint; 
-       analysis_id_var bigint; 
+       type_id_var integer; 
+       analysis_id_var integer; 
        comment_var text; 
        
        transaction_type_var char;
@@ -4295,9 +5637,9 @@
 
    DROP TABLE audit_phylotree_pub;
    CREATE TABLE audit_phylotree_pub ( 
-       phylotree_pub_id bigint, 
-       phylotree_id bigint, 
-       pub_id bigint, 
+       phylotree_pub_id integer, 
+       phylotree_id integer, 
+       pub_id integer, 
        transaction_date timestamp not null default now(),
        transaction_type char(1) not null
    );
@@ -4306,9 +5648,9 @@
    CREATE OR REPLACE FUNCTION audit_update_delete_phylotree_pub() RETURNS trigger AS
    '
    DECLARE
-       phylotree_pub_id_var bigint; 
-       phylotree_id_var bigint; 
-       pub_id_var bigint; 
+       phylotree_pub_id_var integer; 
+       phylotree_id_var integer; 
+       pub_id_var integer; 
        
        transaction_type_var char;
    BEGIN
@@ -4350,15 +5692,82 @@
        EXECUTE PROCEDURE audit_update_delete_phylotree_pub ();
 
 
+   DROP TABLE audit_phylotreeprop;
+   CREATE TABLE audit_phylotreeprop ( 
+       phylotreeprop_id integer, 
+       phylotree_id integer, 
+       type_id integer, 
+       value text, 
+       rank integer, 
+       transaction_date timestamp not null default now(),
+       transaction_type char(1) not null
+   );
+   GRANT ALL on audit_phylotreeprop to PUBLIC;
+
+   CREATE OR REPLACE FUNCTION audit_update_delete_phylotreeprop() RETURNS trigger AS
+   '
+   DECLARE
+       phylotreeprop_id_var integer; 
+       phylotree_id_var integer; 
+       type_id_var integer; 
+       value_var text; 
+       rank_var integer; 
+       
+       transaction_type_var char;
+   BEGIN
+       phylotreeprop_id_var = OLD.phylotreeprop_id;
+       phylotree_id_var = OLD.phylotree_id;
+       type_id_var = OLD.type_id;
+       value_var = OLD.value;
+       rank_var = OLD.rank;
+       
+       IF TG_OP = ''DELETE'' THEN
+           transaction_type_var = ''D'';
+       ELSE
+           transaction_type_var = ''U'';
+       END IF;
+
+       INSERT INTO audit_phylotreeprop ( 
+             phylotreeprop_id, 
+             phylotree_id, 
+             type_id, 
+             value, 
+             rank, 
+             transaction_type
+       ) VALUES ( 
+             phylotreeprop_id_var, 
+             phylotree_id_var, 
+             type_id_var, 
+             value_var, 
+             rank_var, 
+             transaction_type_var
+       );
+
+       IF TG_OP = ''DELETE'' THEN
+           return OLD;
+       ELSE
+           return NEW;
+       END IF;
+   END
+   '
+   LANGUAGE plpgsql; 
+
+   DROP TRIGGER phylotreeprop_audit_ud ON phylotreeprop;
+   CREATE TRIGGER phylotreeprop_audit_ud
+       BEFORE UPDATE OR DELETE ON phylotreeprop
+       FOR EACH ROW
+       EXECUTE PROCEDURE audit_update_delete_phylotreeprop ();
+
+
    DROP TABLE audit_phylonode;
    CREATE TABLE audit_phylonode ( 
-       phylonode_id bigint, 
-       phylotree_id bigint, 
-       parent_phylonode_id bigint, 
+       phylonode_id integer, 
+       phylotree_id integer, 
+       parent_phylonode_id integer, 
        left_idx integer, 
        right_idx integer, 
-       type_id bigint, 
-       feature_id bigint, 
+       type_id integer, 
+       feature_id integer, 
        label varchar(255), 
        distance float, 
        transaction_date timestamp not null default now(),
@@ -4369,13 +5778,13 @@
    CREATE OR REPLACE FUNCTION audit_update_delete_phylonode() RETURNS trigger AS
    '
    DECLARE
-       phylonode_id_var bigint; 
-       phylotree_id_var bigint; 
-       parent_phylonode_id_var bigint; 
+       phylonode_id_var integer; 
+       phylotree_id_var integer; 
+       parent_phylonode_id_var integer; 
        left_idx_var integer; 
        right_idx_var integer; 
-       type_id_var bigint; 
-       feature_id_var bigint; 
+       type_id_var integer; 
+       feature_id_var integer; 
        label_var varchar(255); 
        distance_var float; 
        
@@ -4439,9 +5848,9 @@
 
    DROP TABLE audit_phylonode_dbxref;
    CREATE TABLE audit_phylonode_dbxref ( 
-       phylonode_dbxref_id bigint, 
-       phylonode_id bigint, 
-       dbxref_id bigint, 
+       phylonode_dbxref_id integer, 
+       phylonode_id integer, 
+       dbxref_id integer, 
        transaction_date timestamp not null default now(),
        transaction_type char(1) not null
    );
@@ -4450,9 +5859,9 @@
    CREATE OR REPLACE FUNCTION audit_update_delete_phylonode_dbxref() RETURNS trigger AS
    '
    DECLARE
-       phylonode_dbxref_id_var bigint; 
-       phylonode_id_var bigint; 
-       dbxref_id_var bigint; 
+       phylonode_dbxref_id_var integer; 
+       phylonode_id_var integer; 
+       dbxref_id_var integer; 
        
        transaction_type_var char;
    BEGIN
@@ -4496,9 +5905,9 @@
 
    DROP TABLE audit_phylonode_pub;
    CREATE TABLE audit_phylonode_pub ( 
-       phylonode_pub_id bigint, 
-       phylonode_id bigint, 
-       pub_id bigint, 
+       phylonode_pub_id integer, 
+       phylonode_id integer, 
+       pub_id integer, 
        transaction_date timestamp not null default now(),
        transaction_type char(1) not null
    );
@@ -4507,9 +5916,9 @@
    CREATE OR REPLACE FUNCTION audit_update_delete_phylonode_pub() RETURNS trigger AS
    '
    DECLARE
-       phylonode_pub_id_var bigint; 
-       phylonode_id_var bigint; 
-       pub_id_var bigint; 
+       phylonode_pub_id_var integer; 
+       phylonode_id_var integer; 
+       pub_id_var integer; 
        
        transaction_type_var char;
    BEGIN
@@ -4553,9 +5962,9 @@
 
    DROP TABLE audit_phylonode_organism;
    CREATE TABLE audit_phylonode_organism ( 
-       phylonode_organism_id bigint, 
-       phylonode_id bigint, 
-       organism_id bigint, 
+       phylonode_organism_id integer, 
+       phylonode_id integer, 
+       organism_id integer, 
        transaction_date timestamp not null default now(),
        transaction_type char(1) not null
    );
@@ -4564,9 +5973,9 @@
    CREATE OR REPLACE FUNCTION audit_update_delete_phylonode_organism() RETURNS trigger AS
    '
    DECLARE
-       phylonode_organism_id_var bigint; 
-       phylonode_id_var bigint; 
-       organism_id_var bigint; 
+       phylonode_organism_id_var integer; 
+       phylonode_id_var integer; 
+       organism_id_var integer; 
        
        transaction_type_var char;
    BEGIN
@@ -4610,9 +6019,9 @@
 
    DROP TABLE audit_phylonodeprop;
    CREATE TABLE audit_phylonodeprop ( 
-       phylonodeprop_id bigint, 
-       phylonode_id bigint, 
-       type_id bigint, 
+       phylonodeprop_id integer, 
+       phylonode_id integer, 
+       type_id integer, 
        value text, 
        rank integer, 
        transaction_date timestamp not null default now(),
@@ -4623,9 +6032,9 @@
    CREATE OR REPLACE FUNCTION audit_update_delete_phylonodeprop() RETURNS trigger AS
    '
    DECLARE
-       phylonodeprop_id_var bigint; 
-       phylonode_id_var bigint; 
-       type_id_var bigint; 
+       phylonodeprop_id_var integer; 
+       phylonode_id_var integer; 
+       type_id_var integer; 
        value_var text; 
        rank_var integer; 
        
@@ -4677,12 +6086,12 @@
 
    DROP TABLE audit_phylonode_relationship;
    CREATE TABLE audit_phylonode_relationship ( 
-       phylonode_relationship_id bigint, 
-       subject_id bigint, 
-       object_id bigint, 
-       type_id bigint, 
+       phylonode_relationship_id integer, 
+       subject_id integer, 
+       object_id integer, 
+       type_id integer, 
        rank integer, 
-       phylotree_id bigint, 
+       phylotree_id integer, 
        transaction_date timestamp not null default now(),
        transaction_type char(1) not null
    );
@@ -4691,12 +6100,12 @@
    CREATE OR REPLACE FUNCTION audit_update_delete_phylonode_relationship() RETURNS trigger AS
    '
    DECLARE
-       phylonode_relationship_id_var bigint; 
-       subject_id_var bigint; 
-       object_id_var bigint; 
-       type_id_var bigint; 
+       phylonode_relationship_id_var integer; 
+       subject_id_var integer; 
+       object_id_var integer; 
+       type_id_var integer; 
        rank_var integer; 
-       phylotree_id_var bigint; 
+       phylotree_id_var integer; 
        
        transaction_type_var char;
    BEGIN
@@ -4747,133 +6156,9 @@
        EXECUTE PROCEDURE audit_update_delete_phylonode_relationship ();
 
 
-   DROP TABLE audit_contact;
-   CREATE TABLE audit_contact ( 
-       contact_id bigint, 
-       type_id bigint, 
-       name varchar(255), 
-       description varchar(255), 
-       transaction_date timestamp not null default now(),
-       transaction_type char(1) not null
-   );
-   GRANT ALL on audit_contact to PUBLIC;
-
-   CREATE OR REPLACE FUNCTION audit_update_delete_contact() RETURNS trigger AS
-   '
-   DECLARE
-       contact_id_var bigint; 
-       type_id_var bigint; 
-       name_var varchar(255); 
-       description_var varchar(255); 
-       
-       transaction_type_var char;
-   BEGIN
-       contact_id_var = OLD.contact_id;
-       type_id_var = OLD.type_id;
-       name_var = OLD.name;
-       description_var = OLD.description;
-       
-       IF TG_OP = ''DELETE'' THEN
-           transaction_type_var = ''D'';
-       ELSE
-           transaction_type_var = ''U'';
-       END IF;
-
-       INSERT INTO audit_contact ( 
-             contact_id, 
-             type_id, 
-             name, 
-             description, 
-             transaction_type
-       ) VALUES ( 
-             contact_id_var, 
-             type_id_var, 
-             name_var, 
-             description_var, 
-             transaction_type_var
-       );
-
-       IF TG_OP = ''DELETE'' THEN
-           return OLD;
-       ELSE
-           return NEW;
-       END IF;
-   END
-   '
-   LANGUAGE plpgsql; 
-
-   DROP TRIGGER contact_audit_ud ON contact;
-   CREATE TRIGGER contact_audit_ud
-       BEFORE UPDATE OR DELETE ON contact
-       FOR EACH ROW
-       EXECUTE PROCEDURE audit_update_delete_contact ();
-
-
-   DROP TABLE audit_contact_relationship;
-   CREATE TABLE audit_contact_relationship ( 
-       contact_relationship_id bigint, 
-       type_id bigint, 
-       subject_id bigint, 
-       object_id bigint, 
-       transaction_date timestamp not null default now(),
-       transaction_type char(1) not null
-   );
-   GRANT ALL on audit_contact_relationship to PUBLIC;
-
-   CREATE OR REPLACE FUNCTION audit_update_delete_contact_relationship() RETURNS trigger AS
-   '
-   DECLARE
-       contact_relationship_id_var bigint; 
-       type_id_var bigint; 
-       subject_id_var bigint; 
-       object_id_var bigint; 
-       
-       transaction_type_var char;
-   BEGIN
-       contact_relationship_id_var = OLD.contact_relationship_id;
-       type_id_var = OLD.type_id;
-       subject_id_var = OLD.subject_id;
-       object_id_var = OLD.object_id;
-       
-       IF TG_OP = ''DELETE'' THEN
-           transaction_type_var = ''D'';
-       ELSE
-           transaction_type_var = ''U'';
-       END IF;
-
-       INSERT INTO audit_contact_relationship ( 
-             contact_relationship_id, 
-             type_id, 
-             subject_id, 
-             object_id, 
-             transaction_type
-       ) VALUES ( 
-             contact_relationship_id_var, 
-             type_id_var, 
-             subject_id_var, 
-             object_id_var, 
-             transaction_type_var
-       );
-
-       IF TG_OP = ''DELETE'' THEN
-           return OLD;
-       ELSE
-           return NEW;
-       END IF;
-   END
-   '
-   LANGUAGE plpgsql; 
-
-   DROP TRIGGER contact_relationship_audit_ud ON contact_relationship;
-   CREATE TRIGGER contact_relationship_audit_ud
-       BEFORE UPDATE OR DELETE ON contact_relationship
-       FOR EACH ROW
-       EXECUTE PROCEDURE audit_update_delete_contact_relationship ();
-
-
    DROP TABLE audit_expression;
    CREATE TABLE audit_expression ( 
-       expression_id bigint, 
+       expression_id integer, 
        uniquename text, 
        md5checksum char(32), 
        description text, 
@@ -4885,7 +6170,7 @@
    CREATE OR REPLACE FUNCTION audit_update_delete_expression() RETURNS trigger AS
    '
    DECLARE
-       expression_id_var bigint; 
+       expression_id_var integer; 
        uniquename_var text; 
        md5checksum_var char(32); 
        description_var text; 
@@ -4935,11 +6220,11 @@
 
    DROP TABLE audit_expression_cvterm;
    CREATE TABLE audit_expression_cvterm ( 
-       expression_cvterm_id bigint, 
-       expression_id bigint, 
-       cvterm_id bigint, 
+       expression_cvterm_id integer, 
+       expression_id integer, 
+       cvterm_id integer, 
        rank integer, 
-       cvterm_type_id bigint, 
+       cvterm_type_id integer, 
        transaction_date timestamp not null default now(),
        transaction_type char(1) not null
    );
@@ -4948,11 +6233,11 @@
    CREATE OR REPLACE FUNCTION audit_update_delete_expression_cvterm() RETURNS trigger AS
    '
    DECLARE
-       expression_cvterm_id_var bigint; 
-       expression_id_var bigint; 
-       cvterm_id_var bigint; 
+       expression_cvterm_id_var integer; 
+       expression_id_var integer; 
+       cvterm_id_var integer; 
        rank_var integer; 
-       cvterm_type_id_var bigint; 
+       cvterm_type_id_var integer; 
        
        transaction_type_var char;
    BEGIN
@@ -5002,9 +6287,9 @@
 
    DROP TABLE audit_expression_cvtermprop;
    CREATE TABLE audit_expression_cvtermprop ( 
-       expression_cvtermprop_id bigint, 
-       expression_cvterm_id bigint, 
-       type_id bigint, 
+       expression_cvtermprop_id integer, 
+       expression_cvterm_id integer, 
+       type_id integer, 
        value text, 
        rank integer, 
        transaction_date timestamp not null default now(),
@@ -5015,9 +6300,9 @@
    CREATE OR REPLACE FUNCTION audit_update_delete_expression_cvtermprop() RETURNS trigger AS
    '
    DECLARE
-       expression_cvtermprop_id_var bigint; 
-       expression_cvterm_id_var bigint; 
-       type_id_var bigint; 
+       expression_cvtermprop_id_var integer; 
+       expression_cvterm_id_var integer; 
+       type_id_var integer; 
        value_var text; 
        rank_var integer; 
        
@@ -5069,9 +6354,9 @@
 
    DROP TABLE audit_expressionprop;
    CREATE TABLE audit_expressionprop ( 
-       expressionprop_id bigint, 
-       expression_id bigint, 
-       type_id bigint, 
+       expressionprop_id integer, 
+       expression_id integer, 
+       type_id integer, 
        value text, 
        rank integer, 
        transaction_date timestamp not null default now(),
@@ -5082,9 +6367,9 @@
    CREATE OR REPLACE FUNCTION audit_update_delete_expressionprop() RETURNS trigger AS
    '
    DECLARE
-       expressionprop_id_var bigint; 
-       expression_id_var bigint; 
-       type_id_var bigint; 
+       expressionprop_id_var integer; 
+       expression_id_var integer; 
+       type_id_var integer; 
        value_var text; 
        rank_var integer; 
        
@@ -5136,9 +6421,9 @@
 
    DROP TABLE audit_expression_pub;
    CREATE TABLE audit_expression_pub ( 
-       expression_pub_id bigint, 
-       expression_id bigint, 
-       pub_id bigint, 
+       expression_pub_id integer, 
+       expression_id integer, 
+       pub_id integer, 
        transaction_date timestamp not null default now(),
        transaction_type char(1) not null
    );
@@ -5147,9 +6432,9 @@
    CREATE OR REPLACE FUNCTION audit_update_delete_expression_pub() RETURNS trigger AS
    '
    DECLARE
-       expression_pub_id_var bigint; 
-       expression_id_var bigint; 
-       pub_id_var bigint; 
+       expression_pub_id_var integer; 
+       expression_id_var integer; 
+       pub_id_var integer; 
        
        transaction_type_var char;
    BEGIN
@@ -5193,10 +6478,10 @@
 
    DROP TABLE audit_feature_expression;
    CREATE TABLE audit_feature_expression ( 
-       feature_expression_id bigint, 
-       expression_id bigint, 
-       feature_id bigint, 
-       pub_id bigint, 
+       feature_expression_id integer, 
+       expression_id integer, 
+       feature_id integer, 
+       pub_id integer, 
        transaction_date timestamp not null default now(),
        transaction_type char(1) not null
    );
@@ -5205,10 +6490,10 @@
    CREATE OR REPLACE FUNCTION audit_update_delete_feature_expression() RETURNS trigger AS
    '
    DECLARE
-       feature_expression_id_var bigint; 
-       expression_id_var bigint; 
-       feature_id_var bigint; 
-       pub_id_var bigint; 
+       feature_expression_id_var integer; 
+       expression_id_var integer; 
+       feature_id_var integer; 
+       pub_id_var integer; 
        
        transaction_type_var char;
    BEGIN
@@ -5255,9 +6540,9 @@
 
    DROP TABLE audit_feature_expressionprop;
    CREATE TABLE audit_feature_expressionprop ( 
-       feature_expressionprop_id bigint, 
-       feature_expression_id bigint, 
-       type_id bigint, 
+       feature_expressionprop_id integer, 
+       feature_expression_id integer, 
+       type_id integer, 
        value text, 
        rank integer, 
        transaction_date timestamp not null default now(),
@@ -5268,9 +6553,9 @@
    CREATE OR REPLACE FUNCTION audit_update_delete_feature_expressionprop() RETURNS trigger AS
    '
    DECLARE
-       feature_expressionprop_id_var bigint; 
-       feature_expression_id_var bigint; 
-       type_id_var bigint; 
+       feature_expressionprop_id_var integer; 
+       feature_expression_id_var integer; 
+       type_id_var integer; 
        value_var text; 
        rank_var integer; 
        
@@ -5322,7 +6607,7 @@
 
    DROP TABLE audit_eimage;
    CREATE TABLE audit_eimage ( 
-       eimage_id bigint, 
+       eimage_id integer, 
        eimage_data text, 
        eimage_type varchar(255), 
        image_uri varchar(255), 
@@ -5334,7 +6619,7 @@
    CREATE OR REPLACE FUNCTION audit_update_delete_eimage() RETURNS trigger AS
    '
    DECLARE
-       eimage_id_var bigint; 
+       eimage_id_var integer; 
        eimage_data_var text; 
        eimage_type_var varchar(255); 
        image_uri_var varchar(255); 
@@ -5384,9 +6669,9 @@
 
    DROP TABLE audit_expression_image;
    CREATE TABLE audit_expression_image ( 
-       expression_image_id bigint, 
-       expression_id bigint, 
-       eimage_id bigint, 
+       expression_image_id integer, 
+       expression_id integer, 
+       eimage_id integer, 
        transaction_date timestamp not null default now(),
        transaction_type char(1) not null
    );
@@ -5395,9 +6680,9 @@
    CREATE OR REPLACE FUNCTION audit_update_delete_expression_image() RETURNS trigger AS
    '
    DECLARE
-       expression_image_id_var bigint; 
-       expression_id_var bigint; 
-       eimage_id_var bigint; 
+       expression_image_id_var integer; 
+       expression_id_var integer; 
+       eimage_id_var integer; 
        
        transaction_type_var char;
    BEGIN
@@ -5439,11 +6724,2112 @@
        EXECUTE PROCEDURE audit_update_delete_expression_image ();
 
 
+   DROP TABLE audit_library;
+   CREATE TABLE audit_library ( 
+       library_id integer, 
+       organism_id integer, 
+       name varchar(255), 
+       uniquename text, 
+       type_id integer, 
+       is_obsolete integer, 
+       timeaccessioned timestamp, 
+       timelastmodified timestamp, 
+       transaction_date timestamp not null default now(),
+       transaction_type char(1) not null
+   );
+   GRANT ALL on audit_library to PUBLIC;
+
+   CREATE OR REPLACE FUNCTION audit_update_delete_library() RETURNS trigger AS
+   '
+   DECLARE
+       library_id_var integer; 
+       organism_id_var integer; 
+       name_var varchar(255); 
+       uniquename_var text; 
+       type_id_var integer; 
+       is_obsolete_var integer; 
+       timeaccessioned_var timestamp; 
+       timelastmodified_var timestamp; 
+       
+       transaction_type_var char;
+   BEGIN
+       library_id_var = OLD.library_id;
+       organism_id_var = OLD.organism_id;
+       name_var = OLD.name;
+       uniquename_var = OLD.uniquename;
+       type_id_var = OLD.type_id;
+       is_obsolete_var = OLD.is_obsolete;
+       timeaccessioned_var = OLD.timeaccessioned;
+       timelastmodified_var = OLD.timelastmodified;
+       
+       IF TG_OP = ''DELETE'' THEN
+           transaction_type_var = ''D'';
+       ELSE
+           transaction_type_var = ''U'';
+       END IF;
+
+       INSERT INTO audit_library ( 
+             library_id, 
+             organism_id, 
+             name, 
+             uniquename, 
+             type_id, 
+             is_obsolete, 
+             timeaccessioned, 
+             timelastmodified, 
+             transaction_type
+       ) VALUES ( 
+             library_id_var, 
+             organism_id_var, 
+             name_var, 
+             uniquename_var, 
+             type_id_var, 
+             is_obsolete_var, 
+             timeaccessioned_var, 
+             timelastmodified_var, 
+             transaction_type_var
+       );
+
+       IF TG_OP = ''DELETE'' THEN
+           return OLD;
+       ELSE
+           return NEW;
+       END IF;
+   END
+   '
+   LANGUAGE plpgsql; 
+
+   DROP TRIGGER library_audit_ud ON library;
+   CREATE TRIGGER library_audit_ud
+       BEFORE UPDATE OR DELETE ON library
+       FOR EACH ROW
+       EXECUTE PROCEDURE audit_update_delete_library ();
+
+
+   DROP TABLE audit_library_synonym;
+   CREATE TABLE audit_library_synonym ( 
+       library_synonym_id integer, 
+       synonym_id integer, 
+       library_id integer, 
+       pub_id integer, 
+       is_current boolean, 
+       is_internal boolean, 
+       transaction_date timestamp not null default now(),
+       transaction_type char(1) not null
+   );
+   GRANT ALL on audit_library_synonym to PUBLIC;
+
+   CREATE OR REPLACE FUNCTION audit_update_delete_library_synonym() RETURNS trigger AS
+   '
+   DECLARE
+       library_synonym_id_var integer; 
+       synonym_id_var integer; 
+       library_id_var integer; 
+       pub_id_var integer; 
+       is_current_var boolean; 
+       is_internal_var boolean; 
+       
+       transaction_type_var char;
+   BEGIN
+       library_synonym_id_var = OLD.library_synonym_id;
+       synonym_id_var = OLD.synonym_id;
+       library_id_var = OLD.library_id;
+       pub_id_var = OLD.pub_id;
+       is_current_var = OLD.is_current;
+       is_internal_var = OLD.is_internal;
+       
+       IF TG_OP = ''DELETE'' THEN
+           transaction_type_var = ''D'';
+       ELSE
+           transaction_type_var = ''U'';
+       END IF;
+
+       INSERT INTO audit_library_synonym ( 
+             library_synonym_id, 
+             synonym_id, 
+             library_id, 
+             pub_id, 
+             is_current, 
+             is_internal, 
+             transaction_type
+       ) VALUES ( 
+             library_synonym_id_var, 
+             synonym_id_var, 
+             library_id_var, 
+             pub_id_var, 
+             is_current_var, 
+             is_internal_var, 
+             transaction_type_var
+       );
+
+       IF TG_OP = ''DELETE'' THEN
+           return OLD;
+       ELSE
+           return NEW;
+       END IF;
+   END
+   '
+   LANGUAGE plpgsql; 
+
+   DROP TRIGGER library_synonym_audit_ud ON library_synonym;
+   CREATE TRIGGER library_synonym_audit_ud
+       BEFORE UPDATE OR DELETE ON library_synonym
+       FOR EACH ROW
+       EXECUTE PROCEDURE audit_update_delete_library_synonym ();
+
+
+   DROP TABLE audit_library_pub;
+   CREATE TABLE audit_library_pub ( 
+       library_pub_id integer, 
+       library_id integer, 
+       pub_id integer, 
+       transaction_date timestamp not null default now(),
+       transaction_type char(1) not null
+   );
+   GRANT ALL on audit_library_pub to PUBLIC;
+
+   CREATE OR REPLACE FUNCTION audit_update_delete_library_pub() RETURNS trigger AS
+   '
+   DECLARE
+       library_pub_id_var integer; 
+       library_id_var integer; 
+       pub_id_var integer; 
+       
+       transaction_type_var char;
+   BEGIN
+       library_pub_id_var = OLD.library_pub_id;
+       library_id_var = OLD.library_id;
+       pub_id_var = OLD.pub_id;
+       
+       IF TG_OP = ''DELETE'' THEN
+           transaction_type_var = ''D'';
+       ELSE
+           transaction_type_var = ''U'';
+       END IF;
+
+       INSERT INTO audit_library_pub ( 
+             library_pub_id, 
+             library_id, 
+             pub_id, 
+             transaction_type
+       ) VALUES ( 
+             library_pub_id_var, 
+             library_id_var, 
+             pub_id_var, 
+             transaction_type_var
+       );
+
+       IF TG_OP = ''DELETE'' THEN
+           return OLD;
+       ELSE
+           return NEW;
+       END IF;
+   END
+   '
+   LANGUAGE plpgsql; 
+
+   DROP TRIGGER library_pub_audit_ud ON library_pub;
+   CREATE TRIGGER library_pub_audit_ud
+       BEFORE UPDATE OR DELETE ON library_pub
+       FOR EACH ROW
+       EXECUTE PROCEDURE audit_update_delete_library_pub ();
+
+
+   DROP TABLE audit_libraryprop;
+   CREATE TABLE audit_libraryprop ( 
+       libraryprop_id integer, 
+       library_id integer, 
+       type_id integer, 
+       value text, 
+       rank integer, 
+       transaction_date timestamp not null default now(),
+       transaction_type char(1) not null
+   );
+   GRANT ALL on audit_libraryprop to PUBLIC;
+
+   CREATE OR REPLACE FUNCTION audit_update_delete_libraryprop() RETURNS trigger AS
+   '
+   DECLARE
+       libraryprop_id_var integer; 
+       library_id_var integer; 
+       type_id_var integer; 
+       value_var text; 
+       rank_var integer; 
+       
+       transaction_type_var char;
+   BEGIN
+       libraryprop_id_var = OLD.libraryprop_id;
+       library_id_var = OLD.library_id;
+       type_id_var = OLD.type_id;
+       value_var = OLD.value;
+       rank_var = OLD.rank;
+       
+       IF TG_OP = ''DELETE'' THEN
+           transaction_type_var = ''D'';
+       ELSE
+           transaction_type_var = ''U'';
+       END IF;
+
+       INSERT INTO audit_libraryprop ( 
+             libraryprop_id, 
+             library_id, 
+             type_id, 
+             value, 
+             rank, 
+             transaction_type
+       ) VALUES ( 
+             libraryprop_id_var, 
+             library_id_var, 
+             type_id_var, 
+             value_var, 
+             rank_var, 
+             transaction_type_var
+       );
+
+       IF TG_OP = ''DELETE'' THEN
+           return OLD;
+       ELSE
+           return NEW;
+       END IF;
+   END
+   '
+   LANGUAGE plpgsql; 
+
+   DROP TRIGGER libraryprop_audit_ud ON libraryprop;
+   CREATE TRIGGER libraryprop_audit_ud
+       BEFORE UPDATE OR DELETE ON libraryprop
+       FOR EACH ROW
+       EXECUTE PROCEDURE audit_update_delete_libraryprop ();
+
+
+   DROP TABLE audit_libraryprop_pub;
+   CREATE TABLE audit_libraryprop_pub ( 
+       libraryprop_pub_id integer, 
+       libraryprop_id integer, 
+       pub_id integer, 
+       transaction_date timestamp not null default now(),
+       transaction_type char(1) not null
+   );
+   GRANT ALL on audit_libraryprop_pub to PUBLIC;
+
+   CREATE OR REPLACE FUNCTION audit_update_delete_libraryprop_pub() RETURNS trigger AS
+   '
+   DECLARE
+       libraryprop_pub_id_var integer; 
+       libraryprop_id_var integer; 
+       pub_id_var integer; 
+       
+       transaction_type_var char;
+   BEGIN
+       libraryprop_pub_id_var = OLD.libraryprop_pub_id;
+       libraryprop_id_var = OLD.libraryprop_id;
+       pub_id_var = OLD.pub_id;
+       
+       IF TG_OP = ''DELETE'' THEN
+           transaction_type_var = ''D'';
+       ELSE
+           transaction_type_var = ''U'';
+       END IF;
+
+       INSERT INTO audit_libraryprop_pub ( 
+             libraryprop_pub_id, 
+             libraryprop_id, 
+             pub_id, 
+             transaction_type
+       ) VALUES ( 
+             libraryprop_pub_id_var, 
+             libraryprop_id_var, 
+             pub_id_var, 
+             transaction_type_var
+       );
+
+       IF TG_OP = ''DELETE'' THEN
+           return OLD;
+       ELSE
+           return NEW;
+       END IF;
+   END
+   '
+   LANGUAGE plpgsql; 
+
+   DROP TRIGGER libraryprop_pub_audit_ud ON libraryprop_pub;
+   CREATE TRIGGER libraryprop_pub_audit_ud
+       BEFORE UPDATE OR DELETE ON libraryprop_pub
+       FOR EACH ROW
+       EXECUTE PROCEDURE audit_update_delete_libraryprop_pub ();
+
+
+   DROP TABLE audit_library_cvterm;
+   CREATE TABLE audit_library_cvterm ( 
+       library_cvterm_id integer, 
+       library_id integer, 
+       cvterm_id integer, 
+       pub_id integer, 
+       transaction_date timestamp not null default now(),
+       transaction_type char(1) not null
+   );
+   GRANT ALL on audit_library_cvterm to PUBLIC;
+
+   CREATE OR REPLACE FUNCTION audit_update_delete_library_cvterm() RETURNS trigger AS
+   '
+   DECLARE
+       library_cvterm_id_var integer; 
+       library_id_var integer; 
+       cvterm_id_var integer; 
+       pub_id_var integer; 
+       
+       transaction_type_var char;
+   BEGIN
+       library_cvterm_id_var = OLD.library_cvterm_id;
+       library_id_var = OLD.library_id;
+       cvterm_id_var = OLD.cvterm_id;
+       pub_id_var = OLD.pub_id;
+       
+       IF TG_OP = ''DELETE'' THEN
+           transaction_type_var = ''D'';
+       ELSE
+           transaction_type_var = ''U'';
+       END IF;
+
+       INSERT INTO audit_library_cvterm ( 
+             library_cvterm_id, 
+             library_id, 
+             cvterm_id, 
+             pub_id, 
+             transaction_type
+       ) VALUES ( 
+             library_cvterm_id_var, 
+             library_id_var, 
+             cvterm_id_var, 
+             pub_id_var, 
+             transaction_type_var
+       );
+
+       IF TG_OP = ''DELETE'' THEN
+           return OLD;
+       ELSE
+           return NEW;
+       END IF;
+   END
+   '
+   LANGUAGE plpgsql; 
+
+   DROP TRIGGER library_cvterm_audit_ud ON library_cvterm;
+   CREATE TRIGGER library_cvterm_audit_ud
+       BEFORE UPDATE OR DELETE ON library_cvterm
+       FOR EACH ROW
+       EXECUTE PROCEDURE audit_update_delete_library_cvterm ();
+
+
+   DROP TABLE audit_library_feature;
+   CREATE TABLE audit_library_feature ( 
+       library_feature_id integer, 
+       library_id integer, 
+       feature_id integer, 
+       transaction_date timestamp not null default now(),
+       transaction_type char(1) not null
+   );
+   GRANT ALL on audit_library_feature to PUBLIC;
+
+   CREATE OR REPLACE FUNCTION audit_update_delete_library_feature() RETURNS trigger AS
+   '
+   DECLARE
+       library_feature_id_var integer; 
+       library_id_var integer; 
+       feature_id_var integer; 
+       
+       transaction_type_var char;
+   BEGIN
+       library_feature_id_var = OLD.library_feature_id;
+       library_id_var = OLD.library_id;
+       feature_id_var = OLD.feature_id;
+       
+       IF TG_OP = ''DELETE'' THEN
+           transaction_type_var = ''D'';
+       ELSE
+           transaction_type_var = ''U'';
+       END IF;
+
+       INSERT INTO audit_library_feature ( 
+             library_feature_id, 
+             library_id, 
+             feature_id, 
+             transaction_type
+       ) VALUES ( 
+             library_feature_id_var, 
+             library_id_var, 
+             feature_id_var, 
+             transaction_type_var
+       );
+
+       IF TG_OP = ''DELETE'' THEN
+           return OLD;
+       ELSE
+           return NEW;
+       END IF;
+   END
+   '
+   LANGUAGE plpgsql; 
+
+   DROP TRIGGER library_feature_audit_ud ON library_feature;
+   CREATE TRIGGER library_feature_audit_ud
+       BEFORE UPDATE OR DELETE ON library_feature
+       FOR EACH ROW
+       EXECUTE PROCEDURE audit_update_delete_library_feature ();
+
+
+   DROP TABLE audit_library_dbxref;
+   CREATE TABLE audit_library_dbxref ( 
+       library_dbxref_id integer, 
+       library_id integer, 
+       dbxref_id integer, 
+       is_current boolean, 
+       transaction_date timestamp not null default now(),
+       transaction_type char(1) not null
+   );
+   GRANT ALL on audit_library_dbxref to PUBLIC;
+
+   CREATE OR REPLACE FUNCTION audit_update_delete_library_dbxref() RETURNS trigger AS
+   '
+   DECLARE
+       library_dbxref_id_var integer; 
+       library_id_var integer; 
+       dbxref_id_var integer; 
+       is_current_var boolean; 
+       
+       transaction_type_var char;
+   BEGIN
+       library_dbxref_id_var = OLD.library_dbxref_id;
+       library_id_var = OLD.library_id;
+       dbxref_id_var = OLD.dbxref_id;
+       is_current_var = OLD.is_current;
+       
+       IF TG_OP = ''DELETE'' THEN
+           transaction_type_var = ''D'';
+       ELSE
+           transaction_type_var = ''U'';
+       END IF;
+
+       INSERT INTO audit_library_dbxref ( 
+             library_dbxref_id, 
+             library_id, 
+             dbxref_id, 
+             is_current, 
+             transaction_type
+       ) VALUES ( 
+             library_dbxref_id_var, 
+             library_id_var, 
+             dbxref_id_var, 
+             is_current_var, 
+             transaction_type_var
+       );
+
+       IF TG_OP = ''DELETE'' THEN
+           return OLD;
+       ELSE
+           return NEW;
+       END IF;
+   END
+   '
+   LANGUAGE plpgsql; 
+
+   DROP TRIGGER library_dbxref_audit_ud ON library_dbxref;
+   CREATE TRIGGER library_dbxref_audit_ud
+       BEFORE UPDATE OR DELETE ON library_dbxref
+       FOR EACH ROW
+       EXECUTE PROCEDURE audit_update_delete_library_dbxref ();
+
+
+   DROP TABLE audit_library_expression;
+   CREATE TABLE audit_library_expression ( 
+       library_expression_id integer, 
+       library_id integer, 
+       expression_id integer, 
+       pub_id integer, 
+       transaction_date timestamp not null default now(),
+       transaction_type char(1) not null
+   );
+   GRANT ALL on audit_library_expression to PUBLIC;
+
+   CREATE OR REPLACE FUNCTION audit_update_delete_library_expression() RETURNS trigger AS
+   '
+   DECLARE
+       library_expression_id_var integer; 
+       library_id_var integer; 
+       expression_id_var integer; 
+       pub_id_var integer; 
+       
+       transaction_type_var char;
+   BEGIN
+       library_expression_id_var = OLD.library_expression_id;
+       library_id_var = OLD.library_id;
+       expression_id_var = OLD.expression_id;
+       pub_id_var = OLD.pub_id;
+       
+       IF TG_OP = ''DELETE'' THEN
+           transaction_type_var = ''D'';
+       ELSE
+           transaction_type_var = ''U'';
+       END IF;
+
+       INSERT INTO audit_library_expression ( 
+             library_expression_id, 
+             library_id, 
+             expression_id, 
+             pub_id, 
+             transaction_type
+       ) VALUES ( 
+             library_expression_id_var, 
+             library_id_var, 
+             expression_id_var, 
+             pub_id_var, 
+             transaction_type_var
+       );
+
+       IF TG_OP = ''DELETE'' THEN
+           return OLD;
+       ELSE
+           return NEW;
+       END IF;
+   END
+   '
+   LANGUAGE plpgsql; 
+
+   DROP TRIGGER library_expression_audit_ud ON library_expression;
+   CREATE TRIGGER library_expression_audit_ud
+       BEFORE UPDATE OR DELETE ON library_expression
+       FOR EACH ROW
+       EXECUTE PROCEDURE audit_update_delete_library_expression ();
+
+
+   DROP TABLE audit_library_expressionprop;
+   CREATE TABLE audit_library_expressionprop ( 
+       library_expressionprop_id integer, 
+       library_expression_id integer, 
+       type_id integer, 
+       value text, 
+       rank integer, 
+       transaction_date timestamp not null default now(),
+       transaction_type char(1) not null
+   );
+   GRANT ALL on audit_library_expressionprop to PUBLIC;
+
+   CREATE OR REPLACE FUNCTION audit_update_delete_library_expressionprop() RETURNS trigger AS
+   '
+   DECLARE
+       library_expressionprop_id_var integer; 
+       library_expression_id_var integer; 
+       type_id_var integer; 
+       value_var text; 
+       rank_var integer; 
+       
+       transaction_type_var char;
+   BEGIN
+       library_expressionprop_id_var = OLD.library_expressionprop_id;
+       library_expression_id_var = OLD.library_expression_id;
+       type_id_var = OLD.type_id;
+       value_var = OLD.value;
+       rank_var = OLD.rank;
+       
+       IF TG_OP = ''DELETE'' THEN
+           transaction_type_var = ''D'';
+       ELSE
+           transaction_type_var = ''U'';
+       END IF;
+
+       INSERT INTO audit_library_expressionprop ( 
+             library_expressionprop_id, 
+             library_expression_id, 
+             type_id, 
+             value, 
+             rank, 
+             transaction_type
+       ) VALUES ( 
+             library_expressionprop_id_var, 
+             library_expression_id_var, 
+             type_id_var, 
+             value_var, 
+             rank_var, 
+             transaction_type_var
+       );
+
+       IF TG_OP = ''DELETE'' THEN
+           return OLD;
+       ELSE
+           return NEW;
+       END IF;
+   END
+   '
+   LANGUAGE plpgsql; 
+
+   DROP TRIGGER library_expressionprop_audit_ud ON library_expressionprop;
+   CREATE TRIGGER library_expressionprop_audit_ud
+       BEFORE UPDATE OR DELETE ON library_expressionprop
+       FOR EACH ROW
+       EXECUTE PROCEDURE audit_update_delete_library_expressionprop ();
+
+
+   DROP TABLE audit_library_featureprop;
+   CREATE TABLE audit_library_featureprop ( 
+       library_featureprop_id integer, 
+       library_feature_id integer, 
+       type_id integer, 
+       value text, 
+       rank integer, 
+       transaction_date timestamp not null default now(),
+       transaction_type char(1) not null
+   );
+   GRANT ALL on audit_library_featureprop to PUBLIC;
+
+   CREATE OR REPLACE FUNCTION audit_update_delete_library_featureprop() RETURNS trigger AS
+   '
+   DECLARE
+       library_featureprop_id_var integer; 
+       library_feature_id_var integer; 
+       type_id_var integer; 
+       value_var text; 
+       rank_var integer; 
+       
+       transaction_type_var char;
+   BEGIN
+       library_featureprop_id_var = OLD.library_featureprop_id;
+       library_feature_id_var = OLD.library_feature_id;
+       type_id_var = OLD.type_id;
+       value_var = OLD.value;
+       rank_var = OLD.rank;
+       
+       IF TG_OP = ''DELETE'' THEN
+           transaction_type_var = ''D'';
+       ELSE
+           transaction_type_var = ''U'';
+       END IF;
+
+       INSERT INTO audit_library_featureprop ( 
+             library_featureprop_id, 
+             library_feature_id, 
+             type_id, 
+             value, 
+             rank, 
+             transaction_type
+       ) VALUES ( 
+             library_featureprop_id_var, 
+             library_feature_id_var, 
+             type_id_var, 
+             value_var, 
+             rank_var, 
+             transaction_type_var
+       );
+
+       IF TG_OP = ''DELETE'' THEN
+           return OLD;
+       ELSE
+           return NEW;
+       END IF;
+   END
+   '
+   LANGUAGE plpgsql; 
+
+   DROP TRIGGER library_featureprop_audit_ud ON library_featureprop;
+   CREATE TRIGGER library_featureprop_audit_ud
+       BEFORE UPDATE OR DELETE ON library_featureprop
+       FOR EACH ROW
+       EXECUTE PROCEDURE audit_update_delete_library_featureprop ();
+
+
+   DROP TABLE audit_library_relationship;
+   CREATE TABLE audit_library_relationship ( 
+       library_relationship_id integer, 
+       subject_id integer, 
+       object_id integer, 
+       type_id integer, 
+       transaction_date timestamp not null default now(),
+       transaction_type char(1) not null
+   );
+   GRANT ALL on audit_library_relationship to PUBLIC;
+
+   CREATE OR REPLACE FUNCTION audit_update_delete_library_relationship() RETURNS trigger AS
+   '
+   DECLARE
+       library_relationship_id_var integer; 
+       subject_id_var integer; 
+       object_id_var integer; 
+       type_id_var integer; 
+       
+       transaction_type_var char;
+   BEGIN
+       library_relationship_id_var = OLD.library_relationship_id;
+       subject_id_var = OLD.subject_id;
+       object_id_var = OLD.object_id;
+       type_id_var = OLD.type_id;
+       
+       IF TG_OP = ''DELETE'' THEN
+           transaction_type_var = ''D'';
+       ELSE
+           transaction_type_var = ''U'';
+       END IF;
+
+       INSERT INTO audit_library_relationship ( 
+             library_relationship_id, 
+             subject_id, 
+             object_id, 
+             type_id, 
+             transaction_type
+       ) VALUES ( 
+             library_relationship_id_var, 
+             subject_id_var, 
+             object_id_var, 
+             type_id_var, 
+             transaction_type_var
+       );
+
+       IF TG_OP = ''DELETE'' THEN
+           return OLD;
+       ELSE
+           return NEW;
+       END IF;
+   END
+   '
+   LANGUAGE plpgsql; 
+
+   DROP TRIGGER library_relationship_audit_ud ON library_relationship;
+   CREATE TRIGGER library_relationship_audit_ud
+       BEFORE UPDATE OR DELETE ON library_relationship
+       FOR EACH ROW
+       EXECUTE PROCEDURE audit_update_delete_library_relationship ();
+
+
+   DROP TABLE audit_library_relationship_pub;
+   CREATE TABLE audit_library_relationship_pub ( 
+       library_relationship_pub_id integer, 
+       library_relationship_id integer, 
+       pub_id integer, 
+       transaction_date timestamp not null default now(),
+       transaction_type char(1) not null
+   );
+   GRANT ALL on audit_library_relationship_pub to PUBLIC;
+
+   CREATE OR REPLACE FUNCTION audit_update_delete_library_relationship_pub() RETURNS trigger AS
+   '
+   DECLARE
+       library_relationship_pub_id_var integer; 
+       library_relationship_id_var integer; 
+       pub_id_var integer; 
+       
+       transaction_type_var char;
+   BEGIN
+       library_relationship_pub_id_var = OLD.library_relationship_pub_id;
+       library_relationship_id_var = OLD.library_relationship_id;
+       pub_id_var = OLD.pub_id;
+       
+       IF TG_OP = ''DELETE'' THEN
+           transaction_type_var = ''D'';
+       ELSE
+           transaction_type_var = ''U'';
+       END IF;
+
+       INSERT INTO audit_library_relationship_pub ( 
+             library_relationship_pub_id, 
+             library_relationship_id, 
+             pub_id, 
+             transaction_type
+       ) VALUES ( 
+             library_relationship_pub_id_var, 
+             library_relationship_id_var, 
+             pub_id_var, 
+             transaction_type_var
+       );
+
+       IF TG_OP = ''DELETE'' THEN
+           return OLD;
+       ELSE
+           return NEW;
+       END IF;
+   END
+   '
+   LANGUAGE plpgsql; 
+
+   DROP TRIGGER library_relationship_pub_audit_ud ON library_relationship_pub;
+   CREATE TRIGGER library_relationship_pub_audit_ud
+       BEFORE UPDATE OR DELETE ON library_relationship_pub
+       FOR EACH ROW
+       EXECUTE PROCEDURE audit_update_delete_library_relationship_pub ();
+
+
+   DROP TABLE audit_library_contact;
+   CREATE TABLE audit_library_contact ( 
+       library_contact_id integer, 
+       library_id integer, 
+       contact_id integer, 
+       transaction_date timestamp not null default now(),
+       transaction_type char(1) not null
+   );
+   GRANT ALL on audit_library_contact to PUBLIC;
+
+   CREATE OR REPLACE FUNCTION audit_update_delete_library_contact() RETURNS trigger AS
+   '
+   DECLARE
+       library_contact_id_var integer; 
+       library_id_var integer; 
+       contact_id_var integer; 
+       
+       transaction_type_var char;
+   BEGIN
+       library_contact_id_var = OLD.library_contact_id;
+       library_id_var = OLD.library_id;
+       contact_id_var = OLD.contact_id;
+       
+       IF TG_OP = ''DELETE'' THEN
+           transaction_type_var = ''D'';
+       ELSE
+           transaction_type_var = ''U'';
+       END IF;
+
+       INSERT INTO audit_library_contact ( 
+             library_contact_id, 
+             library_id, 
+             contact_id, 
+             transaction_type
+       ) VALUES ( 
+             library_contact_id_var, 
+             library_id_var, 
+             contact_id_var, 
+             transaction_type_var
+       );
+
+       IF TG_OP = ''DELETE'' THEN
+           return OLD;
+       ELSE
+           return NEW;
+       END IF;
+   END
+   '
+   LANGUAGE plpgsql; 
+
+   DROP TRIGGER library_contact_audit_ud ON library_contact;
+   CREATE TRIGGER library_contact_audit_ud
+       BEFORE UPDATE OR DELETE ON library_contact
+       FOR EACH ROW
+       EXECUTE PROCEDURE audit_update_delete_library_contact ();
+
+
+   DROP TABLE audit_stock;
+   CREATE TABLE audit_stock ( 
+       stock_id integer, 
+       dbxref_id integer, 
+       organism_id integer, 
+       name varchar(255), 
+       uniquename text, 
+       description text, 
+       type_id integer, 
+       is_obsolete boolean, 
+       transaction_date timestamp not null default now(),
+       transaction_type char(1) not null
+   );
+   GRANT ALL on audit_stock to PUBLIC;
+
+   CREATE OR REPLACE FUNCTION audit_update_delete_stock() RETURNS trigger AS
+   '
+   DECLARE
+       stock_id_var integer; 
+       dbxref_id_var integer; 
+       organism_id_var integer; 
+       name_var varchar(255); 
+       uniquename_var text; 
+       description_var text; 
+       type_id_var integer; 
+       is_obsolete_var boolean; 
+       
+       transaction_type_var char;
+   BEGIN
+       stock_id_var = OLD.stock_id;
+       dbxref_id_var = OLD.dbxref_id;
+       organism_id_var = OLD.organism_id;
+       name_var = OLD.name;
+       uniquename_var = OLD.uniquename;
+       description_var = OLD.description;
+       type_id_var = OLD.type_id;
+       is_obsolete_var = OLD.is_obsolete;
+       
+       IF TG_OP = ''DELETE'' THEN
+           transaction_type_var = ''D'';
+       ELSE
+           transaction_type_var = ''U'';
+       END IF;
+
+       INSERT INTO audit_stock ( 
+             stock_id, 
+             dbxref_id, 
+             organism_id, 
+             name, 
+             uniquename, 
+             description, 
+             type_id, 
+             is_obsolete, 
+             transaction_type
+       ) VALUES ( 
+             stock_id_var, 
+             dbxref_id_var, 
+             organism_id_var, 
+             name_var, 
+             uniquename_var, 
+             description_var, 
+             type_id_var, 
+             is_obsolete_var, 
+             transaction_type_var
+       );
+
+       IF TG_OP = ''DELETE'' THEN
+           return OLD;
+       ELSE
+           return NEW;
+       END IF;
+   END
+   '
+   LANGUAGE plpgsql; 
+
+   DROP TRIGGER stock_audit_ud ON stock;
+   CREATE TRIGGER stock_audit_ud
+       BEFORE UPDATE OR DELETE ON stock
+       FOR EACH ROW
+       EXECUTE PROCEDURE audit_update_delete_stock ();
+
+
+   DROP TABLE audit_stock_pub;
+   CREATE TABLE audit_stock_pub ( 
+       stock_pub_id integer, 
+       stock_id integer, 
+       pub_id integer, 
+       transaction_date timestamp not null default now(),
+       transaction_type char(1) not null
+   );
+   GRANT ALL on audit_stock_pub to PUBLIC;
+
+   CREATE OR REPLACE FUNCTION audit_update_delete_stock_pub() RETURNS trigger AS
+   '
+   DECLARE
+       stock_pub_id_var integer; 
+       stock_id_var integer; 
+       pub_id_var integer; 
+       
+       transaction_type_var char;
+   BEGIN
+       stock_pub_id_var = OLD.stock_pub_id;
+       stock_id_var = OLD.stock_id;
+       pub_id_var = OLD.pub_id;
+       
+       IF TG_OP = ''DELETE'' THEN
+           transaction_type_var = ''D'';
+       ELSE
+           transaction_type_var = ''U'';
+       END IF;
+
+       INSERT INTO audit_stock_pub ( 
+             stock_pub_id, 
+             stock_id, 
+             pub_id, 
+             transaction_type
+       ) VALUES ( 
+             stock_pub_id_var, 
+             stock_id_var, 
+             pub_id_var, 
+             transaction_type_var
+       );
+
+       IF TG_OP = ''DELETE'' THEN
+           return OLD;
+       ELSE
+           return NEW;
+       END IF;
+   END
+   '
+   LANGUAGE plpgsql; 
+
+   DROP TRIGGER stock_pub_audit_ud ON stock_pub;
+   CREATE TRIGGER stock_pub_audit_ud
+       BEFORE UPDATE OR DELETE ON stock_pub
+       FOR EACH ROW
+       EXECUTE PROCEDURE audit_update_delete_stock_pub ();
+
+
+   DROP TABLE audit_stockprop;
+   CREATE TABLE audit_stockprop ( 
+       stockprop_id integer, 
+       stock_id integer, 
+       type_id integer, 
+       value text, 
+       rank integer, 
+       transaction_date timestamp not null default now(),
+       transaction_type char(1) not null
+   );
+   GRANT ALL on audit_stockprop to PUBLIC;
+
+   CREATE OR REPLACE FUNCTION audit_update_delete_stockprop() RETURNS trigger AS
+   '
+   DECLARE
+       stockprop_id_var integer; 
+       stock_id_var integer; 
+       type_id_var integer; 
+       value_var text; 
+       rank_var integer; 
+       
+       transaction_type_var char;
+   BEGIN
+       stockprop_id_var = OLD.stockprop_id;
+       stock_id_var = OLD.stock_id;
+       type_id_var = OLD.type_id;
+       value_var = OLD.value;
+       rank_var = OLD.rank;
+       
+       IF TG_OP = ''DELETE'' THEN
+           transaction_type_var = ''D'';
+       ELSE
+           transaction_type_var = ''U'';
+       END IF;
+
+       INSERT INTO audit_stockprop ( 
+             stockprop_id, 
+             stock_id, 
+             type_id, 
+             value, 
+             rank, 
+             transaction_type
+       ) VALUES ( 
+             stockprop_id_var, 
+             stock_id_var, 
+             type_id_var, 
+             value_var, 
+             rank_var, 
+             transaction_type_var
+       );
+
+       IF TG_OP = ''DELETE'' THEN
+           return OLD;
+       ELSE
+           return NEW;
+       END IF;
+   END
+   '
+   LANGUAGE plpgsql; 
+
+   DROP TRIGGER stockprop_audit_ud ON stockprop;
+   CREATE TRIGGER stockprop_audit_ud
+       BEFORE UPDATE OR DELETE ON stockprop
+       FOR EACH ROW
+       EXECUTE PROCEDURE audit_update_delete_stockprop ();
+
+
+   DROP TABLE audit_stockprop_pub;
+   CREATE TABLE audit_stockprop_pub ( 
+       stockprop_pub_id integer, 
+       stockprop_id integer, 
+       pub_id integer, 
+       transaction_date timestamp not null default now(),
+       transaction_type char(1) not null
+   );
+   GRANT ALL on audit_stockprop_pub to PUBLIC;
+
+   CREATE OR REPLACE FUNCTION audit_update_delete_stockprop_pub() RETURNS trigger AS
+   '
+   DECLARE
+       stockprop_pub_id_var integer; 
+       stockprop_id_var integer; 
+       pub_id_var integer; 
+       
+       transaction_type_var char;
+   BEGIN
+       stockprop_pub_id_var = OLD.stockprop_pub_id;
+       stockprop_id_var = OLD.stockprop_id;
+       pub_id_var = OLD.pub_id;
+       
+       IF TG_OP = ''DELETE'' THEN
+           transaction_type_var = ''D'';
+       ELSE
+           transaction_type_var = ''U'';
+       END IF;
+
+       INSERT INTO audit_stockprop_pub ( 
+             stockprop_pub_id, 
+             stockprop_id, 
+             pub_id, 
+             transaction_type
+       ) VALUES ( 
+             stockprop_pub_id_var, 
+             stockprop_id_var, 
+             pub_id_var, 
+             transaction_type_var
+       );
+
+       IF TG_OP = ''DELETE'' THEN
+           return OLD;
+       ELSE
+           return NEW;
+       END IF;
+   END
+   '
+   LANGUAGE plpgsql; 
+
+   DROP TRIGGER stockprop_pub_audit_ud ON stockprop_pub;
+   CREATE TRIGGER stockprop_pub_audit_ud
+       BEFORE UPDATE OR DELETE ON stockprop_pub
+       FOR EACH ROW
+       EXECUTE PROCEDURE audit_update_delete_stockprop_pub ();
+
+
+   DROP TABLE audit_stock_relationship;
+   CREATE TABLE audit_stock_relationship ( 
+       stock_relationship_id integer, 
+       subject_id integer, 
+       object_id integer, 
+       type_id integer, 
+       value text, 
+       rank integer, 
+       transaction_date timestamp not null default now(),
+       transaction_type char(1) not null
+   );
+   GRANT ALL on audit_stock_relationship to PUBLIC;
+
+   CREATE OR REPLACE FUNCTION audit_update_delete_stock_relationship() RETURNS trigger AS
+   '
+   DECLARE
+       stock_relationship_id_var integer; 
+       subject_id_var integer; 
+       object_id_var integer; 
+       type_id_var integer; 
+       value_var text; 
+       rank_var integer; 
+       
+       transaction_type_var char;
+   BEGIN
+       stock_relationship_id_var = OLD.stock_relationship_id;
+       subject_id_var = OLD.subject_id;
+       object_id_var = OLD.object_id;
+       type_id_var = OLD.type_id;
+       value_var = OLD.value;
+       rank_var = OLD.rank;
+       
+       IF TG_OP = ''DELETE'' THEN
+           transaction_type_var = ''D'';
+       ELSE
+           transaction_type_var = ''U'';
+       END IF;
+
+       INSERT INTO audit_stock_relationship ( 
+             stock_relationship_id, 
+             subject_id, 
+             object_id, 
+             type_id, 
+             value, 
+             rank, 
+             transaction_type
+       ) VALUES ( 
+             stock_relationship_id_var, 
+             subject_id_var, 
+             object_id_var, 
+             type_id_var, 
+             value_var, 
+             rank_var, 
+             transaction_type_var
+       );
+
+       IF TG_OP = ''DELETE'' THEN
+           return OLD;
+       ELSE
+           return NEW;
+       END IF;
+   END
+   '
+   LANGUAGE plpgsql; 
+
+   DROP TRIGGER stock_relationship_audit_ud ON stock_relationship;
+   CREATE TRIGGER stock_relationship_audit_ud
+       BEFORE UPDATE OR DELETE ON stock_relationship
+       FOR EACH ROW
+       EXECUTE PROCEDURE audit_update_delete_stock_relationship ();
+
+
+   DROP TABLE audit_stock_relationship_cvterm;
+   CREATE TABLE audit_stock_relationship_cvterm ( 
+       stock_relationship_cvterm_id integer, 
+       stock_relationship_id integer, 
+       cvterm_id integer, 
+       pub_id integer, 
+       transaction_date timestamp not null default now(),
+       transaction_type char(1) not null
+   );
+   GRANT ALL on audit_stock_relationship_cvterm to PUBLIC;
+
+   CREATE OR REPLACE FUNCTION audit_update_delete_stock_relationship_cvterm() RETURNS trigger AS
+   '
+   DECLARE
+       stock_relationship_cvterm_id_var integer; 
+       stock_relationship_id_var integer; 
+       cvterm_id_var integer; 
+       pub_id_var integer; 
+       
+       transaction_type_var char;
+   BEGIN
+       stock_relationship_cvterm_id_var = OLD.stock_relationship_cvterm_id;
+       stock_relationship_id_var = OLD.stock_relationship_id;
+       cvterm_id_var = OLD.cvterm_id;
+       pub_id_var = OLD.pub_id;
+       
+       IF TG_OP = ''DELETE'' THEN
+           transaction_type_var = ''D'';
+       ELSE
+           transaction_type_var = ''U'';
+       END IF;
+
+       INSERT INTO audit_stock_relationship_cvterm ( 
+             stock_relationship_cvterm_id, 
+             stock_relationship_id, 
+             cvterm_id, 
+             pub_id, 
+             transaction_type
+       ) VALUES ( 
+             stock_relationship_cvterm_id_var, 
+             stock_relationship_id_var, 
+             cvterm_id_var, 
+             pub_id_var, 
+             transaction_type_var
+       );
+
+       IF TG_OP = ''DELETE'' THEN
+           return OLD;
+       ELSE
+           return NEW;
+       END IF;
+   END
+   '
+   LANGUAGE plpgsql; 
+
+   DROP TRIGGER stock_relationship_cvterm_audit_ud ON stock_relationship_cvterm;
+   CREATE TRIGGER stock_relationship_cvterm_audit_ud
+       BEFORE UPDATE OR DELETE ON stock_relationship_cvterm
+       FOR EACH ROW
+       EXECUTE PROCEDURE audit_update_delete_stock_relationship_cvterm ();
+
+
+   DROP TABLE audit_stock_relationship_pub;
+   CREATE TABLE audit_stock_relationship_pub ( 
+       stock_relationship_pub_id integer, 
+       stock_relationship_id integer, 
+       pub_id integer, 
+       transaction_date timestamp not null default now(),
+       transaction_type char(1) not null
+   );
+   GRANT ALL on audit_stock_relationship_pub to PUBLIC;
+
+   CREATE OR REPLACE FUNCTION audit_update_delete_stock_relationship_pub() RETURNS trigger AS
+   '
+   DECLARE
+       stock_relationship_pub_id_var integer; 
+       stock_relationship_id_var integer; 
+       pub_id_var integer; 
+       
+       transaction_type_var char;
+   BEGIN
+       stock_relationship_pub_id_var = OLD.stock_relationship_pub_id;
+       stock_relationship_id_var = OLD.stock_relationship_id;
+       pub_id_var = OLD.pub_id;
+       
+       IF TG_OP = ''DELETE'' THEN
+           transaction_type_var = ''D'';
+       ELSE
+           transaction_type_var = ''U'';
+       END IF;
+
+       INSERT INTO audit_stock_relationship_pub ( 
+             stock_relationship_pub_id, 
+             stock_relationship_id, 
+             pub_id, 
+             transaction_type
+       ) VALUES ( 
+             stock_relationship_pub_id_var, 
+             stock_relationship_id_var, 
+             pub_id_var, 
+             transaction_type_var
+       );
+
+       IF TG_OP = ''DELETE'' THEN
+           return OLD;
+       ELSE
+           return NEW;
+       END IF;
+   END
+   '
+   LANGUAGE plpgsql; 
+
+   DROP TRIGGER stock_relationship_pub_audit_ud ON stock_relationship_pub;
+   CREATE TRIGGER stock_relationship_pub_audit_ud
+       BEFORE UPDATE OR DELETE ON stock_relationship_pub
+       FOR EACH ROW
+       EXECUTE PROCEDURE audit_update_delete_stock_relationship_pub ();
+
+
+   DROP TABLE audit_stock_dbxref;
+   CREATE TABLE audit_stock_dbxref ( 
+       stock_dbxref_id integer, 
+       stock_id integer, 
+       dbxref_id integer, 
+       is_current boolean, 
+       transaction_date timestamp not null default now(),
+       transaction_type char(1) not null
+   );
+   GRANT ALL on audit_stock_dbxref to PUBLIC;
+
+   CREATE OR REPLACE FUNCTION audit_update_delete_stock_dbxref() RETURNS trigger AS
+   '
+   DECLARE
+       stock_dbxref_id_var integer; 
+       stock_id_var integer; 
+       dbxref_id_var integer; 
+       is_current_var boolean; 
+       
+       transaction_type_var char;
+   BEGIN
+       stock_dbxref_id_var = OLD.stock_dbxref_id;
+       stock_id_var = OLD.stock_id;
+       dbxref_id_var = OLD.dbxref_id;
+       is_current_var = OLD.is_current;
+       
+       IF TG_OP = ''DELETE'' THEN
+           transaction_type_var = ''D'';
+       ELSE
+           transaction_type_var = ''U'';
+       END IF;
+
+       INSERT INTO audit_stock_dbxref ( 
+             stock_dbxref_id, 
+             stock_id, 
+             dbxref_id, 
+             is_current, 
+             transaction_type
+       ) VALUES ( 
+             stock_dbxref_id_var, 
+             stock_id_var, 
+             dbxref_id_var, 
+             is_current_var, 
+             transaction_type_var
+       );
+
+       IF TG_OP = ''DELETE'' THEN
+           return OLD;
+       ELSE
+           return NEW;
+       END IF;
+   END
+   '
+   LANGUAGE plpgsql; 
+
+   DROP TRIGGER stock_dbxref_audit_ud ON stock_dbxref;
+   CREATE TRIGGER stock_dbxref_audit_ud
+       BEFORE UPDATE OR DELETE ON stock_dbxref
+       FOR EACH ROW
+       EXECUTE PROCEDURE audit_update_delete_stock_dbxref ();
+
+
+   DROP TABLE audit_stock_cvterm;
+   CREATE TABLE audit_stock_cvterm ( 
+       stock_cvterm_id integer, 
+       stock_id integer, 
+       cvterm_id integer, 
+       pub_id integer, 
+       is_not boolean, 
+       rank integer, 
+       transaction_date timestamp not null default now(),
+       transaction_type char(1) not null
+   );
+   GRANT ALL on audit_stock_cvterm to PUBLIC;
+
+   CREATE OR REPLACE FUNCTION audit_update_delete_stock_cvterm() RETURNS trigger AS
+   '
+   DECLARE
+       stock_cvterm_id_var integer; 
+       stock_id_var integer; 
+       cvterm_id_var integer; 
+       pub_id_var integer; 
+       is_not_var boolean; 
+       rank_var integer; 
+       
+       transaction_type_var char;
+   BEGIN
+       stock_cvterm_id_var = OLD.stock_cvterm_id;
+       stock_id_var = OLD.stock_id;
+       cvterm_id_var = OLD.cvterm_id;
+       pub_id_var = OLD.pub_id;
+       is_not_var = OLD.is_not;
+       rank_var = OLD.rank;
+       
+       IF TG_OP = ''DELETE'' THEN
+           transaction_type_var = ''D'';
+       ELSE
+           transaction_type_var = ''U'';
+       END IF;
+
+       INSERT INTO audit_stock_cvterm ( 
+             stock_cvterm_id, 
+             stock_id, 
+             cvterm_id, 
+             pub_id, 
+             is_not, 
+             rank, 
+             transaction_type
+       ) VALUES ( 
+             stock_cvterm_id_var, 
+             stock_id_var, 
+             cvterm_id_var, 
+             pub_id_var, 
+             is_not_var, 
+             rank_var, 
+             transaction_type_var
+       );
+
+       IF TG_OP = ''DELETE'' THEN
+           return OLD;
+       ELSE
+           return NEW;
+       END IF;
+   END
+   '
+   LANGUAGE plpgsql; 
+
+   DROP TRIGGER stock_cvterm_audit_ud ON stock_cvterm;
+   CREATE TRIGGER stock_cvterm_audit_ud
+       BEFORE UPDATE OR DELETE ON stock_cvterm
+       FOR EACH ROW
+       EXECUTE PROCEDURE audit_update_delete_stock_cvterm ();
+
+
+   DROP TABLE audit_stock_cvtermprop;
+   CREATE TABLE audit_stock_cvtermprop ( 
+       stock_cvtermprop_id integer, 
+       stock_cvterm_id integer, 
+       type_id integer, 
+       value text, 
+       rank integer, 
+       transaction_date timestamp not null default now(),
+       transaction_type char(1) not null
+   );
+   GRANT ALL on audit_stock_cvtermprop to PUBLIC;
+
+   CREATE OR REPLACE FUNCTION audit_update_delete_stock_cvtermprop() RETURNS trigger AS
+   '
+   DECLARE
+       stock_cvtermprop_id_var integer; 
+       stock_cvterm_id_var integer; 
+       type_id_var integer; 
+       value_var text; 
+       rank_var integer; 
+       
+       transaction_type_var char;
+   BEGIN
+       stock_cvtermprop_id_var = OLD.stock_cvtermprop_id;
+       stock_cvterm_id_var = OLD.stock_cvterm_id;
+       type_id_var = OLD.type_id;
+       value_var = OLD.value;
+       rank_var = OLD.rank;
+       
+       IF TG_OP = ''DELETE'' THEN
+           transaction_type_var = ''D'';
+       ELSE
+           transaction_type_var = ''U'';
+       END IF;
+
+       INSERT INTO audit_stock_cvtermprop ( 
+             stock_cvtermprop_id, 
+             stock_cvterm_id, 
+             type_id, 
+             value, 
+             rank, 
+             transaction_type
+       ) VALUES ( 
+             stock_cvtermprop_id_var, 
+             stock_cvterm_id_var, 
+             type_id_var, 
+             value_var, 
+             rank_var, 
+             transaction_type_var
+       );
+
+       IF TG_OP = ''DELETE'' THEN
+           return OLD;
+       ELSE
+           return NEW;
+       END IF;
+   END
+   '
+   LANGUAGE plpgsql; 
+
+   DROP TRIGGER stock_cvtermprop_audit_ud ON stock_cvtermprop;
+   CREATE TRIGGER stock_cvtermprop_audit_ud
+       BEFORE UPDATE OR DELETE ON stock_cvtermprop
+       FOR EACH ROW
+       EXECUTE PROCEDURE audit_update_delete_stock_cvtermprop ();
+
+
+   DROP TABLE audit_stock_genotype;
+   CREATE TABLE audit_stock_genotype ( 
+       stock_genotype_id integer, 
+       stock_id integer, 
+       genotype_id integer, 
+       transaction_date timestamp not null default now(),
+       transaction_type char(1) not null
+   );
+   GRANT ALL on audit_stock_genotype to PUBLIC;
+
+   CREATE OR REPLACE FUNCTION audit_update_delete_stock_genotype() RETURNS trigger AS
+   '
+   DECLARE
+       stock_genotype_id_var integer; 
+       stock_id_var integer; 
+       genotype_id_var integer; 
+       
+       transaction_type_var char;
+   BEGIN
+       stock_genotype_id_var = OLD.stock_genotype_id;
+       stock_id_var = OLD.stock_id;
+       genotype_id_var = OLD.genotype_id;
+       
+       IF TG_OP = ''DELETE'' THEN
+           transaction_type_var = ''D'';
+       ELSE
+           transaction_type_var = ''U'';
+       END IF;
+
+       INSERT INTO audit_stock_genotype ( 
+             stock_genotype_id, 
+             stock_id, 
+             genotype_id, 
+             transaction_type
+       ) VALUES ( 
+             stock_genotype_id_var, 
+             stock_id_var, 
+             genotype_id_var, 
+             transaction_type_var
+       );
+
+       IF TG_OP = ''DELETE'' THEN
+           return OLD;
+       ELSE
+           return NEW;
+       END IF;
+   END
+   '
+   LANGUAGE plpgsql; 
+
+   DROP TRIGGER stock_genotype_audit_ud ON stock_genotype;
+   CREATE TRIGGER stock_genotype_audit_ud
+       BEFORE UPDATE OR DELETE ON stock_genotype
+       FOR EACH ROW
+       EXECUTE PROCEDURE audit_update_delete_stock_genotype ();
+
+
+   DROP TABLE audit_stockcollection;
+   CREATE TABLE audit_stockcollection ( 
+       stockcollection_id integer, 
+       type_id integer, 
+       contact_id integer, 
+       name varchar(255), 
+       uniquename text, 
+       transaction_date timestamp not null default now(),
+       transaction_type char(1) not null
+   );
+   GRANT ALL on audit_stockcollection to PUBLIC;
+
+   CREATE OR REPLACE FUNCTION audit_update_delete_stockcollection() RETURNS trigger AS
+   '
+   DECLARE
+       stockcollection_id_var integer; 
+       type_id_var integer; 
+       contact_id_var integer; 
+       name_var varchar(255); 
+       uniquename_var text; 
+       
+       transaction_type_var char;
+   BEGIN
+       stockcollection_id_var = OLD.stockcollection_id;
+       type_id_var = OLD.type_id;
+       contact_id_var = OLD.contact_id;
+       name_var = OLD.name;
+       uniquename_var = OLD.uniquename;
+       
+       IF TG_OP = ''DELETE'' THEN
+           transaction_type_var = ''D'';
+       ELSE
+           transaction_type_var = ''U'';
+       END IF;
+
+       INSERT INTO audit_stockcollection ( 
+             stockcollection_id, 
+             type_id, 
+             contact_id, 
+             name, 
+             uniquename, 
+             transaction_type
+       ) VALUES ( 
+             stockcollection_id_var, 
+             type_id_var, 
+             contact_id_var, 
+             name_var, 
+             uniquename_var, 
+             transaction_type_var
+       );
+
+       IF TG_OP = ''DELETE'' THEN
+           return OLD;
+       ELSE
+           return NEW;
+       END IF;
+   END
+   '
+   LANGUAGE plpgsql; 
+
+   DROP TRIGGER stockcollection_audit_ud ON stockcollection;
+   CREATE TRIGGER stockcollection_audit_ud
+       BEFORE UPDATE OR DELETE ON stockcollection
+       FOR EACH ROW
+       EXECUTE PROCEDURE audit_update_delete_stockcollection ();
+
+
+   DROP TABLE audit_stockcollectionprop;
+   CREATE TABLE audit_stockcollectionprop ( 
+       stockcollectionprop_id integer, 
+       stockcollection_id integer, 
+       type_id integer, 
+       value text, 
+       rank integer, 
+       transaction_date timestamp not null default now(),
+       transaction_type char(1) not null
+   );
+   GRANT ALL on audit_stockcollectionprop to PUBLIC;
+
+   CREATE OR REPLACE FUNCTION audit_update_delete_stockcollectionprop() RETURNS trigger AS
+   '
+   DECLARE
+       stockcollectionprop_id_var integer; 
+       stockcollection_id_var integer; 
+       type_id_var integer; 
+       value_var text; 
+       rank_var integer; 
+       
+       transaction_type_var char;
+   BEGIN
+       stockcollectionprop_id_var = OLD.stockcollectionprop_id;
+       stockcollection_id_var = OLD.stockcollection_id;
+       type_id_var = OLD.type_id;
+       value_var = OLD.value;
+       rank_var = OLD.rank;
+       
+       IF TG_OP = ''DELETE'' THEN
+           transaction_type_var = ''D'';
+       ELSE
+           transaction_type_var = ''U'';
+       END IF;
+
+       INSERT INTO audit_stockcollectionprop ( 
+             stockcollectionprop_id, 
+             stockcollection_id, 
+             type_id, 
+             value, 
+             rank, 
+             transaction_type
+       ) VALUES ( 
+             stockcollectionprop_id_var, 
+             stockcollection_id_var, 
+             type_id_var, 
+             value_var, 
+             rank_var, 
+             transaction_type_var
+       );
+
+       IF TG_OP = ''DELETE'' THEN
+           return OLD;
+       ELSE
+           return NEW;
+       END IF;
+   END
+   '
+   LANGUAGE plpgsql; 
+
+   DROP TRIGGER stockcollectionprop_audit_ud ON stockcollectionprop;
+   CREATE TRIGGER stockcollectionprop_audit_ud
+       BEFORE UPDATE OR DELETE ON stockcollectionprop
+       FOR EACH ROW
+       EXECUTE PROCEDURE audit_update_delete_stockcollectionprop ();
+
+
+   DROP TABLE audit_stockcollection_stock;
+   CREATE TABLE audit_stockcollection_stock ( 
+       stockcollection_stock_id integer, 
+       stockcollection_id integer, 
+       stock_id integer, 
+       transaction_date timestamp not null default now(),
+       transaction_type char(1) not null
+   );
+   GRANT ALL on audit_stockcollection_stock to PUBLIC;
+
+   CREATE OR REPLACE FUNCTION audit_update_delete_stockcollection_stock() RETURNS trigger AS
+   '
+   DECLARE
+       stockcollection_stock_id_var integer; 
+       stockcollection_id_var integer; 
+       stock_id_var integer; 
+       
+       transaction_type_var char;
+   BEGIN
+       stockcollection_stock_id_var = OLD.stockcollection_stock_id;
+       stockcollection_id_var = OLD.stockcollection_id;
+       stock_id_var = OLD.stock_id;
+       
+       IF TG_OP = ''DELETE'' THEN
+           transaction_type_var = ''D'';
+       ELSE
+           transaction_type_var = ''U'';
+       END IF;
+
+       INSERT INTO audit_stockcollection_stock ( 
+             stockcollection_stock_id, 
+             stockcollection_id, 
+             stock_id, 
+             transaction_type
+       ) VALUES ( 
+             stockcollection_stock_id_var, 
+             stockcollection_id_var, 
+             stock_id_var, 
+             transaction_type_var
+       );
+
+       IF TG_OP = ''DELETE'' THEN
+           return OLD;
+       ELSE
+           return NEW;
+       END IF;
+   END
+   '
+   LANGUAGE plpgsql; 
+
+   DROP TRIGGER stockcollection_stock_audit_ud ON stockcollection_stock;
+   CREATE TRIGGER stockcollection_stock_audit_ud
+       BEFORE UPDATE OR DELETE ON stockcollection_stock
+       FOR EACH ROW
+       EXECUTE PROCEDURE audit_update_delete_stockcollection_stock ();
+
+
+   DROP TABLE audit_stock_dbxrefprop;
+   CREATE TABLE audit_stock_dbxrefprop ( 
+       stock_dbxrefprop_id integer, 
+       stock_dbxref_id integer, 
+       type_id integer, 
+       value text, 
+       rank integer, 
+       transaction_date timestamp not null default now(),
+       transaction_type char(1) not null
+   );
+   GRANT ALL on audit_stock_dbxrefprop to PUBLIC;
+
+   CREATE OR REPLACE FUNCTION audit_update_delete_stock_dbxrefprop() RETURNS trigger AS
+   '
+   DECLARE
+       stock_dbxrefprop_id_var integer; 
+       stock_dbxref_id_var integer; 
+       type_id_var integer; 
+       value_var text; 
+       rank_var integer; 
+       
+       transaction_type_var char;
+   BEGIN
+       stock_dbxrefprop_id_var = OLD.stock_dbxrefprop_id;
+       stock_dbxref_id_var = OLD.stock_dbxref_id;
+       type_id_var = OLD.type_id;
+       value_var = OLD.value;
+       rank_var = OLD.rank;
+       
+       IF TG_OP = ''DELETE'' THEN
+           transaction_type_var = ''D'';
+       ELSE
+           transaction_type_var = ''U'';
+       END IF;
+
+       INSERT INTO audit_stock_dbxrefprop ( 
+             stock_dbxrefprop_id, 
+             stock_dbxref_id, 
+             type_id, 
+             value, 
+             rank, 
+             transaction_type
+       ) VALUES ( 
+             stock_dbxrefprop_id_var, 
+             stock_dbxref_id_var, 
+             type_id_var, 
+             value_var, 
+             rank_var, 
+             transaction_type_var
+       );
+
+       IF TG_OP = ''DELETE'' THEN
+           return OLD;
+       ELSE
+           return NEW;
+       END IF;
+   END
+   '
+   LANGUAGE plpgsql; 
+
+   DROP TRIGGER stock_dbxrefprop_audit_ud ON stock_dbxrefprop;
+   CREATE TRIGGER stock_dbxrefprop_audit_ud
+       BEFORE UPDATE OR DELETE ON stock_dbxrefprop
+       FOR EACH ROW
+       EXECUTE PROCEDURE audit_update_delete_stock_dbxrefprop ();
+
+
+   DROP TABLE audit_stockcollection_db;
+   CREATE TABLE audit_stockcollection_db ( 
+       stockcollection_db_id integer, 
+       stockcollection_id integer, 
+       db_id integer, 
+       transaction_date timestamp not null default now(),
+       transaction_type char(1) not null
+   );
+   GRANT ALL on audit_stockcollection_db to PUBLIC;
+
+   CREATE OR REPLACE FUNCTION audit_update_delete_stockcollection_db() RETURNS trigger AS
+   '
+   DECLARE
+       stockcollection_db_id_var integer; 
+       stockcollection_id_var integer; 
+       db_id_var integer; 
+       
+       transaction_type_var char;
+   BEGIN
+       stockcollection_db_id_var = OLD.stockcollection_db_id;
+       stockcollection_id_var = OLD.stockcollection_id;
+       db_id_var = OLD.db_id;
+       
+       IF TG_OP = ''DELETE'' THEN
+           transaction_type_var = ''D'';
+       ELSE
+           transaction_type_var = ''U'';
+       END IF;
+
+       INSERT INTO audit_stockcollection_db ( 
+             stockcollection_db_id, 
+             stockcollection_id, 
+             db_id, 
+             transaction_type
+       ) VALUES ( 
+             stockcollection_db_id_var, 
+             stockcollection_id_var, 
+             db_id_var, 
+             transaction_type_var
+       );
+
+       IF TG_OP = ''DELETE'' THEN
+           return OLD;
+       ELSE
+           return NEW;
+       END IF;
+   END
+   '
+   LANGUAGE plpgsql; 
+
+   DROP TRIGGER stockcollection_db_audit_ud ON stockcollection_db;
+   CREATE TRIGGER stockcollection_db_audit_ud
+       BEFORE UPDATE OR DELETE ON stockcollection_db
+       FOR EACH ROW
+       EXECUTE PROCEDURE audit_update_delete_stockcollection_db ();
+
+
+   DROP TABLE audit_stock_feature;
+   CREATE TABLE audit_stock_feature ( 
+       stock_feature_id integer, 
+       feature_id integer, 
+       stock_id integer, 
+       type_id integer, 
+       rank integer, 
+       transaction_date timestamp not null default now(),
+       transaction_type char(1) not null
+   );
+   GRANT ALL on audit_stock_feature to PUBLIC;
+
+   CREATE OR REPLACE FUNCTION audit_update_delete_stock_feature() RETURNS trigger AS
+   '
+   DECLARE
+       stock_feature_id_var integer; 
+       feature_id_var integer; 
+       stock_id_var integer; 
+       type_id_var integer; 
+       rank_var integer; 
+       
+       transaction_type_var char;
+   BEGIN
+       stock_feature_id_var = OLD.stock_feature_id;
+       feature_id_var = OLD.feature_id;
+       stock_id_var = OLD.stock_id;
+       type_id_var = OLD.type_id;
+       rank_var = OLD.rank;
+       
+       IF TG_OP = ''DELETE'' THEN
+           transaction_type_var = ''D'';
+       ELSE
+           transaction_type_var = ''U'';
+       END IF;
+
+       INSERT INTO audit_stock_feature ( 
+             stock_feature_id, 
+             feature_id, 
+             stock_id, 
+             type_id, 
+             rank, 
+             transaction_type
+       ) VALUES ( 
+             stock_feature_id_var, 
+             feature_id_var, 
+             stock_id_var, 
+             type_id_var, 
+             rank_var, 
+             transaction_type_var
+       );
+
+       IF TG_OP = ''DELETE'' THEN
+           return OLD;
+       ELSE
+           return NEW;
+       END IF;
+   END
+   '
+   LANGUAGE plpgsql; 
+
+   DROP TRIGGER stock_feature_audit_ud ON stock_feature;
+   CREATE TRIGGER stock_feature_audit_ud
+       BEFORE UPDATE OR DELETE ON stock_feature
+       FOR EACH ROW
+       EXECUTE PROCEDURE audit_update_delete_stock_feature ();
+
+
+   DROP TABLE audit_stock_featuremap;
+   CREATE TABLE audit_stock_featuremap ( 
+       stock_featuremap_id integer, 
+       featuremap_id integer, 
+       stock_id integer, 
+       type_id integer, 
+       transaction_date timestamp not null default now(),
+       transaction_type char(1) not null
+   );
+   GRANT ALL on audit_stock_featuremap to PUBLIC;
+
+   CREATE OR REPLACE FUNCTION audit_update_delete_stock_featuremap() RETURNS trigger AS
+   '
+   DECLARE
+       stock_featuremap_id_var integer; 
+       featuremap_id_var integer; 
+       stock_id_var integer; 
+       type_id_var integer; 
+       
+       transaction_type_var char;
+   BEGIN
+       stock_featuremap_id_var = OLD.stock_featuremap_id;
+       featuremap_id_var = OLD.featuremap_id;
+       stock_id_var = OLD.stock_id;
+       type_id_var = OLD.type_id;
+       
+       IF TG_OP = ''DELETE'' THEN
+           transaction_type_var = ''D'';
+       ELSE
+           transaction_type_var = ''U'';
+       END IF;
+
+       INSERT INTO audit_stock_featuremap ( 
+             stock_featuremap_id, 
+             featuremap_id, 
+             stock_id, 
+             type_id, 
+             transaction_type
+       ) VALUES ( 
+             stock_featuremap_id_var, 
+             featuremap_id_var, 
+             stock_id_var, 
+             type_id_var, 
+             transaction_type_var
+       );
+
+       IF TG_OP = ''DELETE'' THEN
+           return OLD;
+       ELSE
+           return NEW;
+       END IF;
+   END
+   '
+   LANGUAGE plpgsql; 
+
+   DROP TRIGGER stock_featuremap_audit_ud ON stock_featuremap;
+   CREATE TRIGGER stock_featuremap_audit_ud
+       BEFORE UPDATE OR DELETE ON stock_featuremap
+       FOR EACH ROW
+       EXECUTE PROCEDURE audit_update_delete_stock_featuremap ();
+
+
+   DROP TABLE audit_stock_library;
+   CREATE TABLE audit_stock_library ( 
+       stock_library_id integer, 
+       library_id integer, 
+       stock_id integer, 
+       transaction_date timestamp not null default now(),
+       transaction_type char(1) not null
+   );
+   GRANT ALL on audit_stock_library to PUBLIC;
+
+   CREATE OR REPLACE FUNCTION audit_update_delete_stock_library() RETURNS trigger AS
+   '
+   DECLARE
+       stock_library_id_var integer; 
+       library_id_var integer; 
+       stock_id_var integer; 
+       
+       transaction_type_var char;
+   BEGIN
+       stock_library_id_var = OLD.stock_library_id;
+       library_id_var = OLD.library_id;
+       stock_id_var = OLD.stock_id;
+       
+       IF TG_OP = ''DELETE'' THEN
+           transaction_type_var = ''D'';
+       ELSE
+           transaction_type_var = ''U'';
+       END IF;
+
+       INSERT INTO audit_stock_library ( 
+             stock_library_id, 
+             library_id, 
+             stock_id, 
+             transaction_type
+       ) VALUES ( 
+             stock_library_id_var, 
+             library_id_var, 
+             stock_id_var, 
+             transaction_type_var
+       );
+
+       IF TG_OP = ''DELETE'' THEN
+           return OLD;
+       ELSE
+           return NEW;
+       END IF;
+   END
+   '
+   LANGUAGE plpgsql; 
+
+   DROP TRIGGER stock_library_audit_ud ON stock_library;
+   CREATE TRIGGER stock_library_audit_ud
+       BEFORE UPDATE OR DELETE ON stock_library
+       FOR EACH ROW
+       EXECUTE PROCEDURE audit_update_delete_stock_library ();
+
+
    DROP TABLE audit_project;
    CREATE TABLE audit_project ( 
-       project_id bigint, 
+       project_id integer, 
        name varchar(255), 
-       description varchar(255), 
+       description text, 
        transaction_date timestamp not null default now(),
        transaction_type char(1) not null
    );
@@ -5452,9 +8838,9 @@
    CREATE OR REPLACE FUNCTION audit_update_delete_project() RETURNS trigger AS
    '
    DECLARE
-       project_id_var bigint; 
+       project_id_var integer; 
        name_var varchar(255); 
-       description_var varchar(255); 
+       description_var text; 
        
        transaction_type_var char;
    BEGIN
@@ -5498,9 +8884,9 @@
 
    DROP TABLE audit_projectprop;
    CREATE TABLE audit_projectprop ( 
-       projectprop_id bigint, 
-       project_id bigint, 
-       type_id bigint, 
+       projectprop_id integer, 
+       project_id integer, 
+       type_id integer, 
        value text, 
        rank integer, 
        transaction_date timestamp not null default now(),
@@ -5511,9 +8897,9 @@
    CREATE OR REPLACE FUNCTION audit_update_delete_projectprop() RETURNS trigger AS
    '
    DECLARE
-       projectprop_id_var bigint; 
-       project_id_var bigint; 
-       type_id_var bigint; 
+       projectprop_id_var integer; 
+       project_id_var integer; 
+       type_id_var integer; 
        value_var text; 
        rank_var integer; 
        
@@ -5565,10 +8951,10 @@
 
    DROP TABLE audit_project_relationship;
    CREATE TABLE audit_project_relationship ( 
-       project_relationship_id bigint, 
-       subject_project_id bigint, 
-       object_project_id bigint, 
-       type_id bigint, 
+       project_relationship_id integer, 
+       subject_project_id integer, 
+       object_project_id integer, 
+       type_id integer, 
        transaction_date timestamp not null default now(),
        transaction_type char(1) not null
    );
@@ -5577,10 +8963,10 @@
    CREATE OR REPLACE FUNCTION audit_update_delete_project_relationship() RETURNS trigger AS
    '
    DECLARE
-       project_relationship_id_var bigint; 
-       subject_project_id_var bigint; 
-       object_project_id_var bigint; 
-       type_id_var bigint; 
+       project_relationship_id_var integer; 
+       subject_project_id_var integer; 
+       object_project_id_var integer; 
+       type_id_var integer; 
        
        transaction_type_var char;
    BEGIN
@@ -5627,9 +9013,9 @@
 
    DROP TABLE audit_project_pub;
    CREATE TABLE audit_project_pub ( 
-       project_pub_id bigint, 
-       project_id bigint, 
-       pub_id bigint, 
+       project_pub_id integer, 
+       project_id integer, 
+       pub_id integer, 
        transaction_date timestamp not null default now(),
        transaction_type char(1) not null
    );
@@ -5638,9 +9024,9 @@
    CREATE OR REPLACE FUNCTION audit_update_delete_project_pub() RETURNS trigger AS
    '
    DECLARE
-       project_pub_id_var bigint; 
-       project_id_var bigint; 
-       pub_id_var bigint; 
+       project_pub_id_var integer; 
+       project_id_var integer; 
+       pub_id_var integer; 
        
        transaction_type_var char;
    BEGIN
@@ -5684,9 +9070,9 @@
 
    DROP TABLE audit_project_contact;
    CREATE TABLE audit_project_contact ( 
-       project_contact_id bigint, 
-       project_id bigint, 
-       contact_id bigint, 
+       project_contact_id integer, 
+       project_id integer, 
+       contact_id integer, 
        transaction_date timestamp not null default now(),
        transaction_type char(1) not null
    );
@@ -5695,9 +9081,9 @@
    CREATE OR REPLACE FUNCTION audit_update_delete_project_contact() RETURNS trigger AS
    '
    DECLARE
-       project_contact_id_var bigint; 
-       project_id_var bigint; 
-       contact_id_var bigint; 
+       project_contact_id_var integer; 
+       project_id_var integer; 
+       contact_id_var integer; 
        
        transaction_type_var char;
    BEGIN
@@ -5739,9 +9125,247 @@
        EXECUTE PROCEDURE audit_update_delete_project_contact ();
 
 
+   DROP TABLE audit_project_dbxref;
+   CREATE TABLE audit_project_dbxref ( 
+       project_dbxref_id integer, 
+       project_id integer, 
+       dbxref_id integer, 
+       is_current boolean, 
+       transaction_date timestamp not null default now(),
+       transaction_type char(1) not null
+   );
+   GRANT ALL on audit_project_dbxref to PUBLIC;
+
+   CREATE OR REPLACE FUNCTION audit_update_delete_project_dbxref() RETURNS trigger AS
+   '
+   DECLARE
+       project_dbxref_id_var integer; 
+       project_id_var integer; 
+       dbxref_id_var integer; 
+       is_current_var boolean; 
+       
+       transaction_type_var char;
+   BEGIN
+       project_dbxref_id_var = OLD.project_dbxref_id;
+       project_id_var = OLD.project_id;
+       dbxref_id_var = OLD.dbxref_id;
+       is_current_var = OLD.is_current;
+       
+       IF TG_OP = ''DELETE'' THEN
+           transaction_type_var = ''D'';
+       ELSE
+           transaction_type_var = ''U'';
+       END IF;
+
+       INSERT INTO audit_project_dbxref ( 
+             project_dbxref_id, 
+             project_id, 
+             dbxref_id, 
+             is_current, 
+             transaction_type
+       ) VALUES ( 
+             project_dbxref_id_var, 
+             project_id_var, 
+             dbxref_id_var, 
+             is_current_var, 
+             transaction_type_var
+       );
+
+       IF TG_OP = ''DELETE'' THEN
+           return OLD;
+       ELSE
+           return NEW;
+       END IF;
+   END
+   '
+   LANGUAGE plpgsql; 
+
+   DROP TRIGGER project_dbxref_audit_ud ON project_dbxref;
+   CREATE TRIGGER project_dbxref_audit_ud
+       BEFORE UPDATE OR DELETE ON project_dbxref
+       FOR EACH ROW
+       EXECUTE PROCEDURE audit_update_delete_project_dbxref ();
+
+
+   DROP TABLE audit_project_analysis;
+   CREATE TABLE audit_project_analysis ( 
+       project_analysis_id integer, 
+       project_id integer, 
+       analysis_id integer, 
+       rank integer, 
+       transaction_date timestamp not null default now(),
+       transaction_type char(1) not null
+   );
+   GRANT ALL on audit_project_analysis to PUBLIC;
+
+   CREATE OR REPLACE FUNCTION audit_update_delete_project_analysis() RETURNS trigger AS
+   '
+   DECLARE
+       project_analysis_id_var integer; 
+       project_id_var integer; 
+       analysis_id_var integer; 
+       rank_var integer; 
+       
+       transaction_type_var char;
+   BEGIN
+       project_analysis_id_var = OLD.project_analysis_id;
+       project_id_var = OLD.project_id;
+       analysis_id_var = OLD.analysis_id;
+       rank_var = OLD.rank;
+       
+       IF TG_OP = ''DELETE'' THEN
+           transaction_type_var = ''D'';
+       ELSE
+           transaction_type_var = ''U'';
+       END IF;
+
+       INSERT INTO audit_project_analysis ( 
+             project_analysis_id, 
+             project_id, 
+             analysis_id, 
+             rank, 
+             transaction_type
+       ) VALUES ( 
+             project_analysis_id_var, 
+             project_id_var, 
+             analysis_id_var, 
+             rank_var, 
+             transaction_type_var
+       );
+
+       IF TG_OP = ''DELETE'' THEN
+           return OLD;
+       ELSE
+           return NEW;
+       END IF;
+   END
+   '
+   LANGUAGE plpgsql; 
+
+   DROP TRIGGER project_analysis_audit_ud ON project_analysis;
+   CREATE TRIGGER project_analysis_audit_ud
+       BEFORE UPDATE OR DELETE ON project_analysis
+       FOR EACH ROW
+       EXECUTE PROCEDURE audit_update_delete_project_analysis ();
+
+
+   DROP TABLE audit_project_feature;
+   CREATE TABLE audit_project_feature ( 
+       project_feature_id integer, 
+       feature_id integer, 
+       project_id integer, 
+       transaction_date timestamp not null default now(),
+       transaction_type char(1) not null
+   );
+   GRANT ALL on audit_project_feature to PUBLIC;
+
+   CREATE OR REPLACE FUNCTION audit_update_delete_project_feature() RETURNS trigger AS
+   '
+   DECLARE
+       project_feature_id_var integer; 
+       feature_id_var integer; 
+       project_id_var integer; 
+       
+       transaction_type_var char;
+   BEGIN
+       project_feature_id_var = OLD.project_feature_id;
+       feature_id_var = OLD.feature_id;
+       project_id_var = OLD.project_id;
+       
+       IF TG_OP = ''DELETE'' THEN
+           transaction_type_var = ''D'';
+       ELSE
+           transaction_type_var = ''U'';
+       END IF;
+
+       INSERT INTO audit_project_feature ( 
+             project_feature_id, 
+             feature_id, 
+             project_id, 
+             transaction_type
+       ) VALUES ( 
+             project_feature_id_var, 
+             feature_id_var, 
+             project_id_var, 
+             transaction_type_var
+       );
+
+       IF TG_OP = ''DELETE'' THEN
+           return OLD;
+       ELSE
+           return NEW;
+       END IF;
+   END
+   '
+   LANGUAGE plpgsql; 
+
+   DROP TRIGGER project_feature_audit_ud ON project_feature;
+   CREATE TRIGGER project_feature_audit_ud
+       BEFORE UPDATE OR DELETE ON project_feature
+       FOR EACH ROW
+       EXECUTE PROCEDURE audit_update_delete_project_feature ();
+
+
+   DROP TABLE audit_project_stock;
+   CREATE TABLE audit_project_stock ( 
+       project_stock_id integer, 
+       stock_id integer, 
+       project_id integer, 
+       transaction_date timestamp not null default now(),
+       transaction_type char(1) not null
+   );
+   GRANT ALL on audit_project_stock to PUBLIC;
+
+   CREATE OR REPLACE FUNCTION audit_update_delete_project_stock() RETURNS trigger AS
+   '
+   DECLARE
+       project_stock_id_var integer; 
+       stock_id_var integer; 
+       project_id_var integer; 
+       
+       transaction_type_var char;
+   BEGIN
+       project_stock_id_var = OLD.project_stock_id;
+       stock_id_var = OLD.stock_id;
+       project_id_var = OLD.project_id;
+       
+       IF TG_OP = ''DELETE'' THEN
+           transaction_type_var = ''D'';
+       ELSE
+           transaction_type_var = ''U'';
+       END IF;
+
+       INSERT INTO audit_project_stock ( 
+             project_stock_id, 
+             stock_id, 
+             project_id, 
+             transaction_type
+       ) VALUES ( 
+             project_stock_id_var, 
+             stock_id_var, 
+             project_id_var, 
+             transaction_type_var
+       );
+
+       IF TG_OP = ''DELETE'' THEN
+           return OLD;
+       ELSE
+           return NEW;
+       END IF;
+   END
+   '
+   LANGUAGE plpgsql; 
+
+   DROP TRIGGER project_stock_audit_ud ON project_stock;
+   CREATE TRIGGER project_stock_audit_ud
+       BEFORE UPDATE OR DELETE ON project_stock
+       FOR EACH ROW
+       EXECUTE PROCEDURE audit_update_delete_project_stock ();
+
+
    DROP TABLE audit_mageml;
    CREATE TABLE audit_mageml ( 
-       mageml_id bigint, 
+       mageml_id integer, 
        mage_package text, 
        mage_ml text, 
        transaction_date timestamp not null default now(),
@@ -5752,7 +9376,7 @@
    CREATE OR REPLACE FUNCTION audit_update_delete_mageml() RETURNS trigger AS
    '
    DECLARE
-       mageml_id_var bigint; 
+       mageml_id_var integer; 
        mage_package_var text; 
        mage_ml_var text; 
        
@@ -5798,10 +9422,10 @@
 
    DROP TABLE audit_magedocumentation;
    CREATE TABLE audit_magedocumentation ( 
-       magedocumentation_id bigint, 
-       mageml_id bigint, 
-       tableinfo_id bigint, 
-       row_id bigint, 
+       magedocumentation_id integer, 
+       mageml_id integer, 
+       tableinfo_id integer, 
+       row_id integer, 
        mageidentifier text, 
        transaction_date timestamp not null default now(),
        transaction_type char(1) not null
@@ -5811,10 +9435,10 @@
    CREATE OR REPLACE FUNCTION audit_update_delete_magedocumentation() RETURNS trigger AS
    '
    DECLARE
-       magedocumentation_id_var bigint; 
-       mageml_id_var bigint; 
-       tableinfo_id_var bigint; 
-       row_id_var bigint; 
+       magedocumentation_id_var integer; 
+       mageml_id_var integer; 
+       tableinfo_id_var integer; 
+       row_id_var integer; 
        mageidentifier_var text; 
        
        transaction_type_var char;
@@ -5865,10 +9489,10 @@
 
    DROP TABLE audit_protocol;
    CREATE TABLE audit_protocol ( 
-       protocol_id bigint, 
-       type_id bigint, 
-       pub_id bigint, 
-       dbxref_id bigint, 
+       protocol_id integer, 
+       type_id integer, 
+       pub_id integer, 
+       dbxref_id integer, 
        name text, 
        uri text, 
        protocoldescription text, 
@@ -5882,10 +9506,10 @@
    CREATE OR REPLACE FUNCTION audit_update_delete_protocol() RETURNS trigger AS
    '
    DECLARE
-       protocol_id_var bigint; 
-       type_id_var bigint; 
-       pub_id_var bigint; 
-       dbxref_id_var bigint; 
+       protocol_id_var integer; 
+       type_id_var integer; 
+       pub_id_var integer; 
+       dbxref_id_var integer; 
        name_var text; 
        uri_var text; 
        protocoldescription_var text; 
@@ -5952,11 +9576,11 @@
 
    DROP TABLE audit_protocolparam;
    CREATE TABLE audit_protocolparam ( 
-       protocolparam_id bigint, 
-       protocol_id bigint, 
+       protocolparam_id integer, 
+       protocol_id integer, 
        name text, 
-       datatype_id bigint, 
-       unittype_id bigint, 
+       datatype_id integer, 
+       unittype_id integer, 
        value text, 
        rank integer, 
        transaction_date timestamp not null default now(),
@@ -5967,11 +9591,11 @@
    CREATE OR REPLACE FUNCTION audit_update_delete_protocolparam() RETURNS trigger AS
    '
    DECLARE
-       protocolparam_id_var bigint; 
-       protocol_id_var bigint; 
+       protocolparam_id_var integer; 
+       protocol_id_var integer; 
        name_var text; 
-       datatype_id_var bigint; 
-       unittype_id_var bigint; 
+       datatype_id_var integer; 
+       unittype_id_var integer; 
        value_var text; 
        rank_var integer; 
        
@@ -6029,7 +9653,7 @@
 
    DROP TABLE audit_channel;
    CREATE TABLE audit_channel ( 
-       channel_id bigint, 
+       channel_id integer, 
        name text, 
        definition text, 
        transaction_date timestamp not null default now(),
@@ -6040,7 +9664,7 @@
    CREATE OR REPLACE FUNCTION audit_update_delete_channel() RETURNS trigger AS
    '
    DECLARE
-       channel_id_var bigint; 
+       channel_id_var integer; 
        name_var text; 
        definition_var text; 
        
@@ -6086,12 +9710,12 @@
 
    DROP TABLE audit_arraydesign;
    CREATE TABLE audit_arraydesign ( 
-       arraydesign_id bigint, 
-       manufacturer_id bigint, 
-       platformtype_id bigint, 
-       substratetype_id bigint, 
-       protocol_id bigint, 
-       dbxref_id bigint, 
+       arraydesign_id integer, 
+       manufacturer_id integer, 
+       platformtype_id integer, 
+       substratetype_id integer, 
+       protocol_id integer, 
+       dbxref_id integer, 
        name text, 
        version text, 
        description text, 
@@ -6112,12 +9736,12 @@
    CREATE OR REPLACE FUNCTION audit_update_delete_arraydesign() RETURNS trigger AS
    '
    DECLARE
-       arraydesign_id_var bigint; 
-       manufacturer_id_var bigint; 
-       platformtype_id_var bigint; 
-       substratetype_id_var bigint; 
-       protocol_id_var bigint; 
-       dbxref_id_var bigint; 
+       arraydesign_id_var integer; 
+       manufacturer_id_var integer; 
+       platformtype_id_var integer; 
+       substratetype_id_var integer; 
+       protocol_id_var integer; 
+       dbxref_id_var integer; 
        name_var text; 
        version_var text; 
        description_var text; 
@@ -6218,9 +9842,9 @@
 
    DROP TABLE audit_arraydesignprop;
    CREATE TABLE audit_arraydesignprop ( 
-       arraydesignprop_id bigint, 
-       arraydesign_id bigint, 
-       type_id bigint, 
+       arraydesignprop_id integer, 
+       arraydesign_id integer, 
+       type_id integer, 
        value text, 
        rank integer, 
        transaction_date timestamp not null default now(),
@@ -6231,9 +9855,9 @@
    CREATE OR REPLACE FUNCTION audit_update_delete_arraydesignprop() RETURNS trigger AS
    '
    DECLARE
-       arraydesignprop_id_var bigint; 
-       arraydesign_id_var bigint; 
-       type_id_var bigint; 
+       arraydesignprop_id_var integer; 
+       arraydesign_id_var integer; 
+       type_id_var integer; 
        value_var text; 
        rank_var integer; 
        
@@ -6285,14 +9909,14 @@
 
    DROP TABLE audit_assay;
    CREATE TABLE audit_assay ( 
-       assay_id bigint, 
-       arraydesign_id bigint, 
-       protocol_id bigint, 
+       assay_id integer, 
+       arraydesign_id integer, 
+       protocol_id integer, 
        assaydate timestamp, 
        arrayidentifier text, 
        arraybatchidentifier text, 
-       operator_id bigint, 
-       dbxref_id bigint, 
+       operator_id integer, 
+       dbxref_id integer, 
        name text, 
        description text, 
        transaction_date timestamp not null default now(),
@@ -6303,14 +9927,14 @@
    CREATE OR REPLACE FUNCTION audit_update_delete_assay() RETURNS trigger AS
    '
    DECLARE
-       assay_id_var bigint; 
-       arraydesign_id_var bigint; 
-       protocol_id_var bigint; 
+       assay_id_var integer; 
+       arraydesign_id_var integer; 
+       protocol_id_var integer; 
        assaydate_var timestamp; 
        arrayidentifier_var text; 
        arraybatchidentifier_var text; 
-       operator_id_var bigint; 
-       dbxref_id_var bigint; 
+       operator_id_var integer; 
+       dbxref_id_var integer; 
        name_var text; 
        description_var text; 
        
@@ -6377,9 +10001,9 @@
 
    DROP TABLE audit_assayprop;
    CREATE TABLE audit_assayprop ( 
-       assayprop_id bigint, 
-       assay_id bigint, 
-       type_id bigint, 
+       assayprop_id integer, 
+       assay_id integer, 
+       type_id integer, 
        value text, 
        rank integer, 
        transaction_date timestamp not null default now(),
@@ -6390,9 +10014,9 @@
    CREATE OR REPLACE FUNCTION audit_update_delete_assayprop() RETURNS trigger AS
    '
    DECLARE
-       assayprop_id_var bigint; 
-       assay_id_var bigint; 
-       type_id_var bigint; 
+       assayprop_id_var integer; 
+       assay_id_var integer; 
+       type_id_var integer; 
        value_var text; 
        rank_var integer; 
        
@@ -6444,9 +10068,9 @@
 
    DROP TABLE audit_assay_project;
    CREATE TABLE audit_assay_project ( 
-       assay_project_id bigint, 
-       assay_id bigint, 
-       project_id bigint, 
+       assay_project_id integer, 
+       assay_id integer, 
+       project_id integer, 
        transaction_date timestamp not null default now(),
        transaction_type char(1) not null
    );
@@ -6455,9 +10079,9 @@
    CREATE OR REPLACE FUNCTION audit_update_delete_assay_project() RETURNS trigger AS
    '
    DECLARE
-       assay_project_id_var bigint; 
-       assay_id_var bigint; 
-       project_id_var bigint; 
+       assay_project_id_var integer; 
+       assay_id_var integer; 
+       project_id_var integer; 
        
        transaction_type_var char;
    BEGIN
@@ -6501,10 +10125,10 @@
 
    DROP TABLE audit_biomaterial;
    CREATE TABLE audit_biomaterial ( 
-       biomaterial_id bigint, 
-       taxon_id bigint, 
-       biosourceprovider_id bigint, 
-       dbxref_id bigint, 
+       biomaterial_id integer, 
+       taxon_id integer, 
+       biosourceprovider_id integer, 
+       dbxref_id integer, 
        name text, 
        description text, 
        transaction_date timestamp not null default now(),
@@ -6515,10 +10139,10 @@
    CREATE OR REPLACE FUNCTION audit_update_delete_biomaterial() RETURNS trigger AS
    '
    DECLARE
-       biomaterial_id_var bigint; 
-       taxon_id_var bigint; 
-       biosourceprovider_id_var bigint; 
-       dbxref_id_var bigint; 
+       biomaterial_id_var integer; 
+       taxon_id_var integer; 
+       biosourceprovider_id_var integer; 
+       dbxref_id_var integer; 
        name_var text; 
        description_var text; 
        
@@ -6573,10 +10197,10 @@
 
    DROP TABLE audit_biomaterial_relationship;
    CREATE TABLE audit_biomaterial_relationship ( 
-       biomaterial_relationship_id bigint, 
-       subject_id bigint, 
-       type_id bigint, 
-       object_id bigint, 
+       biomaterial_relationship_id integer, 
+       subject_id integer, 
+       type_id integer, 
+       object_id integer, 
        transaction_date timestamp not null default now(),
        transaction_type char(1) not null
    );
@@ -6585,10 +10209,10 @@
    CREATE OR REPLACE FUNCTION audit_update_delete_biomaterial_relationship() RETURNS trigger AS
    '
    DECLARE
-       biomaterial_relationship_id_var bigint; 
-       subject_id_var bigint; 
-       type_id_var bigint; 
-       object_id_var bigint; 
+       biomaterial_relationship_id_var integer; 
+       subject_id_var integer; 
+       type_id_var integer; 
+       object_id_var integer; 
        
        transaction_type_var char;
    BEGIN
@@ -6635,9 +10259,9 @@
 
    DROP TABLE audit_biomaterialprop;
    CREATE TABLE audit_biomaterialprop ( 
-       biomaterialprop_id bigint, 
-       biomaterial_id bigint, 
-       type_id bigint, 
+       biomaterialprop_id integer, 
+       biomaterial_id integer, 
+       type_id integer, 
        value text, 
        rank integer, 
        transaction_date timestamp not null default now(),
@@ -6648,9 +10272,9 @@
    CREATE OR REPLACE FUNCTION audit_update_delete_biomaterialprop() RETURNS trigger AS
    '
    DECLARE
-       biomaterialprop_id_var bigint; 
-       biomaterial_id_var bigint; 
-       type_id_var bigint; 
+       biomaterialprop_id_var integer; 
+       biomaterial_id_var integer; 
+       type_id_var integer; 
        value_var text; 
        rank_var integer; 
        
@@ -6702,9 +10326,9 @@
 
    DROP TABLE audit_biomaterial_dbxref;
    CREATE TABLE audit_biomaterial_dbxref ( 
-       biomaterial_dbxref_id bigint, 
-       biomaterial_id bigint, 
-       dbxref_id bigint, 
+       biomaterial_dbxref_id integer, 
+       biomaterial_id integer, 
+       dbxref_id integer, 
        transaction_date timestamp not null default now(),
        transaction_type char(1) not null
    );
@@ -6713,9 +10337,9 @@
    CREATE OR REPLACE FUNCTION audit_update_delete_biomaterial_dbxref() RETURNS trigger AS
    '
    DECLARE
-       biomaterial_dbxref_id_var bigint; 
-       biomaterial_id_var bigint; 
-       dbxref_id_var bigint; 
+       biomaterial_dbxref_id_var integer; 
+       biomaterial_id_var integer; 
+       dbxref_id_var integer; 
        
        transaction_type_var char;
    BEGIN
@@ -6759,11 +10383,11 @@
 
    DROP TABLE audit_treatment;
    CREATE TABLE audit_treatment ( 
-       treatment_id bigint, 
+       treatment_id integer, 
        rank integer, 
-       biomaterial_id bigint, 
-       type_id bigint, 
-       protocol_id bigint, 
+       biomaterial_id integer, 
+       type_id integer, 
+       protocol_id integer, 
        name text, 
        transaction_date timestamp not null default now(),
        transaction_type char(1) not null
@@ -6773,11 +10397,11 @@
    CREATE OR REPLACE FUNCTION audit_update_delete_treatment() RETURNS trigger AS
    '
    DECLARE
-       treatment_id_var bigint; 
+       treatment_id_var integer; 
        rank_var integer; 
-       biomaterial_id_var bigint; 
-       type_id_var bigint; 
-       protocol_id_var bigint; 
+       biomaterial_id_var integer; 
+       type_id_var integer; 
+       protocol_id_var integer; 
        name_var text; 
        
        transaction_type_var char;
@@ -6831,10 +10455,10 @@
 
    DROP TABLE audit_biomaterial_treatment;
    CREATE TABLE audit_biomaterial_treatment ( 
-       biomaterial_treatment_id bigint, 
-       biomaterial_id bigint, 
-       treatment_id bigint, 
-       unittype_id bigint, 
+       biomaterial_treatment_id integer, 
+       biomaterial_id integer, 
+       treatment_id integer, 
+       unittype_id integer, 
        value float, 
        rank integer, 
        transaction_date timestamp not null default now(),
@@ -6845,10 +10469,10 @@
    CREATE OR REPLACE FUNCTION audit_update_delete_biomaterial_treatment() RETURNS trigger AS
    '
    DECLARE
-       biomaterial_treatment_id_var bigint; 
-       biomaterial_id_var bigint; 
-       treatment_id_var bigint; 
-       unittype_id_var bigint; 
+       biomaterial_treatment_id_var integer; 
+       biomaterial_id_var integer; 
+       treatment_id_var integer; 
+       unittype_id_var integer; 
        value_var float; 
        rank_var integer; 
        
@@ -6903,10 +10527,10 @@
 
    DROP TABLE audit_assay_biomaterial;
    CREATE TABLE audit_assay_biomaterial ( 
-       assay_biomaterial_id bigint, 
-       assay_id bigint, 
-       biomaterial_id bigint, 
-       channel_id bigint, 
+       assay_biomaterial_id integer, 
+       assay_id integer, 
+       biomaterial_id integer, 
+       channel_id integer, 
        rank integer, 
        transaction_date timestamp not null default now(),
        transaction_type char(1) not null
@@ -6916,10 +10540,10 @@
    CREATE OR REPLACE FUNCTION audit_update_delete_assay_biomaterial() RETURNS trigger AS
    '
    DECLARE
-       assay_biomaterial_id_var bigint; 
-       assay_id_var bigint; 
-       biomaterial_id_var bigint; 
-       channel_id_var bigint; 
+       assay_biomaterial_id_var integer; 
+       assay_id_var integer; 
+       biomaterial_id_var integer; 
+       channel_id_var integer; 
        rank_var integer; 
        
        transaction_type_var char;
@@ -6970,10 +10594,10 @@
 
    DROP TABLE audit_acquisition;
    CREATE TABLE audit_acquisition ( 
-       acquisition_id bigint, 
-       assay_id bigint, 
-       protocol_id bigint, 
-       channel_id bigint, 
+       acquisition_id integer, 
+       assay_id integer, 
+       protocol_id integer, 
+       channel_id integer, 
        acquisitiondate timestamp, 
        name text, 
        uri text, 
@@ -6985,10 +10609,10 @@
    CREATE OR REPLACE FUNCTION audit_update_delete_acquisition() RETURNS trigger AS
    '
    DECLARE
-       acquisition_id_var bigint; 
-       assay_id_var bigint; 
-       protocol_id_var bigint; 
-       channel_id_var bigint; 
+       acquisition_id_var integer; 
+       assay_id_var integer; 
+       protocol_id_var integer; 
+       channel_id_var integer; 
        acquisitiondate_var timestamp; 
        name_var text; 
        uri_var text; 
@@ -7047,9 +10671,9 @@
 
    DROP TABLE audit_acquisitionprop;
    CREATE TABLE audit_acquisitionprop ( 
-       acquisitionprop_id bigint, 
-       acquisition_id bigint, 
-       type_id bigint, 
+       acquisitionprop_id integer, 
+       acquisition_id integer, 
+       type_id integer, 
        value text, 
        rank integer, 
        transaction_date timestamp not null default now(),
@@ -7060,9 +10684,9 @@
    CREATE OR REPLACE FUNCTION audit_update_delete_acquisitionprop() RETURNS trigger AS
    '
    DECLARE
-       acquisitionprop_id_var bigint; 
-       acquisition_id_var bigint; 
-       type_id_var bigint; 
+       acquisitionprop_id_var integer; 
+       acquisition_id_var integer; 
+       type_id_var integer; 
        value_var text; 
        rank_var integer; 
        
@@ -7114,10 +10738,10 @@
 
    DROP TABLE audit_acquisition_relationship;
    CREATE TABLE audit_acquisition_relationship ( 
-       acquisition_relationship_id bigint, 
-       subject_id bigint, 
-       type_id bigint, 
-       object_id bigint, 
+       acquisition_relationship_id integer, 
+       subject_id integer, 
+       type_id integer, 
+       object_id integer, 
        value text, 
        rank integer, 
        transaction_date timestamp not null default now(),
@@ -7128,10 +10752,10 @@
    CREATE OR REPLACE FUNCTION audit_update_delete_acquisition_relationship() RETURNS trigger AS
    '
    DECLARE
-       acquisition_relationship_id_var bigint; 
-       subject_id_var bigint; 
-       type_id_var bigint; 
-       object_id_var bigint; 
+       acquisition_relationship_id_var integer; 
+       subject_id_var integer; 
+       type_id_var integer; 
+       object_id_var integer; 
        value_var text; 
        rank_var integer; 
        
@@ -7186,11 +10810,11 @@
 
    DROP TABLE audit_quantification;
    CREATE TABLE audit_quantification ( 
-       quantification_id bigint, 
-       acquisition_id bigint, 
-       operator_id bigint, 
-       protocol_id bigint, 
-       analysis_id bigint, 
+       quantification_id integer, 
+       acquisition_id integer, 
+       operator_id integer, 
+       protocol_id integer, 
+       analysis_id integer, 
        quantificationdate timestamp, 
        name text, 
        uri text, 
@@ -7202,11 +10826,11 @@
    CREATE OR REPLACE FUNCTION audit_update_delete_quantification() RETURNS trigger AS
    '
    DECLARE
-       quantification_id_var bigint; 
-       acquisition_id_var bigint; 
-       operator_id_var bigint; 
-       protocol_id_var bigint; 
-       analysis_id_var bigint; 
+       quantification_id_var integer; 
+       acquisition_id_var integer; 
+       operator_id_var integer; 
+       protocol_id_var integer; 
+       analysis_id_var integer; 
        quantificationdate_var timestamp; 
        name_var text; 
        uri_var text; 
@@ -7268,9 +10892,9 @@
 
    DROP TABLE audit_quantificationprop;
    CREATE TABLE audit_quantificationprop ( 
-       quantificationprop_id bigint, 
-       quantification_id bigint, 
-       type_id bigint, 
+       quantificationprop_id integer, 
+       quantification_id integer, 
+       type_id integer, 
        value text, 
        rank integer, 
        transaction_date timestamp not null default now(),
@@ -7281,9 +10905,9 @@
    CREATE OR REPLACE FUNCTION audit_update_delete_quantificationprop() RETURNS trigger AS
    '
    DECLARE
-       quantificationprop_id_var bigint; 
-       quantification_id_var bigint; 
-       type_id_var bigint; 
+       quantificationprop_id_var integer; 
+       quantification_id_var integer; 
+       type_id_var integer; 
        value_var text; 
        rank_var integer; 
        
@@ -7335,10 +10959,10 @@
 
    DROP TABLE audit_quantification_relationship;
    CREATE TABLE audit_quantification_relationship ( 
-       quantification_relationship_id bigint, 
-       subject_id bigint, 
-       type_id bigint, 
-       object_id bigint, 
+       quantification_relationship_id integer, 
+       subject_id integer, 
+       type_id integer, 
+       object_id integer, 
        transaction_date timestamp not null default now(),
        transaction_type char(1) not null
    );
@@ -7347,10 +10971,10 @@
    CREATE OR REPLACE FUNCTION audit_update_delete_quantification_relationship() RETURNS trigger AS
    '
    DECLARE
-       quantification_relationship_id_var bigint; 
-       subject_id_var bigint; 
-       type_id_var bigint; 
-       object_id_var bigint; 
+       quantification_relationship_id_var integer; 
+       subject_id_var integer; 
+       type_id_var integer; 
+       object_id_var integer; 
        
        transaction_type_var char;
    BEGIN
@@ -7397,11 +11021,11 @@
 
    DROP TABLE audit_control;
    CREATE TABLE audit_control ( 
-       control_id bigint, 
-       type_id bigint, 
-       assay_id bigint, 
-       tableinfo_id bigint, 
-       row_id bigint, 
+       control_id integer, 
+       type_id integer, 
+       assay_id integer, 
+       tableinfo_id integer, 
+       row_id integer, 
        name text, 
        value text, 
        rank integer, 
@@ -7413,11 +11037,11 @@
    CREATE OR REPLACE FUNCTION audit_update_delete_control() RETURNS trigger AS
    '
    DECLARE
-       control_id_var bigint; 
-       type_id_var bigint; 
-       assay_id_var bigint; 
-       tableinfo_id_var bigint; 
-       row_id_var bigint; 
+       control_id_var integer; 
+       type_id_var integer; 
+       assay_id_var integer; 
+       tableinfo_id_var integer; 
+       row_id_var integer; 
        name_var text; 
        value_var text; 
        rank_var integer; 
@@ -7479,11 +11103,11 @@
 
    DROP TABLE audit_element;
    CREATE TABLE audit_element ( 
-       element_id bigint, 
-       feature_id bigint, 
-       arraydesign_id bigint, 
-       type_id bigint, 
-       dbxref_id bigint, 
+       element_id integer, 
+       feature_id integer, 
+       arraydesign_id integer, 
+       type_id integer, 
+       dbxref_id integer, 
        transaction_date timestamp not null default now(),
        transaction_type char(1) not null
    );
@@ -7492,11 +11116,11 @@
    CREATE OR REPLACE FUNCTION audit_update_delete_element() RETURNS trigger AS
    '
    DECLARE
-       element_id_var bigint; 
-       feature_id_var bigint; 
-       arraydesign_id_var bigint; 
-       type_id_var bigint; 
-       dbxref_id_var bigint; 
+       element_id_var integer; 
+       feature_id_var integer; 
+       arraydesign_id_var integer; 
+       type_id_var integer; 
+       dbxref_id_var integer; 
        
        transaction_type_var char;
    BEGIN
@@ -7546,9 +11170,9 @@
 
    DROP TABLE audit_elementresult;
    CREATE TABLE audit_elementresult ( 
-       elementresult_id bigint, 
-       element_id bigint, 
-       quantification_id bigint, 
+       elementresult_id integer, 
+       element_id integer, 
+       quantification_id integer, 
        signal float, 
        transaction_date timestamp not null default now(),
        transaction_type char(1) not null
@@ -7558,9 +11182,9 @@
    CREATE OR REPLACE FUNCTION audit_update_delete_elementresult() RETURNS trigger AS
    '
    DECLARE
-       elementresult_id_var bigint; 
-       element_id_var bigint; 
-       quantification_id_var bigint; 
+       elementresult_id_var integer; 
+       element_id_var integer; 
+       quantification_id_var integer; 
        signal_var float; 
        
        transaction_type_var char;
@@ -7608,10 +11232,10 @@
 
    DROP TABLE audit_element_relationship;
    CREATE TABLE audit_element_relationship ( 
-       element_relationship_id bigint, 
-       subject_id bigint, 
-       type_id bigint, 
-       object_id bigint, 
+       element_relationship_id integer, 
+       subject_id integer, 
+       type_id integer, 
+       object_id integer, 
        value text, 
        rank integer, 
        transaction_date timestamp not null default now(),
@@ -7622,10 +11246,10 @@
    CREATE OR REPLACE FUNCTION audit_update_delete_element_relationship() RETURNS trigger AS
    '
    DECLARE
-       element_relationship_id_var bigint; 
-       subject_id_var bigint; 
-       type_id_var bigint; 
-       object_id_var bigint; 
+       element_relationship_id_var integer; 
+       subject_id_var integer; 
+       type_id_var integer; 
+       object_id_var integer; 
        value_var text; 
        rank_var integer; 
        
@@ -7680,10 +11304,10 @@
 
    DROP TABLE audit_elementresult_relationship;
    CREATE TABLE audit_elementresult_relationship ( 
-       elementresult_relationship_id bigint, 
-       subject_id bigint, 
-       type_id bigint, 
-       object_id bigint, 
+       elementresult_relationship_id integer, 
+       subject_id integer, 
+       type_id integer, 
+       object_id integer, 
        value text, 
        rank integer, 
        transaction_date timestamp not null default now(),
@@ -7694,10 +11318,10 @@
    CREATE OR REPLACE FUNCTION audit_update_delete_elementresult_relationship() RETURNS trigger AS
    '
    DECLARE
-       elementresult_relationship_id_var bigint; 
-       subject_id_var bigint; 
-       type_id_var bigint; 
-       object_id_var bigint; 
+       elementresult_relationship_id_var integer; 
+       subject_id_var integer; 
+       type_id_var integer; 
+       object_id_var integer; 
        value_var text; 
        rank_var integer; 
        
@@ -7752,10 +11376,10 @@
 
    DROP TABLE audit_study;
    CREATE TABLE audit_study ( 
-       study_id bigint, 
-       contact_id bigint, 
-       pub_id bigint, 
-       dbxref_id bigint, 
+       study_id integer, 
+       contact_id integer, 
+       pub_id integer, 
+       dbxref_id integer, 
        name text, 
        description text, 
        transaction_date timestamp not null default now(),
@@ -7766,10 +11390,10 @@
    CREATE OR REPLACE FUNCTION audit_update_delete_study() RETURNS trigger AS
    '
    DECLARE
-       study_id_var bigint; 
-       contact_id_var bigint; 
-       pub_id_var bigint; 
-       dbxref_id_var bigint; 
+       study_id_var integer; 
+       contact_id_var integer; 
+       pub_id_var integer; 
+       dbxref_id_var integer; 
        name_var text; 
        description_var text; 
        
@@ -7824,9 +11448,9 @@
 
    DROP TABLE audit_study_assay;
    CREATE TABLE audit_study_assay ( 
-       study_assay_id bigint, 
-       study_id bigint, 
-       assay_id bigint, 
+       study_assay_id integer, 
+       study_id integer, 
+       assay_id integer, 
        transaction_date timestamp not null default now(),
        transaction_type char(1) not null
    );
@@ -7835,9 +11459,9 @@
    CREATE OR REPLACE FUNCTION audit_update_delete_study_assay() RETURNS trigger AS
    '
    DECLARE
-       study_assay_id_var bigint; 
-       study_id_var bigint; 
-       assay_id_var bigint; 
+       study_assay_id_var integer; 
+       study_id_var integer; 
+       assay_id_var integer; 
        
        transaction_type_var char;
    BEGIN
@@ -7881,8 +11505,8 @@
 
    DROP TABLE audit_studydesign;
    CREATE TABLE audit_studydesign ( 
-       studydesign_id bigint, 
-       study_id bigint, 
+       studydesign_id integer, 
+       study_id integer, 
        description text, 
        transaction_date timestamp not null default now(),
        transaction_type char(1) not null
@@ -7892,8 +11516,8 @@
    CREATE OR REPLACE FUNCTION audit_update_delete_studydesign() RETURNS trigger AS
    '
    DECLARE
-       studydesign_id_var bigint; 
-       study_id_var bigint; 
+       studydesign_id_var integer; 
+       study_id_var integer; 
        description_var text; 
        
        transaction_type_var char;
@@ -7938,9 +11562,9 @@
 
    DROP TABLE audit_studydesignprop;
    CREATE TABLE audit_studydesignprop ( 
-       studydesignprop_id bigint, 
-       studydesign_id bigint, 
-       type_id bigint, 
+       studydesignprop_id integer, 
+       studydesign_id integer, 
+       type_id integer, 
        value text, 
        rank integer, 
        transaction_date timestamp not null default now(),
@@ -7951,9 +11575,9 @@
    CREATE OR REPLACE FUNCTION audit_update_delete_studydesignprop() RETURNS trigger AS
    '
    DECLARE
-       studydesignprop_id_var bigint; 
-       studydesign_id_var bigint; 
-       type_id_var bigint; 
+       studydesignprop_id_var integer; 
+       studydesign_id_var integer; 
+       type_id_var integer; 
        value_var text; 
        rank_var integer; 
        
@@ -8005,9 +11629,9 @@
 
    DROP TABLE audit_studyfactor;
    CREATE TABLE audit_studyfactor ( 
-       studyfactor_id bigint, 
-       studydesign_id bigint, 
-       type_id bigint, 
+       studyfactor_id integer, 
+       studydesign_id integer, 
+       type_id integer, 
        name text, 
        description text, 
        transaction_date timestamp not null default now(),
@@ -8018,9 +11642,9 @@
    CREATE OR REPLACE FUNCTION audit_update_delete_studyfactor() RETURNS trigger AS
    '
    DECLARE
-       studyfactor_id_var bigint; 
-       studydesign_id_var bigint; 
-       type_id_var bigint; 
+       studyfactor_id_var integer; 
+       studydesign_id_var integer; 
+       type_id_var integer; 
        name_var text; 
        description_var text; 
        
@@ -8072,9 +11696,9 @@
 
    DROP TABLE audit_studyfactorvalue;
    CREATE TABLE audit_studyfactorvalue ( 
-       studyfactorvalue_id bigint, 
-       studyfactor_id bigint, 
-       assay_id bigint, 
+       studyfactorvalue_id integer, 
+       studyfactor_id integer, 
+       assay_id integer, 
        factorvalue text, 
        name text, 
        rank integer, 
@@ -8086,9 +11710,9 @@
    CREATE OR REPLACE FUNCTION audit_update_delete_studyfactorvalue() RETURNS trigger AS
    '
    DECLARE
-       studyfactorvalue_id_var bigint; 
-       studyfactor_id_var bigint; 
-       assay_id_var bigint; 
+       studyfactorvalue_id_var integer; 
+       studyfactor_id_var integer; 
+       assay_id_var integer; 
        factorvalue_var text; 
        name_var text; 
        rank_var integer; 
@@ -8144,9 +11768,9 @@
 
    DROP TABLE audit_studyprop;
    CREATE TABLE audit_studyprop ( 
-       studyprop_id bigint, 
-       study_id bigint, 
-       type_id bigint, 
+       studyprop_id integer, 
+       study_id integer, 
+       type_id integer, 
        value text, 
        rank integer, 
        transaction_date timestamp not null default now(),
@@ -8157,9 +11781,9 @@
    CREATE OR REPLACE FUNCTION audit_update_delete_studyprop() RETURNS trigger AS
    '
    DECLARE
-       studyprop_id_var bigint; 
-       study_id_var bigint; 
-       type_id_var bigint; 
+       studyprop_id_var integer; 
+       study_id_var integer; 
+       type_id_var integer; 
        value_var text; 
        rank_var integer; 
        
@@ -8211,10 +11835,10 @@
 
    DROP TABLE audit_studyprop_feature;
    CREATE TABLE audit_studyprop_feature ( 
-       studyprop_feature_id bigint, 
-       studyprop_id bigint, 
-       feature_id bigint, 
-       type_id bigint, 
+       studyprop_feature_id integer, 
+       studyprop_id integer, 
+       feature_id integer, 
+       type_id integer, 
        transaction_date timestamp not null default now(),
        transaction_type char(1) not null
    );
@@ -8223,10 +11847,10 @@
    CREATE OR REPLACE FUNCTION audit_update_delete_studyprop_feature() RETURNS trigger AS
    '
    DECLARE
-       studyprop_feature_id_var bigint; 
-       studyprop_id_var bigint; 
-       feature_id_var bigint; 
-       type_id_var bigint; 
+       studyprop_feature_id_var integer; 
+       studyprop_id_var integer; 
+       feature_id_var integer; 
+       type_id_var integer; 
        
        transaction_type_var char;
    BEGIN
@@ -8271,1498 +11895,12 @@
        EXECUTE PROCEDURE audit_update_delete_studyprop_feature ();
 
 
-   DROP TABLE audit_stock;
-   CREATE TABLE audit_stock ( 
-       stock_id bigint, 
-       dbxref_id bigint, 
-       organism_id bigint, 
-       name varchar(255), 
-       uniquename text, 
-       description text, 
-       type_id bigint, 
-       is_obsolete boolean, 
-       transaction_date timestamp not null default now(),
-       transaction_type char(1) not null
-   );
-   GRANT ALL on audit_stock to PUBLIC;
-
-   CREATE OR REPLACE FUNCTION audit_update_delete_stock() RETURNS trigger AS
-   '
-   DECLARE
-       stock_id_var bigint; 
-       dbxref_id_var bigint; 
-       organism_id_var bigint; 
-       name_var varchar(255); 
-       uniquename_var text; 
-       description_var text; 
-       type_id_var bigint; 
-       is_obsolete_var boolean; 
-       
-       transaction_type_var char;
-   BEGIN
-       stock_id_var = OLD.stock_id;
-       dbxref_id_var = OLD.dbxref_id;
-       organism_id_var = OLD.organism_id;
-       name_var = OLD.name;
-       uniquename_var = OLD.uniquename;
-       description_var = OLD.description;
-       type_id_var = OLD.type_id;
-       is_obsolete_var = OLD.is_obsolete;
-       
-       IF TG_OP = ''DELETE'' THEN
-           transaction_type_var = ''D'';
-       ELSE
-           transaction_type_var = ''U'';
-       END IF;
-
-       INSERT INTO audit_stock ( 
-             stock_id, 
-             dbxref_id, 
-             organism_id, 
-             name, 
-             uniquename, 
-             description, 
-             type_id, 
-             is_obsolete, 
-             transaction_type
-       ) VALUES ( 
-             stock_id_var, 
-             dbxref_id_var, 
-             organism_id_var, 
-             name_var, 
-             uniquename_var, 
-             description_var, 
-             type_id_var, 
-             is_obsolete_var, 
-             transaction_type_var
-       );
-
-       IF TG_OP = ''DELETE'' THEN
-           return OLD;
-       ELSE
-           return NEW;
-       END IF;
-   END
-   '
-   LANGUAGE plpgsql; 
-
-   DROP TRIGGER stock_audit_ud ON stock;
-   CREATE TRIGGER stock_audit_ud
-       BEFORE UPDATE OR DELETE ON stock
-       FOR EACH ROW
-       EXECUTE PROCEDURE audit_update_delete_stock ();
-
-
-   DROP TABLE audit_stock_pub;
-   CREATE TABLE audit_stock_pub ( 
-       stock_pub_id bigint, 
-       stock_id bigint, 
-       pub_id bigint, 
-       transaction_date timestamp not null default now(),
-       transaction_type char(1) not null
-   );
-   GRANT ALL on audit_stock_pub to PUBLIC;
-
-   CREATE OR REPLACE FUNCTION audit_update_delete_stock_pub() RETURNS trigger AS
-   '
-   DECLARE
-       stock_pub_id_var bigint; 
-       stock_id_var bigint; 
-       pub_id_var bigint; 
-       
-       transaction_type_var char;
-   BEGIN
-       stock_pub_id_var = OLD.stock_pub_id;
-       stock_id_var = OLD.stock_id;
-       pub_id_var = OLD.pub_id;
-       
-       IF TG_OP = ''DELETE'' THEN
-           transaction_type_var = ''D'';
-       ELSE
-           transaction_type_var = ''U'';
-       END IF;
-
-       INSERT INTO audit_stock_pub ( 
-             stock_pub_id, 
-             stock_id, 
-             pub_id, 
-             transaction_type
-       ) VALUES ( 
-             stock_pub_id_var, 
-             stock_id_var, 
-             pub_id_var, 
-             transaction_type_var
-       );
-
-       IF TG_OP = ''DELETE'' THEN
-           return OLD;
-       ELSE
-           return NEW;
-       END IF;
-   END
-   '
-   LANGUAGE plpgsql; 
-
-   DROP TRIGGER stock_pub_audit_ud ON stock_pub;
-   CREATE TRIGGER stock_pub_audit_ud
-       BEFORE UPDATE OR DELETE ON stock_pub
-       FOR EACH ROW
-       EXECUTE PROCEDURE audit_update_delete_stock_pub ();
-
-
-   DROP TABLE audit_stockprop;
-   CREATE TABLE audit_stockprop ( 
-       stockprop_id bigint, 
-       stock_id bigint, 
-       type_id bigint, 
-       value text, 
-       rank integer, 
-       transaction_date timestamp not null default now(),
-       transaction_type char(1) not null
-   );
-   GRANT ALL on audit_stockprop to PUBLIC;
-
-   CREATE OR REPLACE FUNCTION audit_update_delete_stockprop() RETURNS trigger AS
-   '
-   DECLARE
-       stockprop_id_var bigint; 
-       stock_id_var bigint; 
-       type_id_var bigint; 
-       value_var text; 
-       rank_var integer; 
-       
-       transaction_type_var char;
-   BEGIN
-       stockprop_id_var = OLD.stockprop_id;
-       stock_id_var = OLD.stock_id;
-       type_id_var = OLD.type_id;
-       value_var = OLD.value;
-       rank_var = OLD.rank;
-       
-       IF TG_OP = ''DELETE'' THEN
-           transaction_type_var = ''D'';
-       ELSE
-           transaction_type_var = ''U'';
-       END IF;
-
-       INSERT INTO audit_stockprop ( 
-             stockprop_id, 
-             stock_id, 
-             type_id, 
-             value, 
-             rank, 
-             transaction_type
-       ) VALUES ( 
-             stockprop_id_var, 
-             stock_id_var, 
-             type_id_var, 
-             value_var, 
-             rank_var, 
-             transaction_type_var
-       );
-
-       IF TG_OP = ''DELETE'' THEN
-           return OLD;
-       ELSE
-           return NEW;
-       END IF;
-   END
-   '
-   LANGUAGE plpgsql; 
-
-   DROP TRIGGER stockprop_audit_ud ON stockprop;
-   CREATE TRIGGER stockprop_audit_ud
-       BEFORE UPDATE OR DELETE ON stockprop
-       FOR EACH ROW
-       EXECUTE PROCEDURE audit_update_delete_stockprop ();
-
-
-   DROP TABLE audit_stockprop_pub;
-   CREATE TABLE audit_stockprop_pub ( 
-       stockprop_pub_id bigint, 
-       stockprop_id bigint, 
-       pub_id bigint, 
-       transaction_date timestamp not null default now(),
-       transaction_type char(1) not null
-   );
-   GRANT ALL on audit_stockprop_pub to PUBLIC;
-
-   CREATE OR REPLACE FUNCTION audit_update_delete_stockprop_pub() RETURNS trigger AS
-   '
-   DECLARE
-       stockprop_pub_id_var bigint; 
-       stockprop_id_var bigint; 
-       pub_id_var bigint; 
-       
-       transaction_type_var char;
-   BEGIN
-       stockprop_pub_id_var = OLD.stockprop_pub_id;
-       stockprop_id_var = OLD.stockprop_id;
-       pub_id_var = OLD.pub_id;
-       
-       IF TG_OP = ''DELETE'' THEN
-           transaction_type_var = ''D'';
-       ELSE
-           transaction_type_var = ''U'';
-       END IF;
-
-       INSERT INTO audit_stockprop_pub ( 
-             stockprop_pub_id, 
-             stockprop_id, 
-             pub_id, 
-             transaction_type
-       ) VALUES ( 
-             stockprop_pub_id_var, 
-             stockprop_id_var, 
-             pub_id_var, 
-             transaction_type_var
-       );
-
-       IF TG_OP = ''DELETE'' THEN
-           return OLD;
-       ELSE
-           return NEW;
-       END IF;
-   END
-   '
-   LANGUAGE plpgsql; 
-
-   DROP TRIGGER stockprop_pub_audit_ud ON stockprop_pub;
-   CREATE TRIGGER stockprop_pub_audit_ud
-       BEFORE UPDATE OR DELETE ON stockprop_pub
-       FOR EACH ROW
-       EXECUTE PROCEDURE audit_update_delete_stockprop_pub ();
-
-
-   DROP TABLE audit_stock_relationship;
-   CREATE TABLE audit_stock_relationship ( 
-       stock_relationship_id bigint, 
-       subject_id bigint, 
-       object_id bigint, 
-       type_id bigint, 
-       value text, 
-       rank integer, 
-       transaction_date timestamp not null default now(),
-       transaction_type char(1) not null
-   );
-   GRANT ALL on audit_stock_relationship to PUBLIC;
-
-   CREATE OR REPLACE FUNCTION audit_update_delete_stock_relationship() RETURNS trigger AS
-   '
-   DECLARE
-       stock_relationship_id_var bigint; 
-       subject_id_var bigint; 
-       object_id_var bigint; 
-       type_id_var bigint; 
-       value_var text; 
-       rank_var integer; 
-       
-       transaction_type_var char;
-   BEGIN
-       stock_relationship_id_var = OLD.stock_relationship_id;
-       subject_id_var = OLD.subject_id;
-       object_id_var = OLD.object_id;
-       type_id_var = OLD.type_id;
-       value_var = OLD.value;
-       rank_var = OLD.rank;
-       
-       IF TG_OP = ''DELETE'' THEN
-           transaction_type_var = ''D'';
-       ELSE
-           transaction_type_var = ''U'';
-       END IF;
-
-       INSERT INTO audit_stock_relationship ( 
-             stock_relationship_id, 
-             subject_id, 
-             object_id, 
-             type_id, 
-             value, 
-             rank, 
-             transaction_type
-       ) VALUES ( 
-             stock_relationship_id_var, 
-             subject_id_var, 
-             object_id_var, 
-             type_id_var, 
-             value_var, 
-             rank_var, 
-             transaction_type_var
-       );
-
-       IF TG_OP = ''DELETE'' THEN
-           return OLD;
-       ELSE
-           return NEW;
-       END IF;
-   END
-   '
-   LANGUAGE plpgsql; 
-
-   DROP TRIGGER stock_relationship_audit_ud ON stock_relationship;
-   CREATE TRIGGER stock_relationship_audit_ud
-       BEFORE UPDATE OR DELETE ON stock_relationship
-       FOR EACH ROW
-       EXECUTE PROCEDURE audit_update_delete_stock_relationship ();
-
-
-   DROP TABLE audit_stock_relationship_cvterm;
-   CREATE TABLE audit_stock_relationship_cvterm ( 
-       stock_relationship_cvterm_id bigint, 
-       stock_relationship_id bigint, 
-       cvterm_id bigint, 
-       pub_id bigint, 
-       transaction_date timestamp not null default now(),
-       transaction_type char(1) not null
-   );
-   GRANT ALL on audit_stock_relationship_cvterm to PUBLIC;
-
-   CREATE OR REPLACE FUNCTION audit_update_delete_stock_relationship_cvterm() RETURNS trigger AS
-   '
-   DECLARE
-       stock_relationship_cvterm_id_var bigint; 
-       stock_relationship_id_var bigint; 
-       cvterm_id_var bigint; 
-       pub_id_var bigint; 
-       
-       transaction_type_var char;
-   BEGIN
-       stock_relationship_cvterm_id_var = OLD.stock_relationship_cvterm_id;
-       stock_relationship_id_var = OLD.stock_relationship_id;
-       cvterm_id_var = OLD.cvterm_id;
-       pub_id_var = OLD.pub_id;
-       
-       IF TG_OP = ''DELETE'' THEN
-           transaction_type_var = ''D'';
-       ELSE
-           transaction_type_var = ''U'';
-       END IF;
-
-       INSERT INTO audit_stock_relationship_cvterm ( 
-             stock_relationship_cvterm_id, 
-             stock_relationship_id, 
-             cvterm_id, 
-             pub_id, 
-             transaction_type
-       ) VALUES ( 
-             stock_relationship_cvterm_id_var, 
-             stock_relationship_id_var, 
-             cvterm_id_var, 
-             pub_id_var, 
-             transaction_type_var
-       );
-
-       IF TG_OP = ''DELETE'' THEN
-           return OLD;
-       ELSE
-           return NEW;
-       END IF;
-   END
-   '
-   LANGUAGE plpgsql; 
-
-   DROP TRIGGER stock_relationship_cvterm_audit_ud ON stock_relationship_cvterm;
-   CREATE TRIGGER stock_relationship_cvterm_audit_ud
-       BEFORE UPDATE OR DELETE ON stock_relationship_cvterm
-       FOR EACH ROW
-       EXECUTE PROCEDURE audit_update_delete_stock_relationship_cvterm ();
-
-
-   DROP TABLE audit_stock_relationship_pub;
-   CREATE TABLE audit_stock_relationship_pub ( 
-       stock_relationship_pub_id bigint, 
-       stock_relationship_id bigint, 
-       pub_id bigint, 
-       transaction_date timestamp not null default now(),
-       transaction_type char(1) not null
-   );
-   GRANT ALL on audit_stock_relationship_pub to PUBLIC;
-
-   CREATE OR REPLACE FUNCTION audit_update_delete_stock_relationship_pub() RETURNS trigger AS
-   '
-   DECLARE
-       stock_relationship_pub_id_var bigint; 
-       stock_relationship_id_var bigint; 
-       pub_id_var bigint; 
-       
-       transaction_type_var char;
-   BEGIN
-       stock_relationship_pub_id_var = OLD.stock_relationship_pub_id;
-       stock_relationship_id_var = OLD.stock_relationship_id;
-       pub_id_var = OLD.pub_id;
-       
-       IF TG_OP = ''DELETE'' THEN
-           transaction_type_var = ''D'';
-       ELSE
-           transaction_type_var = ''U'';
-       END IF;
-
-       INSERT INTO audit_stock_relationship_pub ( 
-             stock_relationship_pub_id, 
-             stock_relationship_id, 
-             pub_id, 
-             transaction_type
-       ) VALUES ( 
-             stock_relationship_pub_id_var, 
-             stock_relationship_id_var, 
-             pub_id_var, 
-             transaction_type_var
-       );
-
-       IF TG_OP = ''DELETE'' THEN
-           return OLD;
-       ELSE
-           return NEW;
-       END IF;
-   END
-   '
-   LANGUAGE plpgsql; 
-
-   DROP TRIGGER stock_relationship_pub_audit_ud ON stock_relationship_pub;
-   CREATE TRIGGER stock_relationship_pub_audit_ud
-       BEFORE UPDATE OR DELETE ON stock_relationship_pub
-       FOR EACH ROW
-       EXECUTE PROCEDURE audit_update_delete_stock_relationship_pub ();
-
-
-   DROP TABLE audit_stock_dbxref;
-   CREATE TABLE audit_stock_dbxref ( 
-       stock_dbxref_id bigint, 
-       stock_id bigint, 
-       dbxref_id bigint, 
-       is_current boolean, 
-       transaction_date timestamp not null default now(),
-       transaction_type char(1) not null
-   );
-   GRANT ALL on audit_stock_dbxref to PUBLIC;
-
-   CREATE OR REPLACE FUNCTION audit_update_delete_stock_dbxref() RETURNS trigger AS
-   '
-   DECLARE
-       stock_dbxref_id_var bigint; 
-       stock_id_var bigint; 
-       dbxref_id_var bigint; 
-       is_current_var boolean; 
-       
-       transaction_type_var char;
-   BEGIN
-       stock_dbxref_id_var = OLD.stock_dbxref_id;
-       stock_id_var = OLD.stock_id;
-       dbxref_id_var = OLD.dbxref_id;
-       is_current_var = OLD.is_current;
-       
-       IF TG_OP = ''DELETE'' THEN
-           transaction_type_var = ''D'';
-       ELSE
-           transaction_type_var = ''U'';
-       END IF;
-
-       INSERT INTO audit_stock_dbxref ( 
-             stock_dbxref_id, 
-             stock_id, 
-             dbxref_id, 
-             is_current, 
-             transaction_type
-       ) VALUES ( 
-             stock_dbxref_id_var, 
-             stock_id_var, 
-             dbxref_id_var, 
-             is_current_var, 
-             transaction_type_var
-       );
-
-       IF TG_OP = ''DELETE'' THEN
-           return OLD;
-       ELSE
-           return NEW;
-       END IF;
-   END
-   '
-   LANGUAGE plpgsql; 
-
-   DROP TRIGGER stock_dbxref_audit_ud ON stock_dbxref;
-   CREATE TRIGGER stock_dbxref_audit_ud
-       BEFORE UPDATE OR DELETE ON stock_dbxref
-       FOR EACH ROW
-       EXECUTE PROCEDURE audit_update_delete_stock_dbxref ();
-
-
-   DROP TABLE audit_stock_cvterm;
-   CREATE TABLE audit_stock_cvterm ( 
-       stock_cvterm_id bigint, 
-       stock_id bigint, 
-       cvterm_id bigint, 
-       pub_id bigint, 
-       is_not boolean, 
-       rank integer, 
-       transaction_date timestamp not null default now(),
-       transaction_type char(1) not null
-   );
-   GRANT ALL on audit_stock_cvterm to PUBLIC;
-
-   CREATE OR REPLACE FUNCTION audit_update_delete_stock_cvterm() RETURNS trigger AS
-   '
-   DECLARE
-       stock_cvterm_id_var bigint; 
-       stock_id_var bigint; 
-       cvterm_id_var bigint; 
-       pub_id_var bigint; 
-       is_not_var boolean; 
-       rank_var integer; 
-       
-       transaction_type_var char;
-   BEGIN
-       stock_cvterm_id_var = OLD.stock_cvterm_id;
-       stock_id_var = OLD.stock_id;
-       cvterm_id_var = OLD.cvterm_id;
-       pub_id_var = OLD.pub_id;
-       is_not_var = OLD.is_not;
-       rank_var = OLD.rank;
-       
-       IF TG_OP = ''DELETE'' THEN
-           transaction_type_var = ''D'';
-       ELSE
-           transaction_type_var = ''U'';
-       END IF;
-
-       INSERT INTO audit_stock_cvterm ( 
-             stock_cvterm_id, 
-             stock_id, 
-             cvterm_id, 
-             pub_id, 
-             is_not, 
-             rank, 
-             transaction_type
-       ) VALUES ( 
-             stock_cvterm_id_var, 
-             stock_id_var, 
-             cvterm_id_var, 
-             pub_id_var, 
-             is_not_var, 
-             rank_var, 
-             transaction_type_var
-       );
-
-       IF TG_OP = ''DELETE'' THEN
-           return OLD;
-       ELSE
-           return NEW;
-       END IF;
-   END
-   '
-   LANGUAGE plpgsql; 
-
-   DROP TRIGGER stock_cvterm_audit_ud ON stock_cvterm;
-   CREATE TRIGGER stock_cvterm_audit_ud
-       BEFORE UPDATE OR DELETE ON stock_cvterm
-       FOR EACH ROW
-       EXECUTE PROCEDURE audit_update_delete_stock_cvterm ();
-
-
-   DROP TABLE audit_stock_cvtermprop;
-   CREATE TABLE audit_stock_cvtermprop ( 
-       stock_cvtermprop_id bigint, 
-       stock_cvterm_id bigint, 
-       type_id bigint, 
-       value text, 
-       rank integer, 
-       transaction_date timestamp not null default now(),
-       transaction_type char(1) not null
-   );
-   GRANT ALL on audit_stock_cvtermprop to PUBLIC;
-
-   CREATE OR REPLACE FUNCTION audit_update_delete_stock_cvtermprop() RETURNS trigger AS
-   '
-   DECLARE
-       stock_cvtermprop_id_var bigint; 
-       stock_cvterm_id_var bigint; 
-       type_id_var bigint; 
-       value_var text; 
-       rank_var integer; 
-       
-       transaction_type_var char;
-   BEGIN
-       stock_cvtermprop_id_var = OLD.stock_cvtermprop_id;
-       stock_cvterm_id_var = OLD.stock_cvterm_id;
-       type_id_var = OLD.type_id;
-       value_var = OLD.value;
-       rank_var = OLD.rank;
-       
-       IF TG_OP = ''DELETE'' THEN
-           transaction_type_var = ''D'';
-       ELSE
-           transaction_type_var = ''U'';
-       END IF;
-
-       INSERT INTO audit_stock_cvtermprop ( 
-             stock_cvtermprop_id, 
-             stock_cvterm_id, 
-             type_id, 
-             value, 
-             rank, 
-             transaction_type
-       ) VALUES ( 
-             stock_cvtermprop_id_var, 
-             stock_cvterm_id_var, 
-             type_id_var, 
-             value_var, 
-             rank_var, 
-             transaction_type_var
-       );
-
-       IF TG_OP = ''DELETE'' THEN
-           return OLD;
-       ELSE
-           return NEW;
-       END IF;
-   END
-   '
-   LANGUAGE plpgsql; 
-
-   DROP TRIGGER stock_cvtermprop_audit_ud ON stock_cvtermprop;
-   CREATE TRIGGER stock_cvtermprop_audit_ud
-       BEFORE UPDATE OR DELETE ON stock_cvtermprop
-       FOR EACH ROW
-       EXECUTE PROCEDURE audit_update_delete_stock_cvtermprop ();
-
-
-   DROP TABLE audit_stock_genotype;
-   CREATE TABLE audit_stock_genotype ( 
-       stock_genotype_id bigint, 
-       stock_id bigint, 
-       genotype_id bigint, 
-       transaction_date timestamp not null default now(),
-       transaction_type char(1) not null
-   );
-   GRANT ALL on audit_stock_genotype to PUBLIC;
-
-   CREATE OR REPLACE FUNCTION audit_update_delete_stock_genotype() RETURNS trigger AS
-   '
-   DECLARE
-       stock_genotype_id_var bigint; 
-       stock_id_var bigint; 
-       genotype_id_var bigint; 
-       
-       transaction_type_var char;
-   BEGIN
-       stock_genotype_id_var = OLD.stock_genotype_id;
-       stock_id_var = OLD.stock_id;
-       genotype_id_var = OLD.genotype_id;
-       
-       IF TG_OP = ''DELETE'' THEN
-           transaction_type_var = ''D'';
-       ELSE
-           transaction_type_var = ''U'';
-       END IF;
-
-       INSERT INTO audit_stock_genotype ( 
-             stock_genotype_id, 
-             stock_id, 
-             genotype_id, 
-             transaction_type
-       ) VALUES ( 
-             stock_genotype_id_var, 
-             stock_id_var, 
-             genotype_id_var, 
-             transaction_type_var
-       );
-
-       IF TG_OP = ''DELETE'' THEN
-           return OLD;
-       ELSE
-           return NEW;
-       END IF;
-   END
-   '
-   LANGUAGE plpgsql; 
-
-   DROP TRIGGER stock_genotype_audit_ud ON stock_genotype;
-   CREATE TRIGGER stock_genotype_audit_ud
-       BEFORE UPDATE OR DELETE ON stock_genotype
-       FOR EACH ROW
-       EXECUTE PROCEDURE audit_update_delete_stock_genotype ();
-
-
-   DROP TABLE audit_stockcollection;
-   CREATE TABLE audit_stockcollection ( 
-       stockcollection_id bigint, 
-       type_id bigint, 
-       contact_id bigint, 
-       name varchar(255), 
-       uniquename text, 
-       transaction_date timestamp not null default now(),
-       transaction_type char(1) not null
-   );
-   GRANT ALL on audit_stockcollection to PUBLIC;
-
-   CREATE OR REPLACE FUNCTION audit_update_delete_stockcollection() RETURNS trigger AS
-   '
-   DECLARE
-       stockcollection_id_var bigint; 
-       type_id_var bigint; 
-       contact_id_var bigint; 
-       name_var varchar(255); 
-       uniquename_var text; 
-       
-       transaction_type_var char;
-   BEGIN
-       stockcollection_id_var = OLD.stockcollection_id;
-       type_id_var = OLD.type_id;
-       contact_id_var = OLD.contact_id;
-       name_var = OLD.name;
-       uniquename_var = OLD.uniquename;
-       
-       IF TG_OP = ''DELETE'' THEN
-           transaction_type_var = ''D'';
-       ELSE
-           transaction_type_var = ''U'';
-       END IF;
-
-       INSERT INTO audit_stockcollection ( 
-             stockcollection_id, 
-             type_id, 
-             contact_id, 
-             name, 
-             uniquename, 
-             transaction_type
-       ) VALUES ( 
-             stockcollection_id_var, 
-             type_id_var, 
-             contact_id_var, 
-             name_var, 
-             uniquename_var, 
-             transaction_type_var
-       );
-
-       IF TG_OP = ''DELETE'' THEN
-           return OLD;
-       ELSE
-           return NEW;
-       END IF;
-   END
-   '
-   LANGUAGE plpgsql; 
-
-   DROP TRIGGER stockcollection_audit_ud ON stockcollection;
-   CREATE TRIGGER stockcollection_audit_ud
-       BEFORE UPDATE OR DELETE ON stockcollection
-       FOR EACH ROW
-       EXECUTE PROCEDURE audit_update_delete_stockcollection ();
-
-
-   DROP TABLE audit_stockcollectionprop;
-   CREATE TABLE audit_stockcollectionprop ( 
-       stockcollectionprop_id bigint, 
-       stockcollection_id bigint, 
-       type_id bigint, 
-       value text, 
-       rank integer, 
-       transaction_date timestamp not null default now(),
-       transaction_type char(1) not null
-   );
-   GRANT ALL on audit_stockcollectionprop to PUBLIC;
-
-   CREATE OR REPLACE FUNCTION audit_update_delete_stockcollectionprop() RETURNS trigger AS
-   '
-   DECLARE
-       stockcollectionprop_id_var bigint; 
-       stockcollection_id_var bigint; 
-       type_id_var bigint; 
-       value_var text; 
-       rank_var integer; 
-       
-       transaction_type_var char;
-   BEGIN
-       stockcollectionprop_id_var = OLD.stockcollectionprop_id;
-       stockcollection_id_var = OLD.stockcollection_id;
-       type_id_var = OLD.type_id;
-       value_var = OLD.value;
-       rank_var = OLD.rank;
-       
-       IF TG_OP = ''DELETE'' THEN
-           transaction_type_var = ''D'';
-       ELSE
-           transaction_type_var = ''U'';
-       END IF;
-
-       INSERT INTO audit_stockcollectionprop ( 
-             stockcollectionprop_id, 
-             stockcollection_id, 
-             type_id, 
-             value, 
-             rank, 
-             transaction_type
-       ) VALUES ( 
-             stockcollectionprop_id_var, 
-             stockcollection_id_var, 
-             type_id_var, 
-             value_var, 
-             rank_var, 
-             transaction_type_var
-       );
-
-       IF TG_OP = ''DELETE'' THEN
-           return OLD;
-       ELSE
-           return NEW;
-       END IF;
-   END
-   '
-   LANGUAGE plpgsql; 
-
-   DROP TRIGGER stockcollectionprop_audit_ud ON stockcollectionprop;
-   CREATE TRIGGER stockcollectionprop_audit_ud
-       BEFORE UPDATE OR DELETE ON stockcollectionprop
-       FOR EACH ROW
-       EXECUTE PROCEDURE audit_update_delete_stockcollectionprop ();
-
-
-   DROP TABLE audit_stockcollection_stock;
-   CREATE TABLE audit_stockcollection_stock ( 
-       stockcollection_stock_id bigint, 
-       stockcollection_id bigint, 
-       stock_id bigint, 
-       transaction_date timestamp not null default now(),
-       transaction_type char(1) not null
-   );
-   GRANT ALL on audit_stockcollection_stock to PUBLIC;
-
-   CREATE OR REPLACE FUNCTION audit_update_delete_stockcollection_stock() RETURNS trigger AS
-   '
-   DECLARE
-       stockcollection_stock_id_var bigint; 
-       stockcollection_id_var bigint; 
-       stock_id_var bigint; 
-       
-       transaction_type_var char;
-   BEGIN
-       stockcollection_stock_id_var = OLD.stockcollection_stock_id;
-       stockcollection_id_var = OLD.stockcollection_id;
-       stock_id_var = OLD.stock_id;
-       
-       IF TG_OP = ''DELETE'' THEN
-           transaction_type_var = ''D'';
-       ELSE
-           transaction_type_var = ''U'';
-       END IF;
-
-       INSERT INTO audit_stockcollection_stock ( 
-             stockcollection_stock_id, 
-             stockcollection_id, 
-             stock_id, 
-             transaction_type
-       ) VALUES ( 
-             stockcollection_stock_id_var, 
-             stockcollection_id_var, 
-             stock_id_var, 
-             transaction_type_var
-       );
-
-       IF TG_OP = ''DELETE'' THEN
-           return OLD;
-       ELSE
-           return NEW;
-       END IF;
-   END
-   '
-   LANGUAGE plpgsql; 
-
-   DROP TRIGGER stockcollection_stock_audit_ud ON stockcollection_stock;
-   CREATE TRIGGER stockcollection_stock_audit_ud
-       BEFORE UPDATE OR DELETE ON stockcollection_stock
-       FOR EACH ROW
-       EXECUTE PROCEDURE audit_update_delete_stockcollection_stock ();
-
-
-   DROP TABLE audit_stock_dbxrefprop;
-   CREATE TABLE audit_stock_dbxrefprop ( 
-       stock_dbxrefprop_id bigint, 
-       stock_dbxref_id bigint, 
-       type_id bigint, 
-       value text, 
-       rank integer, 
-       transaction_date timestamp not null default now(),
-       transaction_type char(1) not null
-   );
-   GRANT ALL on audit_stock_dbxrefprop to PUBLIC;
-
-   CREATE OR REPLACE FUNCTION audit_update_delete_stock_dbxrefprop() RETURNS trigger AS
-   '
-   DECLARE
-       stock_dbxrefprop_id_var bigint; 
-       stock_dbxref_id_var bigint; 
-       type_id_var bigint; 
-       value_var text; 
-       rank_var integer; 
-       
-       transaction_type_var char;
-   BEGIN
-       stock_dbxrefprop_id_var = OLD.stock_dbxrefprop_id;
-       stock_dbxref_id_var = OLD.stock_dbxref_id;
-       type_id_var = OLD.type_id;
-       value_var = OLD.value;
-       rank_var = OLD.rank;
-       
-       IF TG_OP = ''DELETE'' THEN
-           transaction_type_var = ''D'';
-       ELSE
-           transaction_type_var = ''U'';
-       END IF;
-
-       INSERT INTO audit_stock_dbxrefprop ( 
-             stock_dbxrefprop_id, 
-             stock_dbxref_id, 
-             type_id, 
-             value, 
-             rank, 
-             transaction_type
-       ) VALUES ( 
-             stock_dbxrefprop_id_var, 
-             stock_dbxref_id_var, 
-             type_id_var, 
-             value_var, 
-             rank_var, 
-             transaction_type_var
-       );
-
-       IF TG_OP = ''DELETE'' THEN
-           return OLD;
-       ELSE
-           return NEW;
-       END IF;
-   END
-   '
-   LANGUAGE plpgsql; 
-
-   DROP TRIGGER stock_dbxrefprop_audit_ud ON stock_dbxrefprop;
-   CREATE TRIGGER stock_dbxrefprop_audit_ud
-       BEFORE UPDATE OR DELETE ON stock_dbxrefprop
-       FOR EACH ROW
-       EXECUTE PROCEDURE audit_update_delete_stock_dbxrefprop ();
-
-
-   DROP TABLE audit_library;
-   CREATE TABLE audit_library ( 
-       library_id bigint, 
-       organism_id bigint, 
-       name varchar(255), 
-       uniquename text, 
-       type_id bigint, 
-       is_obsolete integer, 
-       timeaccessioned timestamp, 
-       timelastmodified timestamp, 
-       transaction_date timestamp not null default now(),
-       transaction_type char(1) not null
-   );
-   GRANT ALL on audit_library to PUBLIC;
-
-   CREATE OR REPLACE FUNCTION audit_update_delete_library() RETURNS trigger AS
-   '
-   DECLARE
-       library_id_var bigint; 
-       organism_id_var bigint; 
-       name_var varchar(255); 
-       uniquename_var text; 
-       type_id_var bigint; 
-       is_obsolete_var integer; 
-       timeaccessioned_var timestamp; 
-       timelastmodified_var timestamp; 
-       
-       transaction_type_var char;
-   BEGIN
-       library_id_var = OLD.library_id;
-       organism_id_var = OLD.organism_id;
-       name_var = OLD.name;
-       uniquename_var = OLD.uniquename;
-       type_id_var = OLD.type_id;
-       is_obsolete_var = OLD.is_obsolete;
-       timeaccessioned_var = OLD.timeaccessioned;
-       timelastmodified_var = OLD.timelastmodified;
-       
-       IF TG_OP = ''DELETE'' THEN
-           transaction_type_var = ''D'';
-       ELSE
-           transaction_type_var = ''U'';
-       END IF;
-
-       INSERT INTO audit_library ( 
-             library_id, 
-             organism_id, 
-             name, 
-             uniquename, 
-             type_id, 
-             is_obsolete, 
-             timeaccessioned, 
-             timelastmodified, 
-             transaction_type
-       ) VALUES ( 
-             library_id_var, 
-             organism_id_var, 
-             name_var, 
-             uniquename_var, 
-             type_id_var, 
-             is_obsolete_var, 
-             timeaccessioned_var, 
-             timelastmodified_var, 
-             transaction_type_var
-       );
-
-       IF TG_OP = ''DELETE'' THEN
-           return OLD;
-       ELSE
-           return NEW;
-       END IF;
-   END
-   '
-   LANGUAGE plpgsql; 
-
-   DROP TRIGGER library_audit_ud ON library;
-   CREATE TRIGGER library_audit_ud
-       BEFORE UPDATE OR DELETE ON library
-       FOR EACH ROW
-       EXECUTE PROCEDURE audit_update_delete_library ();
-
-
-   DROP TABLE audit_library_synonym;
-   CREATE TABLE audit_library_synonym ( 
-       library_synonym_id bigint, 
-       synonym_id bigint, 
-       library_id bigint, 
-       pub_id bigint, 
-       is_current boolean, 
-       is_internal boolean, 
-       transaction_date timestamp not null default now(),
-       transaction_type char(1) not null
-   );
-   GRANT ALL on audit_library_synonym to PUBLIC;
-
-   CREATE OR REPLACE FUNCTION audit_update_delete_library_synonym() RETURNS trigger AS
-   '
-   DECLARE
-       library_synonym_id_var bigint; 
-       synonym_id_var bigint; 
-       library_id_var bigint; 
-       pub_id_var bigint; 
-       is_current_var boolean; 
-       is_internal_var boolean; 
-       
-       transaction_type_var char;
-   BEGIN
-       library_synonym_id_var = OLD.library_synonym_id;
-       synonym_id_var = OLD.synonym_id;
-       library_id_var = OLD.library_id;
-       pub_id_var = OLD.pub_id;
-       is_current_var = OLD.is_current;
-       is_internal_var = OLD.is_internal;
-       
-       IF TG_OP = ''DELETE'' THEN
-           transaction_type_var = ''D'';
-       ELSE
-           transaction_type_var = ''U'';
-       END IF;
-
-       INSERT INTO audit_library_synonym ( 
-             library_synonym_id, 
-             synonym_id, 
-             library_id, 
-             pub_id, 
-             is_current, 
-             is_internal, 
-             transaction_type
-       ) VALUES ( 
-             library_synonym_id_var, 
-             synonym_id_var, 
-             library_id_var, 
-             pub_id_var, 
-             is_current_var, 
-             is_internal_var, 
-             transaction_type_var
-       );
-
-       IF TG_OP = ''DELETE'' THEN
-           return OLD;
-       ELSE
-           return NEW;
-       END IF;
-   END
-   '
-   LANGUAGE plpgsql; 
-
-   DROP TRIGGER library_synonym_audit_ud ON library_synonym;
-   CREATE TRIGGER library_synonym_audit_ud
-       BEFORE UPDATE OR DELETE ON library_synonym
-       FOR EACH ROW
-       EXECUTE PROCEDURE audit_update_delete_library_synonym ();
-
-
-   DROP TABLE audit_library_pub;
-   CREATE TABLE audit_library_pub ( 
-       library_pub_id bigint, 
-       library_id bigint, 
-       pub_id bigint, 
-       transaction_date timestamp not null default now(),
-       transaction_type char(1) not null
-   );
-   GRANT ALL on audit_library_pub to PUBLIC;
-
-   CREATE OR REPLACE FUNCTION audit_update_delete_library_pub() RETURNS trigger AS
-   '
-   DECLARE
-       library_pub_id_var bigint; 
-       library_id_var bigint; 
-       pub_id_var bigint; 
-       
-       transaction_type_var char;
-   BEGIN
-       library_pub_id_var = OLD.library_pub_id;
-       library_id_var = OLD.library_id;
-       pub_id_var = OLD.pub_id;
-       
-       IF TG_OP = ''DELETE'' THEN
-           transaction_type_var = ''D'';
-       ELSE
-           transaction_type_var = ''U'';
-       END IF;
-
-       INSERT INTO audit_library_pub ( 
-             library_pub_id, 
-             library_id, 
-             pub_id, 
-             transaction_type
-       ) VALUES ( 
-             library_pub_id_var, 
-             library_id_var, 
-             pub_id_var, 
-             transaction_type_var
-       );
-
-       IF TG_OP = ''DELETE'' THEN
-           return OLD;
-       ELSE
-           return NEW;
-       END IF;
-   END
-   '
-   LANGUAGE plpgsql; 
-
-   DROP TRIGGER library_pub_audit_ud ON library_pub;
-   CREATE TRIGGER library_pub_audit_ud
-       BEFORE UPDATE OR DELETE ON library_pub
-       FOR EACH ROW
-       EXECUTE PROCEDURE audit_update_delete_library_pub ();
-
-
-   DROP TABLE audit_libraryprop;
-   CREATE TABLE audit_libraryprop ( 
-       libraryprop_id bigint, 
-       library_id bigint, 
-       type_id bigint, 
-       value text, 
-       rank integer, 
-       transaction_date timestamp not null default now(),
-       transaction_type char(1) not null
-   );
-   GRANT ALL on audit_libraryprop to PUBLIC;
-
-   CREATE OR REPLACE FUNCTION audit_update_delete_libraryprop() RETURNS trigger AS
-   '
-   DECLARE
-       libraryprop_id_var bigint; 
-       library_id_var bigint; 
-       type_id_var bigint; 
-       value_var text; 
-       rank_var integer; 
-       
-       transaction_type_var char;
-   BEGIN
-       libraryprop_id_var = OLD.libraryprop_id;
-       library_id_var = OLD.library_id;
-       type_id_var = OLD.type_id;
-       value_var = OLD.value;
-       rank_var = OLD.rank;
-       
-       IF TG_OP = ''DELETE'' THEN
-           transaction_type_var = ''D'';
-       ELSE
-           transaction_type_var = ''U'';
-       END IF;
-
-       INSERT INTO audit_libraryprop ( 
-             libraryprop_id, 
-             library_id, 
-             type_id, 
-             value, 
-             rank, 
-             transaction_type
-       ) VALUES ( 
-             libraryprop_id_var, 
-             library_id_var, 
-             type_id_var, 
-             value_var, 
-             rank_var, 
-             transaction_type_var
-       );
-
-       IF TG_OP = ''DELETE'' THEN
-           return OLD;
-       ELSE
-           return NEW;
-       END IF;
-   END
-   '
-   LANGUAGE plpgsql; 
-
-   DROP TRIGGER libraryprop_audit_ud ON libraryprop;
-   CREATE TRIGGER libraryprop_audit_ud
-       BEFORE UPDATE OR DELETE ON libraryprop
-       FOR EACH ROW
-       EXECUTE PROCEDURE audit_update_delete_libraryprop ();
-
-
-   DROP TABLE audit_libraryprop_pub;
-   CREATE TABLE audit_libraryprop_pub ( 
-       libraryprop_pub_id bigint, 
-       libraryprop_id bigint, 
-       pub_id bigint, 
-       transaction_date timestamp not null default now(),
-       transaction_type char(1) not null
-   );
-   GRANT ALL on audit_libraryprop_pub to PUBLIC;
-
-   CREATE OR REPLACE FUNCTION audit_update_delete_libraryprop_pub() RETURNS trigger AS
-   '
-   DECLARE
-       libraryprop_pub_id_var bigint; 
-       libraryprop_id_var bigint; 
-       pub_id_var bigint; 
-       
-       transaction_type_var char;
-   BEGIN
-       libraryprop_pub_id_var = OLD.libraryprop_pub_id;
-       libraryprop_id_var = OLD.libraryprop_id;
-       pub_id_var = OLD.pub_id;
-       
-       IF TG_OP = ''DELETE'' THEN
-           transaction_type_var = ''D'';
-       ELSE
-           transaction_type_var = ''U'';
-       END IF;
-
-       INSERT INTO audit_libraryprop_pub ( 
-             libraryprop_pub_id, 
-             libraryprop_id, 
-             pub_id, 
-             transaction_type
-       ) VALUES ( 
-             libraryprop_pub_id_var, 
-             libraryprop_id_var, 
-             pub_id_var, 
-             transaction_type_var
-       );
-
-       IF TG_OP = ''DELETE'' THEN
-           return OLD;
-       ELSE
-           return NEW;
-       END IF;
-   END
-   '
-   LANGUAGE plpgsql; 
-
-   DROP TRIGGER libraryprop_pub_audit_ud ON libraryprop_pub;
-   CREATE TRIGGER libraryprop_pub_audit_ud
-       BEFORE UPDATE OR DELETE ON libraryprop_pub
-       FOR EACH ROW
-       EXECUTE PROCEDURE audit_update_delete_libraryprop_pub ();
-
-
-   DROP TABLE audit_library_cvterm;
-   CREATE TABLE audit_library_cvterm ( 
-       library_cvterm_id bigint, 
-       library_id bigint, 
-       cvterm_id bigint, 
-       pub_id bigint, 
-       transaction_date timestamp not null default now(),
-       transaction_type char(1) not null
-   );
-   GRANT ALL on audit_library_cvterm to PUBLIC;
-
-   CREATE OR REPLACE FUNCTION audit_update_delete_library_cvterm() RETURNS trigger AS
-   '
-   DECLARE
-       library_cvterm_id_var bigint; 
-       library_id_var bigint; 
-       cvterm_id_var bigint; 
-       pub_id_var bigint; 
-       
-       transaction_type_var char;
-   BEGIN
-       library_cvterm_id_var = OLD.library_cvterm_id;
-       library_id_var = OLD.library_id;
-       cvterm_id_var = OLD.cvterm_id;
-       pub_id_var = OLD.pub_id;
-       
-       IF TG_OP = ''DELETE'' THEN
-           transaction_type_var = ''D'';
-       ELSE
-           transaction_type_var = ''U'';
-       END IF;
-
-       INSERT INTO audit_library_cvterm ( 
-             library_cvterm_id, 
-             library_id, 
-             cvterm_id, 
-             pub_id, 
-             transaction_type
-       ) VALUES ( 
-             library_cvterm_id_var, 
-             library_id_var, 
-             cvterm_id_var, 
-             pub_id_var, 
-             transaction_type_var
-       );
-
-       IF TG_OP = ''DELETE'' THEN
-           return OLD;
-       ELSE
-           return NEW;
-       END IF;
-   END
-   '
-   LANGUAGE plpgsql; 
-
-   DROP TRIGGER library_cvterm_audit_ud ON library_cvterm;
-   CREATE TRIGGER library_cvterm_audit_ud
-       BEFORE UPDATE OR DELETE ON library_cvterm
-       FOR EACH ROW
-       EXECUTE PROCEDURE audit_update_delete_library_cvterm ();
-
-
-   DROP TABLE audit_library_feature;
-   CREATE TABLE audit_library_feature ( 
-       library_feature_id bigint, 
-       library_id bigint, 
-       feature_id bigint, 
-       transaction_date timestamp not null default now(),
-       transaction_type char(1) not null
-   );
-   GRANT ALL on audit_library_feature to PUBLIC;
-
-   CREATE OR REPLACE FUNCTION audit_update_delete_library_feature() RETURNS trigger AS
-   '
-   DECLARE
-       library_feature_id_var bigint; 
-       library_id_var bigint; 
-       feature_id_var bigint; 
-       
-       transaction_type_var char;
-   BEGIN
-       library_feature_id_var = OLD.library_feature_id;
-       library_id_var = OLD.library_id;
-       feature_id_var = OLD.feature_id;
-       
-       IF TG_OP = ''DELETE'' THEN
-           transaction_type_var = ''D'';
-       ELSE
-           transaction_type_var = ''U'';
-       END IF;
-
-       INSERT INTO audit_library_feature ( 
-             library_feature_id, 
-             library_id, 
-             feature_id, 
-             transaction_type
-       ) VALUES ( 
-             library_feature_id_var, 
-             library_id_var, 
-             feature_id_var, 
-             transaction_type_var
-       );
-
-       IF TG_OP = ''DELETE'' THEN
-           return OLD;
-       ELSE
-           return NEW;
-       END IF;
-   END
-   '
-   LANGUAGE plpgsql; 
-
-   DROP TRIGGER library_feature_audit_ud ON library_feature;
-   CREATE TRIGGER library_feature_audit_ud
-       BEFORE UPDATE OR DELETE ON library_feature
-       FOR EACH ROW
-       EXECUTE PROCEDURE audit_update_delete_library_feature ();
-
-
-   DROP TABLE audit_library_dbxref;
-   CREATE TABLE audit_library_dbxref ( 
-       library_dbxref_id bigint, 
-       library_id bigint, 
-       dbxref_id bigint, 
-       is_current boolean, 
-       transaction_date timestamp not null default now(),
-       transaction_type char(1) not null
-   );
-   GRANT ALL on audit_library_dbxref to PUBLIC;
-
-   CREATE OR REPLACE FUNCTION audit_update_delete_library_dbxref() RETURNS trigger AS
-   '
-   DECLARE
-       library_dbxref_id_var bigint; 
-       library_id_var bigint; 
-       dbxref_id_var bigint; 
-       is_current_var boolean; 
-       
-       transaction_type_var char;
-   BEGIN
-       library_dbxref_id_var = OLD.library_dbxref_id;
-       library_id_var = OLD.library_id;
-       dbxref_id_var = OLD.dbxref_id;
-       is_current_var = OLD.is_current;
-       
-       IF TG_OP = ''DELETE'' THEN
-           transaction_type_var = ''D'';
-       ELSE
-           transaction_type_var = ''U'';
-       END IF;
-
-       INSERT INTO audit_library_dbxref ( 
-             library_dbxref_id, 
-             library_id, 
-             dbxref_id, 
-             is_current, 
-             transaction_type
-       ) VALUES ( 
-             library_dbxref_id_var, 
-             library_id_var, 
-             dbxref_id_var, 
-             is_current_var, 
-             transaction_type_var
-       );
-
-       IF TG_OP = ''DELETE'' THEN
-           return OLD;
-       ELSE
-           return NEW;
-       END IF;
-   END
-   '
-   LANGUAGE plpgsql; 
-
-   DROP TRIGGER library_dbxref_audit_ud ON library_dbxref;
-   CREATE TRIGGER library_dbxref_audit_ud
-       BEFORE UPDATE OR DELETE ON library_dbxref
-       FOR EACH ROW
-       EXECUTE PROCEDURE audit_update_delete_library_dbxref ();
-
-
    DROP TABLE audit_cell_line;
    CREATE TABLE audit_cell_line ( 
-       cell_line_id bigint, 
+       cell_line_id integer, 
        name varchar(255), 
        uniquename varchar(255), 
-       organism_id bigint, 
+       organism_id integer, 
        timeaccessioned timestamp, 
        timelastmodified timestamp, 
        transaction_date timestamp not null default now(),
@@ -9773,10 +11911,10 @@
    CREATE OR REPLACE FUNCTION audit_update_delete_cell_line() RETURNS trigger AS
    '
    DECLARE
-       cell_line_id_var bigint; 
+       cell_line_id_var integer; 
        name_var varchar(255); 
        uniquename_var varchar(255); 
-       organism_id_var bigint; 
+       organism_id_var integer; 
        timeaccessioned_var timestamp; 
        timelastmodified_var timestamp; 
        
@@ -9831,10 +11969,10 @@
 
    DROP TABLE audit_cell_line_relationship;
    CREATE TABLE audit_cell_line_relationship ( 
-       cell_line_relationship_id bigint, 
-       subject_id bigint, 
-       object_id bigint, 
-       type_id bigint, 
+       cell_line_relationship_id integer, 
+       subject_id integer, 
+       object_id integer, 
+       type_id integer, 
        transaction_date timestamp not null default now(),
        transaction_type char(1) not null
    );
@@ -9843,10 +11981,10 @@
    CREATE OR REPLACE FUNCTION audit_update_delete_cell_line_relationship() RETURNS trigger AS
    '
    DECLARE
-       cell_line_relationship_id_var bigint; 
-       subject_id_var bigint; 
-       object_id_var bigint; 
-       type_id_var bigint; 
+       cell_line_relationship_id_var integer; 
+       subject_id_var integer; 
+       object_id_var integer; 
+       type_id_var integer; 
        
        transaction_type_var char;
    BEGIN
@@ -9893,10 +12031,10 @@
 
    DROP TABLE audit_cell_line_synonym;
    CREATE TABLE audit_cell_line_synonym ( 
-       cell_line_synonym_id bigint, 
-       cell_line_id bigint, 
-       synonym_id bigint, 
-       pub_id bigint, 
+       cell_line_synonym_id integer, 
+       cell_line_id integer, 
+       synonym_id integer, 
+       pub_id integer, 
        is_current boolean, 
        is_internal boolean, 
        transaction_date timestamp not null default now(),
@@ -9907,10 +12045,10 @@
    CREATE OR REPLACE FUNCTION audit_update_delete_cell_line_synonym() RETURNS trigger AS
    '
    DECLARE
-       cell_line_synonym_id_var bigint; 
-       cell_line_id_var bigint; 
-       synonym_id_var bigint; 
-       pub_id_var bigint; 
+       cell_line_synonym_id_var integer; 
+       cell_line_id_var integer; 
+       synonym_id_var integer; 
+       pub_id_var integer; 
        is_current_var boolean; 
        is_internal_var boolean; 
        
@@ -9965,10 +12103,10 @@
 
    DROP TABLE audit_cell_line_cvterm;
    CREATE TABLE audit_cell_line_cvterm ( 
-       cell_line_cvterm_id bigint, 
-       cell_line_id bigint, 
-       cvterm_id bigint, 
-       pub_id bigint, 
+       cell_line_cvterm_id integer, 
+       cell_line_id integer, 
+       cvterm_id integer, 
+       pub_id integer, 
        rank integer, 
        transaction_date timestamp not null default now(),
        transaction_type char(1) not null
@@ -9978,10 +12116,10 @@
    CREATE OR REPLACE FUNCTION audit_update_delete_cell_line_cvterm() RETURNS trigger AS
    '
    DECLARE
-       cell_line_cvterm_id_var bigint; 
-       cell_line_id_var bigint; 
-       cvterm_id_var bigint; 
-       pub_id_var bigint; 
+       cell_line_cvterm_id_var integer; 
+       cell_line_id_var integer; 
+       cvterm_id_var integer; 
+       pub_id_var integer; 
        rank_var integer; 
        
        transaction_type_var char;
@@ -10032,9 +12170,9 @@
 
    DROP TABLE audit_cell_line_dbxref;
    CREATE TABLE audit_cell_line_dbxref ( 
-       cell_line_dbxref_id bigint, 
-       cell_line_id bigint, 
-       dbxref_id bigint, 
+       cell_line_dbxref_id integer, 
+       cell_line_id integer, 
+       dbxref_id integer, 
        is_current boolean, 
        transaction_date timestamp not null default now(),
        transaction_type char(1) not null
@@ -10044,9 +12182,9 @@
    CREATE OR REPLACE FUNCTION audit_update_delete_cell_line_dbxref() RETURNS trigger AS
    '
    DECLARE
-       cell_line_dbxref_id_var bigint; 
-       cell_line_id_var bigint; 
-       dbxref_id_var bigint; 
+       cell_line_dbxref_id_var integer; 
+       cell_line_id_var integer; 
+       dbxref_id_var integer; 
        is_current_var boolean; 
        
        transaction_type_var char;
@@ -10094,9 +12232,9 @@
 
    DROP TABLE audit_cell_lineprop;
    CREATE TABLE audit_cell_lineprop ( 
-       cell_lineprop_id bigint, 
-       cell_line_id bigint, 
-       type_id bigint, 
+       cell_lineprop_id integer, 
+       cell_line_id integer, 
+       type_id integer, 
        value text, 
        rank integer, 
        transaction_date timestamp not null default now(),
@@ -10107,9 +12245,9 @@
    CREATE OR REPLACE FUNCTION audit_update_delete_cell_lineprop() RETURNS trigger AS
    '
    DECLARE
-       cell_lineprop_id_var bigint; 
-       cell_line_id_var bigint; 
-       type_id_var bigint; 
+       cell_lineprop_id_var integer; 
+       cell_line_id_var integer; 
+       type_id_var integer; 
        value_var text; 
        rank_var integer; 
        
@@ -10161,9 +12299,9 @@
 
    DROP TABLE audit_cell_lineprop_pub;
    CREATE TABLE audit_cell_lineprop_pub ( 
-       cell_lineprop_pub_id bigint, 
-       cell_lineprop_id bigint, 
-       pub_id bigint, 
+       cell_lineprop_pub_id integer, 
+       cell_lineprop_id integer, 
+       pub_id integer, 
        transaction_date timestamp not null default now(),
        transaction_type char(1) not null
    );
@@ -10172,9 +12310,9 @@
    CREATE OR REPLACE FUNCTION audit_update_delete_cell_lineprop_pub() RETURNS trigger AS
    '
    DECLARE
-       cell_lineprop_pub_id_var bigint; 
-       cell_lineprop_id_var bigint; 
-       pub_id_var bigint; 
+       cell_lineprop_pub_id_var integer; 
+       cell_lineprop_id_var integer; 
+       pub_id_var integer; 
        
        transaction_type_var char;
    BEGIN
@@ -10218,10 +12356,10 @@
 
    DROP TABLE audit_cell_line_feature;
    CREATE TABLE audit_cell_line_feature ( 
-       cell_line_feature_id bigint, 
-       cell_line_id bigint, 
-       feature_id bigint, 
-       pub_id bigint, 
+       cell_line_feature_id integer, 
+       cell_line_id integer, 
+       feature_id integer, 
+       pub_id integer, 
        transaction_date timestamp not null default now(),
        transaction_type char(1) not null
    );
@@ -10230,10 +12368,10 @@
    CREATE OR REPLACE FUNCTION audit_update_delete_cell_line_feature() RETURNS trigger AS
    '
    DECLARE
-       cell_line_feature_id_var bigint; 
-       cell_line_id_var bigint; 
-       feature_id_var bigint; 
-       pub_id_var bigint; 
+       cell_line_feature_id_var integer; 
+       cell_line_id_var integer; 
+       feature_id_var integer; 
+       pub_id_var integer; 
        
        transaction_type_var char;
    BEGIN
@@ -10280,9 +12418,9 @@
 
    DROP TABLE audit_cell_line_cvtermprop;
    CREATE TABLE audit_cell_line_cvtermprop ( 
-       cell_line_cvtermprop_id bigint, 
-       cell_line_cvterm_id bigint, 
-       type_id bigint, 
+       cell_line_cvtermprop_id integer, 
+       cell_line_cvterm_id integer, 
+       type_id integer, 
        value text, 
        rank integer, 
        transaction_date timestamp not null default now(),
@@ -10293,9 +12431,9 @@
    CREATE OR REPLACE FUNCTION audit_update_delete_cell_line_cvtermprop() RETURNS trigger AS
    '
    DECLARE
-       cell_line_cvtermprop_id_var bigint; 
-       cell_line_cvterm_id_var bigint; 
-       type_id_var bigint; 
+       cell_line_cvtermprop_id_var integer; 
+       cell_line_cvterm_id_var integer; 
+       type_id_var integer; 
        value_var text; 
        rank_var integer; 
        
@@ -10347,9 +12485,9 @@
 
    DROP TABLE audit_cell_line_pub;
    CREATE TABLE audit_cell_line_pub ( 
-       cell_line_pub_id bigint, 
-       cell_line_id bigint, 
-       pub_id bigint, 
+       cell_line_pub_id integer, 
+       cell_line_id integer, 
+       pub_id integer, 
        transaction_date timestamp not null default now(),
        transaction_type char(1) not null
    );
@@ -10358,9 +12496,9 @@
    CREATE OR REPLACE FUNCTION audit_update_delete_cell_line_pub() RETURNS trigger AS
    '
    DECLARE
-       cell_line_pub_id_var bigint; 
-       cell_line_id_var bigint; 
-       pub_id_var bigint; 
+       cell_line_pub_id_var integer; 
+       cell_line_id_var integer; 
+       pub_id_var integer; 
        
        transaction_type_var char;
    BEGIN
@@ -10404,10 +12542,10 @@
 
    DROP TABLE audit_cell_line_library;
    CREATE TABLE audit_cell_line_library ( 
-       cell_line_library_id bigint, 
-       cell_line_id bigint, 
-       library_id bigint, 
-       pub_id bigint, 
+       cell_line_library_id integer, 
+       cell_line_id integer, 
+       library_id integer, 
+       pub_id integer, 
        transaction_date timestamp not null default now(),
        transaction_type char(1) not null
    );
@@ -10416,10 +12554,10 @@
    CREATE OR REPLACE FUNCTION audit_update_delete_cell_line_library() RETURNS trigger AS
    '
    DECLARE
-       cell_line_library_id_var bigint; 
-       cell_line_id_var bigint; 
-       library_id_var bigint; 
-       pub_id_var bigint; 
+       cell_line_library_id_var integer; 
+       cell_line_id_var integer; 
+       library_id_var integer; 
+       pub_id_var integer; 
        
        transaction_type_var char;
    BEGIN
@@ -10466,8 +12604,8 @@
 
    DROP TABLE audit_nd_geolocation;
    CREATE TABLE audit_nd_geolocation ( 
-       nd_geolocation_id bigint, 
-       description varchar(255), 
+       nd_geolocation_id integer, 
+       description text, 
        latitude real, 
        longitude real, 
        geodetic_datum varchar(32), 
@@ -10480,8 +12618,8 @@
    CREATE OR REPLACE FUNCTION audit_update_delete_nd_geolocation() RETURNS trigger AS
    '
    DECLARE
-       nd_geolocation_id_var bigint; 
-       description_var varchar(255); 
+       nd_geolocation_id_var integer; 
+       description_var text; 
        latitude_var real; 
        longitude_var real; 
        geodetic_datum_var varchar(32); 
@@ -10538,9 +12676,9 @@
 
    DROP TABLE audit_nd_experiment;
    CREATE TABLE audit_nd_experiment ( 
-       nd_experiment_id bigint, 
-       nd_geolocation_id bigint, 
-       type_id bigint, 
+       nd_experiment_id integer, 
+       nd_geolocation_id integer, 
+       type_id integer, 
        transaction_date timestamp not null default now(),
        transaction_type char(1) not null
    );
@@ -10549,9 +12687,9 @@
    CREATE OR REPLACE FUNCTION audit_update_delete_nd_experiment() RETURNS trigger AS
    '
    DECLARE
-       nd_experiment_id_var bigint; 
-       nd_geolocation_id_var bigint; 
-       type_id_var bigint; 
+       nd_experiment_id_var integer; 
+       nd_geolocation_id_var integer; 
+       type_id_var integer; 
        
        transaction_type_var char;
    BEGIN
@@ -10595,9 +12733,9 @@
 
    DROP TABLE audit_nd_experiment_project;
    CREATE TABLE audit_nd_experiment_project ( 
-       nd_experiment_project_id bigint, 
-       project_id bigint, 
-       nd_experiment_id bigint, 
+       nd_experiment_project_id integer, 
+       project_id integer, 
+       nd_experiment_id integer, 
        transaction_date timestamp not null default now(),
        transaction_type char(1) not null
    );
@@ -10606,9 +12744,9 @@
    CREATE OR REPLACE FUNCTION audit_update_delete_nd_experiment_project() RETURNS trigger AS
    '
    DECLARE
-       nd_experiment_project_id_var bigint; 
-       project_id_var bigint; 
-       nd_experiment_id_var bigint; 
+       nd_experiment_project_id_var integer; 
+       project_id_var integer; 
+       nd_experiment_id_var integer; 
        
        transaction_type_var char;
    BEGIN
@@ -10652,9 +12790,9 @@
 
    DROP TABLE audit_nd_experimentprop;
    CREATE TABLE audit_nd_experimentprop ( 
-       nd_experimentprop_id bigint, 
-       nd_experiment_id bigint, 
-       type_id bigint, 
+       nd_experimentprop_id integer, 
+       nd_experiment_id integer, 
+       type_id integer, 
        value text, 
        rank integer, 
        transaction_date timestamp not null default now(),
@@ -10665,9 +12803,9 @@
    CREATE OR REPLACE FUNCTION audit_update_delete_nd_experimentprop() RETURNS trigger AS
    '
    DECLARE
-       nd_experimentprop_id_var bigint; 
-       nd_experiment_id_var bigint; 
-       type_id_var bigint; 
+       nd_experimentprop_id_var integer; 
+       nd_experiment_id_var integer; 
+       type_id_var integer; 
        value_var text; 
        rank_var integer; 
        
@@ -10719,9 +12857,9 @@
 
    DROP TABLE audit_nd_experiment_pub;
    CREATE TABLE audit_nd_experiment_pub ( 
-       nd_experiment_pub_id bigint, 
-       nd_experiment_id bigint, 
-       pub_id bigint, 
+       nd_experiment_pub_id integer, 
+       nd_experiment_id integer, 
+       pub_id integer, 
        transaction_date timestamp not null default now(),
        transaction_type char(1) not null
    );
@@ -10730,9 +12868,9 @@
    CREATE OR REPLACE FUNCTION audit_update_delete_nd_experiment_pub() RETURNS trigger AS
    '
    DECLARE
-       nd_experiment_pub_id_var bigint; 
-       nd_experiment_id_var bigint; 
-       pub_id_var bigint; 
+       nd_experiment_pub_id_var integer; 
+       nd_experiment_id_var integer; 
+       pub_id_var integer; 
        
        transaction_type_var char;
    BEGIN
@@ -10776,9 +12914,9 @@
 
    DROP TABLE audit_nd_geolocationprop;
    CREATE TABLE audit_nd_geolocationprop ( 
-       nd_geolocationprop_id bigint, 
-       nd_geolocation_id bigint, 
-       type_id bigint, 
+       nd_geolocationprop_id integer, 
+       nd_geolocation_id integer, 
+       type_id integer, 
        value text, 
        rank integer, 
        transaction_date timestamp not null default now(),
@@ -10789,9 +12927,9 @@
    CREATE OR REPLACE FUNCTION audit_update_delete_nd_geolocationprop() RETURNS trigger AS
    '
    DECLARE
-       nd_geolocationprop_id_var bigint; 
-       nd_geolocation_id_var bigint; 
-       type_id_var bigint; 
+       nd_geolocationprop_id_var integer; 
+       nd_geolocation_id_var integer; 
+       type_id_var integer; 
        value_var text; 
        rank_var integer; 
        
@@ -10843,9 +12981,9 @@
 
    DROP TABLE audit_nd_protocol;
    CREATE TABLE audit_nd_protocol ( 
-       nd_protocol_id bigint, 
+       nd_protocol_id integer, 
        name varchar(255), 
-       type_id bigint, 
+       type_id integer, 
        transaction_date timestamp not null default now(),
        transaction_type char(1) not null
    );
@@ -10854,9 +12992,9 @@
    CREATE OR REPLACE FUNCTION audit_update_delete_nd_protocol() RETURNS trigger AS
    '
    DECLARE
-       nd_protocol_id_var bigint; 
+       nd_protocol_id_var integer; 
        name_var varchar(255); 
-       type_id_var bigint; 
+       type_id_var integer; 
        
        transaction_type_var char;
    BEGIN
@@ -10900,10 +13038,10 @@
 
    DROP TABLE audit_nd_reagent;
    CREATE TABLE audit_nd_reagent ( 
-       nd_reagent_id bigint, 
+       nd_reagent_id integer, 
        name varchar(80), 
-       type_id bigint, 
-       feature_id bigint, 
+       type_id integer, 
+       feature_id integer, 
        transaction_date timestamp not null default now(),
        transaction_type char(1) not null
    );
@@ -10912,10 +13050,10 @@
    CREATE OR REPLACE FUNCTION audit_update_delete_nd_reagent() RETURNS trigger AS
    '
    DECLARE
-       nd_reagent_id_var bigint; 
+       nd_reagent_id_var integer; 
        name_var varchar(80); 
-       type_id_var bigint; 
-       feature_id_var bigint; 
+       type_id_var integer; 
+       feature_id_var integer; 
        
        transaction_type_var char;
    BEGIN
@@ -10962,10 +13100,10 @@
 
    DROP TABLE audit_nd_protocol_reagent;
    CREATE TABLE audit_nd_protocol_reagent ( 
-       nd_protocol_reagent_id bigint, 
-       nd_protocol_id bigint, 
-       reagent_id bigint, 
-       type_id bigint, 
+       nd_protocol_reagent_id integer, 
+       nd_protocol_id integer, 
+       reagent_id integer, 
+       type_id integer, 
        transaction_date timestamp not null default now(),
        transaction_type char(1) not null
    );
@@ -10974,10 +13112,10 @@
    CREATE OR REPLACE FUNCTION audit_update_delete_nd_protocol_reagent() RETURNS trigger AS
    '
    DECLARE
-       nd_protocol_reagent_id_var bigint; 
-       nd_protocol_id_var bigint; 
-       reagent_id_var bigint; 
-       type_id_var bigint; 
+       nd_protocol_reagent_id_var integer; 
+       nd_protocol_id_var integer; 
+       reagent_id_var integer; 
+       type_id_var integer; 
        
        transaction_type_var char;
    BEGIN
@@ -11024,9 +13162,9 @@
 
    DROP TABLE audit_nd_protocolprop;
    CREATE TABLE audit_nd_protocolprop ( 
-       nd_protocolprop_id bigint, 
-       nd_protocol_id bigint, 
-       type_id bigint, 
+       nd_protocolprop_id integer, 
+       nd_protocol_id integer, 
+       type_id integer, 
        value text, 
        rank integer, 
        transaction_date timestamp not null default now(),
@@ -11037,9 +13175,9 @@
    CREATE OR REPLACE FUNCTION audit_update_delete_nd_protocolprop() RETURNS trigger AS
    '
    DECLARE
-       nd_protocolprop_id_var bigint; 
-       nd_protocol_id_var bigint; 
-       type_id_var bigint; 
+       nd_protocolprop_id_var integer; 
+       nd_protocol_id_var integer; 
+       type_id_var integer; 
        value_var text; 
        rank_var integer; 
        
@@ -11091,10 +13229,10 @@
 
    DROP TABLE audit_nd_experiment_stock;
    CREATE TABLE audit_nd_experiment_stock ( 
-       nd_experiment_stock_id bigint, 
-       nd_experiment_id bigint, 
-       stock_id bigint, 
-       type_id bigint, 
+       nd_experiment_stock_id integer, 
+       nd_experiment_id integer, 
+       stock_id integer, 
+       type_id integer, 
        transaction_date timestamp not null default now(),
        transaction_type char(1) not null
    );
@@ -11103,10 +13241,10 @@
    CREATE OR REPLACE FUNCTION audit_update_delete_nd_experiment_stock() RETURNS trigger AS
    '
    DECLARE
-       nd_experiment_stock_id_var bigint; 
-       nd_experiment_id_var bigint; 
-       stock_id_var bigint; 
-       type_id_var bigint; 
+       nd_experiment_stock_id_var integer; 
+       nd_experiment_id_var integer; 
+       stock_id_var integer; 
+       type_id_var integer; 
        
        transaction_type_var char;
    BEGIN
@@ -11153,9 +13291,9 @@
 
    DROP TABLE audit_nd_experiment_protocol;
    CREATE TABLE audit_nd_experiment_protocol ( 
-       nd_experiment_protocol_id bigint, 
-       nd_experiment_id bigint, 
-       nd_protocol_id bigint, 
+       nd_experiment_protocol_id integer, 
+       nd_experiment_id integer, 
+       nd_protocol_id integer, 
        transaction_date timestamp not null default now(),
        transaction_type char(1) not null
    );
@@ -11164,9 +13302,9 @@
    CREATE OR REPLACE FUNCTION audit_update_delete_nd_experiment_protocol() RETURNS trigger AS
    '
    DECLARE
-       nd_experiment_protocol_id_var bigint; 
-       nd_experiment_id_var bigint; 
-       nd_protocol_id_var bigint; 
+       nd_experiment_protocol_id_var integer; 
+       nd_experiment_id_var integer; 
+       nd_protocol_id_var integer; 
        
        transaction_type_var char;
    BEGIN
@@ -11210,9 +13348,9 @@
 
    DROP TABLE audit_nd_experiment_phenotype;
    CREATE TABLE audit_nd_experiment_phenotype ( 
-       nd_experiment_phenotype_id bigint, 
-       nd_experiment_id bigint, 
-       phenotype_id bigint, 
+       nd_experiment_phenotype_id integer, 
+       nd_experiment_id integer, 
+       phenotype_id integer, 
        transaction_date timestamp not null default now(),
        transaction_type char(1) not null
    );
@@ -11221,9 +13359,9 @@
    CREATE OR REPLACE FUNCTION audit_update_delete_nd_experiment_phenotype() RETURNS trigger AS
    '
    DECLARE
-       nd_experiment_phenotype_id_var bigint; 
-       nd_experiment_id_var bigint; 
-       phenotype_id_var bigint; 
+       nd_experiment_phenotype_id_var integer; 
+       nd_experiment_id_var integer; 
+       phenotype_id_var integer; 
        
        transaction_type_var char;
    BEGIN
@@ -11267,9 +13405,9 @@
 
    DROP TABLE audit_nd_experiment_genotype;
    CREATE TABLE audit_nd_experiment_genotype ( 
-       nd_experiment_genotype_id bigint, 
-       nd_experiment_id bigint, 
-       genotype_id bigint, 
+       nd_experiment_genotype_id integer, 
+       nd_experiment_id integer, 
+       genotype_id integer, 
        transaction_date timestamp not null default now(),
        transaction_type char(1) not null
    );
@@ -11278,9 +13416,9 @@
    CREATE OR REPLACE FUNCTION audit_update_delete_nd_experiment_genotype() RETURNS trigger AS
    '
    DECLARE
-       nd_experiment_genotype_id_var bigint; 
-       nd_experiment_id_var bigint; 
-       genotype_id_var bigint; 
+       nd_experiment_genotype_id_var integer; 
+       nd_experiment_id_var integer; 
+       genotype_id_var integer; 
        
        transaction_type_var char;
    BEGIN
@@ -11324,10 +13462,10 @@
 
    DROP TABLE audit_nd_reagent_relationship;
    CREATE TABLE audit_nd_reagent_relationship ( 
-       nd_reagent_relationship_id bigint, 
-       subject_reagent_id bigint, 
-       object_reagent_id bigint, 
-       type_id bigint, 
+       nd_reagent_relationship_id integer, 
+       subject_reagent_id integer, 
+       object_reagent_id integer, 
+       type_id integer, 
        transaction_date timestamp not null default now(),
        transaction_type char(1) not null
    );
@@ -11336,10 +13474,10 @@
    CREATE OR REPLACE FUNCTION audit_update_delete_nd_reagent_relationship() RETURNS trigger AS
    '
    DECLARE
-       nd_reagent_relationship_id_var bigint; 
-       subject_reagent_id_var bigint; 
-       object_reagent_id_var bigint; 
-       type_id_var bigint; 
+       nd_reagent_relationship_id_var integer; 
+       subject_reagent_id_var integer; 
+       object_reagent_id_var integer; 
+       type_id_var integer; 
        
        transaction_type_var char;
    BEGIN
@@ -11386,9 +13524,9 @@
 
    DROP TABLE audit_nd_reagentprop;
    CREATE TABLE audit_nd_reagentprop ( 
-       nd_reagentprop_id bigint, 
-       nd_reagent_id bigint, 
-       type_id bigint, 
+       nd_reagentprop_id integer, 
+       nd_reagent_id integer, 
+       type_id integer, 
        value text, 
        rank integer, 
        transaction_date timestamp not null default now(),
@@ -11399,9 +13537,9 @@
    CREATE OR REPLACE FUNCTION audit_update_delete_nd_reagentprop() RETURNS trigger AS
    '
    DECLARE
-       nd_reagentprop_id_var bigint; 
-       nd_reagent_id_var bigint; 
-       type_id_var bigint; 
+       nd_reagentprop_id_var integer; 
+       nd_reagent_id_var integer; 
+       type_id_var integer; 
        value_var text; 
        rank_var integer; 
        
@@ -11453,9 +13591,9 @@
 
    DROP TABLE audit_nd_experiment_stockprop;
    CREATE TABLE audit_nd_experiment_stockprop ( 
-       nd_experiment_stockprop_id bigint, 
-       nd_experiment_stock_id bigint, 
-       type_id bigint, 
+       nd_experiment_stockprop_id integer, 
+       nd_experiment_stock_id integer, 
+       type_id integer, 
        value text, 
        rank integer, 
        transaction_date timestamp not null default now(),
@@ -11466,9 +13604,9 @@
    CREATE OR REPLACE FUNCTION audit_update_delete_nd_experiment_stockprop() RETURNS trigger AS
    '
    DECLARE
-       nd_experiment_stockprop_id_var bigint; 
-       nd_experiment_stock_id_var bigint; 
-       type_id_var bigint; 
+       nd_experiment_stockprop_id_var integer; 
+       nd_experiment_stock_id_var integer; 
+       type_id_var integer; 
        value_var text; 
        rank_var integer; 
        
@@ -11520,9 +13658,9 @@
 
    DROP TABLE audit_nd_experiment_stock_dbxref;
    CREATE TABLE audit_nd_experiment_stock_dbxref ( 
-       nd_experiment_stock_dbxref_id bigint, 
-       nd_experiment_stock_id bigint, 
-       dbxref_id bigint, 
+       nd_experiment_stock_dbxref_id integer, 
+       nd_experiment_stock_id integer, 
+       dbxref_id integer, 
        transaction_date timestamp not null default now(),
        transaction_type char(1) not null
    );
@@ -11531,9 +13669,9 @@
    CREATE OR REPLACE FUNCTION audit_update_delete_nd_experiment_stock_dbxref() RETURNS trigger AS
    '
    DECLARE
-       nd_experiment_stock_dbxref_id_var bigint; 
-       nd_experiment_stock_id_var bigint; 
-       dbxref_id_var bigint; 
+       nd_experiment_stock_dbxref_id_var integer; 
+       nd_experiment_stock_id_var integer; 
+       dbxref_id_var integer; 
        
        transaction_type_var char;
    BEGIN
@@ -11577,9 +13715,9 @@
 
    DROP TABLE audit_nd_experiment_dbxref;
    CREATE TABLE audit_nd_experiment_dbxref ( 
-       nd_experiment_dbxref_id bigint, 
-       nd_experiment_id bigint, 
-       dbxref_id bigint, 
+       nd_experiment_dbxref_id integer, 
+       nd_experiment_id integer, 
+       dbxref_id integer, 
        transaction_date timestamp not null default now(),
        transaction_type char(1) not null
    );
@@ -11588,9 +13726,9 @@
    CREATE OR REPLACE FUNCTION audit_update_delete_nd_experiment_dbxref() RETURNS trigger AS
    '
    DECLARE
-       nd_experiment_dbxref_id_var bigint; 
-       nd_experiment_id_var bigint; 
-       dbxref_id_var bigint; 
+       nd_experiment_dbxref_id_var integer; 
+       nd_experiment_id_var integer; 
+       dbxref_id_var integer; 
        
        transaction_type_var char;
    BEGIN
@@ -11634,9 +13772,9 @@
 
    DROP TABLE audit_nd_experiment_contact;
    CREATE TABLE audit_nd_experiment_contact ( 
-       nd_experiment_contact_id bigint, 
-       nd_experiment_id bigint, 
-       contact_id bigint, 
+       nd_experiment_contact_id integer, 
+       nd_experiment_id integer, 
+       contact_id integer, 
        transaction_date timestamp not null default now(),
        transaction_type char(1) not null
    );
@@ -11645,9 +13783,9 @@
    CREATE OR REPLACE FUNCTION audit_update_delete_nd_experiment_contact() RETURNS trigger AS
    '
    DECLARE
-       nd_experiment_contact_id_var bigint; 
-       nd_experiment_id_var bigint; 
-       contact_id_var bigint; 
+       nd_experiment_contact_id_var integer; 
+       nd_experiment_id_var integer; 
+       contact_id_var integer; 
        
        transaction_type_var char;
    BEGIN
@@ -11687,5 +13825,67 @@
        BEFORE UPDATE OR DELETE ON nd_experiment_contact
        FOR EACH ROW
        EXECUTE PROCEDURE audit_update_delete_nd_experiment_contact ();
+
+
+   DROP TABLE audit_nd_experiment_analysis;
+   CREATE TABLE audit_nd_experiment_analysis ( 
+       nd_experiment_analysis_id integer, 
+       nd_experiment_id integer, 
+       analysis_id integer, 
+       type_id integer, 
+       transaction_date timestamp not null default now(),
+       transaction_type char(1) not null
+   );
+   GRANT ALL on audit_nd_experiment_analysis to PUBLIC;
+
+   CREATE OR REPLACE FUNCTION audit_update_delete_nd_experiment_analysis() RETURNS trigger AS
+   '
+   DECLARE
+       nd_experiment_analysis_id_var integer; 
+       nd_experiment_id_var integer; 
+       analysis_id_var integer; 
+       type_id_var integer; 
+       
+       transaction_type_var char;
+   BEGIN
+       nd_experiment_analysis_id_var = OLD.nd_experiment_analysis_id;
+       nd_experiment_id_var = OLD.nd_experiment_id;
+       analysis_id_var = OLD.analysis_id;
+       type_id_var = OLD.type_id;
+       
+       IF TG_OP = ''DELETE'' THEN
+           transaction_type_var = ''D'';
+       ELSE
+           transaction_type_var = ''U'';
+       END IF;
+
+       INSERT INTO audit_nd_experiment_analysis ( 
+             nd_experiment_analysis_id, 
+             nd_experiment_id, 
+             analysis_id, 
+             type_id, 
+             transaction_type
+       ) VALUES ( 
+             nd_experiment_analysis_id_var, 
+             nd_experiment_id_var, 
+             analysis_id_var, 
+             type_id_var, 
+             transaction_type_var
+       );
+
+       IF TG_OP = ''DELETE'' THEN
+           return OLD;
+       ELSE
+           return NEW;
+       END IF;
+   END
+   '
+   LANGUAGE plpgsql; 
+
+   DROP TRIGGER nd_experiment_analysis_audit_ud ON nd_experiment_analysis;
+   CREATE TRIGGER nd_experiment_analysis_audit_ud
+       BEFORE UPDATE OR DELETE ON nd_experiment_analysis
+       FOR EACH ROW
+       EXECUTE PROCEDURE audit_update_delete_nd_experiment_analysis ();
 
 
