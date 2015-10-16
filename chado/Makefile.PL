@@ -616,6 +616,7 @@ graphviz :: \
 	make $working_dir/modules/companalysis/companalysis.graphviz.png \
 	make $working_dir/modules/contact/contact.graphviz.png \
 	make $working_dir/modules/cv/cv.graphviz.png \
+	make $working_dir/modules/db/db.graphviz.png \
 	make $working_dir/modules/expression/expression.graphviz.png \
 	make $working_dir/modules/general/general.graphviz.png \
 	make $working_dir/modules/genetic/genetic.graphviz.png \
@@ -639,6 +640,7 @@ graphviz_svg :: \
 	make $working_dir/modules/companalysis/companalysis.graphviz.svg \
 	make $working_dir/modules/contact/contact.graphviz.svg \
 	make $working_dir/modules/cv/cv.graphviz.svg \
+	make $working_dir/modules/db/db.graphviz.svg \
 	make $working_dir/modules/expression/expression.graphviz.svg \
 	make $working_dir/modules/general/general.graphviz.svg \
 	make $working_dir/modules/genetic/genetic.graphviz.svg \
@@ -661,6 +663,7 @@ diagram :: \
 	make $working_dir/modules/companalysis/companalysis.diagram.png \
 	make $working_dir/modules/contact/contact.diagram.png \
 	make $working_dir/modules/cv/cv.diagram.png \
+	make $working_dir/modules/db/db.diagram.png \
 	make $working_dir/modules/expression/expression.diagram.png \
 	make $working_dir/modules/general/general.diagram.png \
 	make $working_dir/modules/genetic/genetic.diagram.png \
@@ -684,6 +687,7 @@ html :: \
 	make $working_dir/modules/companalysis/companalysis.html \
 	make $working_dir/modules/contact/contact.html \
 	make $working_dir/modules/cv/cv.html \
+	make $working_dir/modules/db/db.html \
 	make $working_dir/modules/expression/expression.html \
 	make $working_dir/modules/general/general.html \
 	make $working_dir/modules/genetic/genetic.html \
@@ -707,6 +711,7 @@ tex :: \
 	make $working_dir/modules/companalysis/companalysis.tex \
 	make $working_dir/modules/contact/contact.tex \
 	make $working_dir/modules/cv/cv.tex \
+	make $working_dir/modules/db/db.tex \
 	make $working_dir/modules/expression/expression.tex \
 	make $working_dir/modules/general/general.tex \
 	make $working_dir/modules/genetic/genetic.tex \
