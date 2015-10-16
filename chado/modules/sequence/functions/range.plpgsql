@@ -35,7 +35,7 @@ CREATE OR REPLACE FUNCTION featureloc_slice(varchar, bigint, bigint)
    AND srcf.name = $1 '
 LANGUAGE 'sql';
 
-CREATE OR REPLACE FUNCTION featureloc_slice(int, bigint, bigint)
+CREATE OR REPLACE FUNCTION featureloc_slice(bigint, bigint, bigint)
   RETURNS setof featureloc AS
   'SELECT * 
    FROM featureloc 

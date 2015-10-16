@@ -1,6 +1,6 @@
 --- example: select * from fill_cvtermpath(7); where 7 is cv_id for an ontology
 --- fill path from the node to its children and their children
-CREATE OR REPLACE FUNCTION _fill_cvtermpath4node(INTEGER, INTEGER, INTEGER, INTEGER, INTEGER) RETURNS INTEGER AS
+CREATE OR REPLACE FUNCTION _fill_cvtermpath4node(BIGINT, BIGINT, BIGINT, BIGINT, INTEGER) RETURNS INTEGER AS
 '
 DECLARE
     origin alias for $1;
@@ -29,12 +29,12 @@ END;
 LANGUAGE 'plpgsql';
 
 
-CREATE OR REPLACE FUNCTION _fill_cvtermpath4root(INTEGER, INTEGER) RETURNS INTEGER AS
+CREATE OR REPLACE FUNCTION _fill_cvtermpath4root(BIGINT, BIGINT) RETURNS INTEGER AS
 '
 DECLARE
     rootid alias for $1;
     cvid alias for $2;
-    ttype int;
+    ttype bigint;
     cterm cvterm_relationship%ROWTYPE;
     child cvterm_relationship%ROWTYPE;
 
@@ -51,7 +51,7 @@ END;
 '
 LANGUAGE 'plpgsql';
 
-CREATE OR REPLACE FUNCTION fill_cvtermpath(INTEGER) RETURNS INTEGER AS
+CREATE OR REPLACE FUNCTION fill_cvtermpath(BIGINT) RETURNS INTEGER AS
 '
 DECLARE
     cvid alias for $1;
@@ -73,7 +73,7 @@ CREATE OR REPLACE FUNCTION fill_cvtermpath(cv.name%TYPE) RETURNS INTEGER AS
 '
 DECLARE
     cvname alias for $1;
-    cv_id   int;
+    cv_id   bigint;
     rtn     int;
 BEGIN
 

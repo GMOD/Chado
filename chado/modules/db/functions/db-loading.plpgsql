@@ -1,10 +1,10 @@
 
 CREATE OR REPLACE FUNCTION store_db (VARCHAR) 
-  RETURNS INT AS 
+  RETURNS BIGINT AS 
 'DECLARE
    v_name             ALIAS FOR $1;
 
-   v_db_id            INTEGER;
+   v_db_id            BIGINT;
  BEGIN
     SELECT INTO v_db_id db_id
       FROM db
@@ -21,13 +21,13 @@ CREATE OR REPLACE FUNCTION store_db (VARCHAR)
 ' LANGUAGE 'plpgsql';
   
 CREATE OR REPLACE FUNCTION store_dbxref (VARCHAR,VARCHAR) 
-  RETURNS INT AS 
+  RETURNS BIGINT AS 
 'DECLARE
    v_dbname                ALIAS FOR $1;
    v_accession             ALIAS FOR $2;
 
-   v_db_id                 INTEGER;
-   v_dbxref_id             INTEGER;
+   v_db_id                 BIGINT;
+   v_dbxref_id             BIGINT;
  BEGIN
     SELECT INTO v_db_id
       store_db(v_dbname);

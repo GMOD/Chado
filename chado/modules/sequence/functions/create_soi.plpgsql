@@ -15,7 +15,7 @@ CREATE TYPE soi_type AS (
     object_id bigint
 );
 
-CREATE OR REPLACE FUNCTION _fill_cvtermpath4soinode(INTEGER, INTEGER, INTEGER, INTEGER, INTEGER) RETURNS INTEGER AS
+CREATE OR REPLACE FUNCTION _fill_cvtermpath4soinode(BIGINT, BIGINT, BIGINT, BIGINT, INTEGER) RETURNS INTEGER AS
 '
 DECLARE
     origin alias for $1;
@@ -45,12 +45,12 @@ END;
 '
 LANGUAGE 'plpgsql';
 
-CREATE OR REPLACE FUNCTION _fill_cvtermpath4soi(INTEGER, INTEGER) RETURNS INTEGER AS
+CREATE OR REPLACE FUNCTION _fill_cvtermpath4soi(BIGINT, BIGINT) RETURNS INTEGER AS
 '
 DECLARE
     rootid alias for $1;
     cvid alias for $2;
-    ttype int;
+    ttype bigint;
     cterm soi_type%ROWTYPE;
 
 BEGIN
@@ -99,7 +99,7 @@ BEGIN
     INSERT INTO cvterm (name, cv_id) VALUES(soi_term, soi_cvid);
     SELECT INTO soiterm_id cvterm_id FROM cvterm WHERE name = soi_term;
 
-    CREATE TEMP TABLE tmpcvtr (tmp_type INT, type_id bigint, subject_id bigint, object_id bigint);
+    CREATE TEMP TABLE tmpcvtr (tmp_type BIGINT, type_id bigint, subject_id bigint, object_id bigint);
     CREATE UNIQUE INDEX u_tmpcvtr ON tmpcvtr(subject_id, object_id);
 
     INSERT INTO tmpcvtr (tmp_type, type_id, subject_id, object_id)

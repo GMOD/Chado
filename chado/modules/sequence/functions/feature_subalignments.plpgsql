@@ -1,4 +1,4 @@
-CREATE OR REPLACE FUNCTION feature_subalignments(integer) RETURNS SETOF featureloc AS '
+CREATE OR REPLACE FUNCTION feature_subalignments(bigint) RETURNS SETOF featureloc AS '
 DECLARE
   return_data featureloc%ROWTYPE;
   f_id ALIAS FOR $1;
@@ -7,8 +7,8 @@ DECLARE
 
   s text;
 
-  fmin integer;
-  slen integer;
+  fmin bigint;
+  slen bigint;
 BEGIN
   --RAISE NOTICE ''feature_id is %'', featureloc_data.feature_id;
   SELECT INTO feature_data * FROM feature WHERE feature_id = f_id;

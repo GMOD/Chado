@@ -14,7 +14,7 @@ CREATE TABLE godb.instance_data (
 --- helper views
 
 --view
-CREATE VIEW godb.v_go_acc AS
+CREATE OR REPLACE VIEW godb.v_go_acc AS
  SELECT 
   dbxref_id                          AS dbxref_id,
   db.name || ':' || dbxref.accession AS acc
@@ -33,7 +33,7 @@ INSERT INTO godb.go_acc SELECT * FROM godb.v_go_acc;
 --- dbxref [clash]
 
 --view
-CREATE VIEW godb.v_dbxref AS
+CREATE OR REPLACE VIEW godb.v_dbxref AS
  SELECT
   dbxref_id                          AS id,
   db.name                            AS xref_dbname,
@@ -44,7 +44,7 @@ CREATE VIEW godb.v_dbxref AS
   INNER JOIN public.db USING (db_id);
 --materialized view
 CREATE TABLE godb.dbxref (
-  id int,
+  id bigint,
   xref_dbname varchar(255),
   xref_key varchar(255),
   xref_keytype varchar(255),
@@ -66,7 +66,7 @@ INSERT INTO godb.dbxref SELECT * FROM godb.v_dbxref;
 -- db [clash] (note in godb, db is only refered to from association table)
 
 --view
-CREATE VIEW godb.v_db AS
+CREATE OR REPLACE VIEW godb.v_db AS
  SELECT
   db_id                                 AS id,
   name                                  AS name,
@@ -76,7 +76,7 @@ CREATE VIEW godb.v_db AS
  FROM public.db;
 --materialized view
 CREATE TABLE godb.db (
-  id int,
+  id bigint,
   name varchar(255),
   fullname varchar(255),
   datatype varchar(255),
@@ -93,7 +93,7 @@ INSERT INTO godb.db SELECT * FROM godb.v_db;
 --- term
 
 --view
-CREATE VIEW godb.v_term AS
+CREATE OR REPLACE VIEW godb.v_term AS
 SELECT
  cvterm_id     AS id,
  godb.go_acc.acc AS acc,
@@ -104,7 +104,7 @@ FROM public.cvterm
  INNER JOIN godb.go_acc USING (dbxref_id);
 --materialized_view
 CREATE TABLE godb.term (
-  id int,
+  id bigint,
   acc text,
   name varchar(1024),
   is_obsolete int,
@@ -121,7 +121,7 @@ UPDATE godb.term SET is_root = 1 WHERE id IN (SELECT cvterm_id FROM public.cvter
 
 --- term_definition
 --view
-CREATE VIEW godb.term_definition AS
+CREATE OR REPLACE VIEW godb.term_definition AS
 SELECT
  cvterm_id AS term_id,
  definition AS term_definition
@@ -130,7 +130,7 @@ WHERE definition IS NOT NULL;
 
 --- term_dbxref
 --view
-CREATE VIEW godb.term_dbxref AS
+CREATE OR REPLACE VIEW godb.term_dbxref AS
 SELECT
  cvterm_id AS term_id,
  dbxref_id  AS dbxref_id,
@@ -139,7 +139,7 @@ FROM public.cvterm_dbxref;
 
 --- term_synonym
 --view
-CREATE VIEW godb.term_synonym AS
+CREATE OR REPLACE VIEW godb.term_synonym AS
 SELECT
  cvterm_id AS term_id,
  synonym  AS term_synonym,
@@ -148,7 +148,7 @@ FROM public.cvtermsynonym;
 
 --- term2term
 --view
-CREATE VIEW godb.v_term2term AS
+CREATE OR REPLACE VIEW godb.v_term2term AS
 SELECT
  cvterm_relationship_id AS id,
  type_id           AS relationship_type_id,
@@ -157,7 +157,7 @@ SELECT
 FROM public.cvterm_relationship;
 --materialized view
 CREATE TABLE godb.term2term (
-  id int,
+  id bigint,
   relationship_type_id bigint,
   term1_id bigint,
   term2_id bigint
@@ -171,7 +171,7 @@ INSERT INTO godb.term2term SELECT * FROM godb.v_term2term;
 
 --- graph_path
 --view
-CREATE VIEW godb.v_graph_path AS
+CREATE OR REPLACE VIEW godb.v_graph_path AS
 SELECT
  cvtermpath_id      AS id,
  object_id      AS term1_id,
@@ -180,7 +180,7 @@ SELECT
 FROM public.cvtermpath;
 --materialized view
 CREATE TABLE godb.graph_path (
-  id int,
+  id bigint,
   term1_id bigint,
   term2_id bigint,
   distance int 
@@ -197,11 +197,11 @@ INSERT INTO godb.graph_path SELECT * FROM godb.v_graph_path;
 
 -- species
 --view
-CREATE VIEW godb.species AS
+CREATE OR REPLACE VIEW godb.species AS
  SELECT
   organism_id                        AS id,
 --FIXME this cast does not work
---  CAST(accession AS INT)             AS ncbi_taxa_id,
+--  CAST(accession AS BIGINT)             AS ncbi_taxa_id,
   accession                          AS ncbi_taxa_id,
   common_name,
   CAST(NULL AS VARCHAR)              AS lineage_string,
@@ -218,13 +218,13 @@ CREATE VIEW godb.species AS
 --  note: secondary_species_id; eg for host species with parasite
 --        this will be handled by a feature_relationship in chado
 --view
-CREATE VIEW godb.gene_product AS
+CREATE OR REPLACE VIEW godb.gene_product AS
  SELECT
   feature_id                    AS id,
   name                          AS symbol,
   dbxref_id                     AS dbxref_id,
   organism_id                   AS species_id,
-  CAST(NULL AS INT)             AS secondary_species_id,
+  CAST(NULL AS BIGINT)          AS secondary_species_id,
   type_id,
 -- todo: make this a left outer join on a featureprop
   name                          AS fullname
@@ -232,7 +232,7 @@ CREATE VIEW godb.gene_product AS
 
 -- gene_product_synonym
 --view
-CREATE VIEW godb.gene_product_synonym AS
+CREATE OR REPLACE VIEW godb.gene_product_synonym AS
  SELECT
   feature_id                    AS gene_product_id,
   synonym.name                  AS product_synonym
@@ -241,7 +241,7 @@ CREATE VIEW godb.gene_product_synonym AS
 
 -- gene_product_property
 --view
-CREATE VIEW godb.gene_product_property AS
+CREATE OR REPLACE VIEW godb.gene_product_property AS
  SELECT
   feature_id                    AS gene_product_id,
   prop.name                     AS property_key,
@@ -251,7 +251,7 @@ CREATE VIEW godb.gene_product_property AS
 
 -- association
 --view
-CREATE VIEW godb.association AS
+CREATE OR REPLACE VIEW godb.association AS
  SELECT
   feature_cvterm_id             AS id,
   cvterm_id                     AS term_id,
@@ -266,7 +266,7 @@ CREATE VIEW godb.association AS
 
 -- association_qualifier
 --view
-CREATE VIEW godb.association_qualifier AS
+CREATE OR REPLACE VIEW godb.association_qualifier AS
  SELECT
   feature_cvtermprop_id         AS id,
   feature_cvterm_id             AS association_id,
@@ -277,7 +277,7 @@ CREATE VIEW godb.association_qualifier AS
 -- evidence
 -- TODO!!
 --view
-CREATE VIEW godb.evidence AS
+CREATE OR REPLACE VIEW godb.evidence AS
  SELECT
   feature_cvtermprop_id         AS id,
   feature_cvterm_id             AS association_id,
@@ -289,7 +289,7 @@ CREATE VIEW godb.evidence AS
 -- evidence_dbxref
 -- TODO
 --view
-CREATE VIEW godb.evidence_dbxref AS
+CREATE OR REPLACE VIEW godb.evidence_dbxref AS
  SELECT
   feature_cvterm_id         AS id,
   feature_cvterm_id             AS association_id,
@@ -300,7 +300,7 @@ CREATE VIEW godb.evidence_dbxref AS
 
 -- seq
 --view
-CREATE VIEW godb.seq AS
+CREATE OR REPLACE VIEW godb.seq AS
  SELECT
   feature_id                    AS id,
   feature.name                  AS display_id,
@@ -315,7 +315,7 @@ CREATE VIEW godb.seq AS
 
 -- seq_property [not used?]
 --view
-CREATE VIEW godb.seq_property AS
+CREATE OR REPLACE VIEW godb.seq_property AS
  SELECT
   *
  FROM public.feature WHERE NULL;
@@ -323,7 +323,7 @@ CREATE VIEW godb.seq_property AS
 -- seq_dbxref
 -- [in GO this typically has interpro ids, etc; diff semantics here]
 --view
-CREATE VIEW godb.seq_dbxref AS
+CREATE OR REPLACE VIEW godb.seq_dbxref AS
  SELECT 
   feature_id                    AS seq_id,
   dbxref_id
@@ -332,7 +332,7 @@ CREATE VIEW godb.seq_dbxref AS
 -- gene_product_seq
 -- 1:{0,1} relationship between features and seqs in chado
 --view
-CREATE VIEW godb.gene_product_seq AS
+CREATE OR REPLACE VIEW godb.gene_product_seq AS
  SELECT
   feature_id              AS gene_product_id,
   feature_id              AS seq_id
@@ -343,7 +343,7 @@ CREATE VIEW godb.gene_product_seq AS
 -- this is an OPTIONAL godb optimization
 --  simulate a rowless table for now
 --view
-CREATE VIEW godb.gene_product_count AS
+CREATE OR REPLACE VIEW godb.gene_product_count AS
  SELECT
   *
  FROM public.feature WHERE NULL;

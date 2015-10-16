@@ -1,12 +1,12 @@
 
 CREATE OR REPLACE FUNCTION store_organism (VARCHAR,VARCHAR,VARCHAR) 
-  RETURNS INT AS 
+  RETURNS BIGINT AS 
 'DECLARE
    v_genus            ALIAS FOR $1;
    v_species          ALIAS FOR $2;
    v_common_name      ALIAS FOR $3;
 
-   v_organism_id      INTEGER;
+   v_organism_id      BIGINT;
  BEGIN
     SELECT INTO v_organism_id organism_id
       FROM organism
