@@ -150,8 +150,7 @@
 	<tr class="TableHeaderRow">
 		<td class="TableHeaderCell"><h3>
 	genotype
-</h3></td>
-		<a name="genotype"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
+</h3></td> <a name="genotype"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
 	</tr>
 </table>
 
@@ -188,7 +187,7 @@
 	:import phenotype from phenotype <br />
 	:import cvterm from cv <br />
 	:import pub from pub <br />
-	:import dbxref from general <br />
+	:import dbxref from db <br />
 	~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ <br />
 	================================================ <br />
 	TABLE: genotype <br />
@@ -220,50 +219,25 @@
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="genotype-genotype_id">genotype_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">11</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">PRIMARY KEY, NOT NULL</td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="genotype-genotype_id">genotype_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">PRIMARY KEY, NOT NULL</td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="genotype-name">name</a></td>
-	<td class="FieldCellType">text</td>
-	<td class="FieldCellSize">64000</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">Optional alternative name for a genotype, 
-for display purposes. </td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="genotype-name">name</a></td> <td class="FieldCellType">text</td> <td class="FieldCellSize">64000</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">Optional alternative name for a genotype, 
+for display purposes. </td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="genotype-uniquename">uniquename</a></td>
-	<td class="FieldCellType">text</td>
-	<td class="FieldCellSize">64000</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL, The unique name for a genotype; 
-typically derived from the features making up the genotype. </td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="genotype-uniquename">uniquename</a></td> <td class="FieldCellType">text</td> <td class="FieldCellSize">64000</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL, The unique name for a genotype; 
+typically derived from the features making up the genotype. </td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="genotype-description">description</a></td>
-	<td class="FieldCellType">varchar</td>
-	<td class="FieldCellSize">255</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther"></td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="genotype-description">description</a></td> <td class="FieldCellType">text</td> <td class="FieldCellSize">64000</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther"></td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="genotype-type_id">type_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">NOT NULL</td>
-	<td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
+	<td class="FieldCellName"><a name="genotype-type_id">type_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">NOT NULL</td> <td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
 </tr>
 
 </table>
@@ -284,13 +258,11 @@ typically derived from the features making up the genotype. </td>
 </tr>
 
 <tr class="IndexCell">
-	<td>genotype_idx1</td>
-	<td>uniquename</td>
+	<td>genotype_idx1</td><td>uniquename</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>genotype_idx2</td>
-	<td>name</td>
+	<td>genotype_idx2</td><td>name</td>
 </tr>
 
 </table>
@@ -311,28 +283,23 @@ typically derived from the features making up the genotype. </td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>genotype_id</td>
+	<td>NOT NULL</td><td>genotype_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>uniquename</td>
+	<td>NOT NULL</td><td>uniquename</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>type_id</td>
+	<td>NOT NULL</td><td>type_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>type_id</td>
+	<td>FOREIGN KEY</td><td>type_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>UNIQUE</td>
-	<td>uniquename</td>
+	<td>UNIQUE</td><td>uniquename</td>
 </tr>
 
 </table>
@@ -349,8 +316,7 @@ typically derived from the features making up the genotype. </td>
 	<tr class="TableHeaderRow">
 		<td class="TableHeaderCell"><h3>
 	feature_genotype
-</h3></td>
-		<a name="feature_genotype"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
+</h3></td> <a name="feature_genotype"> <td align="right" class="TableHeaderCell"><a href="#top">Top</a></td>
 	</tr>
 </table>
 
@@ -392,70 +358,35 @@ typically derived from the features making up the genotype. </td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="feature_genotype-feature_genotype_id">feature_genotype_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">11</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">PRIMARY KEY, NOT NULL</td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="feature_genotype-feature_genotype_id">feature_genotype_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">PRIMARY KEY, NOT NULL</td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="feature_genotype-feature_id">feature_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"><a href="#feature-feature_id">feature.feature_id</a></td>
+	<td class="FieldCellName"><a name="feature_genotype-feature_id">feature_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"><a href="#feature-feature_id">feature.feature_id</a></td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="feature_genotype-genotype_id">genotype_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"><a href="#genotype-genotype_id">genotype.genotype_id</a></td>
+	<td class="FieldCellName"><a name="feature_genotype-genotype_id">genotype_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"><a href="#genotype-genotype_id">genotype.genotype_id</a></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="feature_genotype-chromosome_id">chromosome_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, A feature of SO type "chromosome". </td>
-	<td class="FieldCellFK"><a href="#feature-feature_id">feature.feature_id</a></td>
+	<td class="FieldCellName"><a name="feature_genotype-chromosome_id">chromosome_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, A feature of SO type "chromosome". </td> <td class="FieldCellFK"><a href="#feature-feature_id">feature.feature_id</a></td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="feature_genotype-rank">rank</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL, rank can be used for
-n-ploid organisms or to preserve order. </td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="feature_genotype-rank">rank</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">10</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL, rank can be used for
+n-ploid organisms or to preserve order. </td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="feature_genotype-cgroup">cgroup</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL, Spatially distinguishable
+	<td class="FieldCellName"><a name="feature_genotype-cgroup">cgroup</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">10</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL, Spatially distinguishable
 group. group can be used for distinguishing the chromosomal groups,
 for example (RNAi products and so on can be treated as different
-groups, as they do not fall on a particular chromosome). </td>
-	<td class="FieldCellFK"></td>
+groups, as they do not fall on a particular chromosome). </td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="feature_genotype-cvterm_id">cvterm_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
+	<td class="FieldCellName"><a name="feature_genotype-cvterm_id">cvterm_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
 </tr>
 
 </table>
@@ -476,13 +407,11 @@ groups, as they do not fall on a particular chromosome). </td>
 </tr>
 
 <tr class="IndexCell">
-	<td>feature_genotype_idx1</td>
-	<td>feature_id</td>
+	<td>feature_genotype_idx1</td><td>feature_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>feature_genotype_idx2</td>
-	<td>genotype_id</td>
+	<td>feature_genotype_idx2</td><td>genotype_id</td>
 </tr>
 
 </table>
@@ -503,58 +432,47 @@ groups, as they do not fall on a particular chromosome). </td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>feature_genotype_id</td>
+	<td>NOT NULL</td><td>feature_genotype_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>feature_id</td>
+	<td>NOT NULL</td><td>feature_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>feature_id</td>
+	<td>FOREIGN KEY</td><td>feature_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>genotype_id</td>
+	<td>NOT NULL</td><td>genotype_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>genotype_id</td>
+	<td>FOREIGN KEY</td><td>genotype_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>chromosome_id</td>
+	<td>FOREIGN KEY</td><td>chromosome_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>rank</td>
+	<td>NOT NULL</td><td>rank</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>cgroup</td>
+	<td>NOT NULL</td><td>cgroup</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>cvterm_id</td>
+	<td>NOT NULL</td><td>cvterm_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>cvterm_id</td>
+	<td>FOREIGN KEY</td><td>cvterm_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>UNIQUE</td>
-	<td>feature_id, genotype_id, cvterm_id, chromosome_id, rank, cgroup</td>
+	<td>UNIQUE</td><td>feature_id, genotype_id, cvterm_id, chromosome_id, rank, cgroup</td>
 </tr>
 
 </table>
@@ -571,8 +489,7 @@ groups, as they do not fall on a particular chromosome). </td>
 	<tr class="TableHeaderRow">
 		<td class="TableHeaderCell"><h3>
 	environment
-</h3></td>
-		<a name="environment"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
+</h3></td> <a name="environment"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
 	</tr>
 </table>
 
@@ -614,30 +531,15 @@ groups, as they do not fall on a particular chromosome). </td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="environment-environment_id">environment_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">11</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">PRIMARY KEY, NOT NULL</td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="environment-environment_id">environment_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">PRIMARY KEY, NOT NULL</td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="environment-uniquename">uniquename</a></td>
-	<td class="FieldCellType">text</td>
-	<td class="FieldCellSize">64000</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="environment-uniquename">uniquename</a></td> <td class="FieldCellType">text</td> <td class="FieldCellSize">64000</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="environment-description">description</a></td>
-	<td class="FieldCellType">text</td>
-	<td class="FieldCellSize">64000</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther"></td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="environment-description">description</a></td> <td class="FieldCellType">text</td> <td class="FieldCellSize">64000</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther"></td> <td class="FieldCellFK"></td>
 </tr>
 
 </table>
@@ -658,8 +560,7 @@ groups, as they do not fall on a particular chromosome). </td>
 </tr>
 
 <tr class="IndexCell">
-	<td>environment_idx1</td>
-	<td>uniquename</td>
+	<td>environment_idx1</td><td>uniquename</td>
 </tr>
 
 </table>
@@ -680,18 +581,15 @@ groups, as they do not fall on a particular chromosome). </td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>environment_id</td>
+	<td>NOT NULL</td><td>environment_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>uniquename</td>
+	<td>NOT NULL</td><td>uniquename</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>UNIQUE</td>
-	<td>uniquename</td>
+	<td>UNIQUE</td><td>uniquename</td>
 </tr>
 
 </table>
@@ -708,8 +606,7 @@ groups, as they do not fall on a particular chromosome). </td>
 	<tr class="TableHeaderRow">
 		<td class="TableHeaderCell"><h3>
 	environment_cvterm
-</h3></td>
-		<a name="environment_cvterm"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
+</h3></td> <a name="environment_cvterm"> <td align="right" class="TableHeaderCell"><a href="#top">Top</a></td>
 	</tr>
 </table>
 
@@ -751,30 +648,15 @@ groups, as they do not fall on a particular chromosome). </td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="environment_cvterm-environment_cvterm_id">environment_cvterm_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">11</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">PRIMARY KEY, NOT NULL</td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="environment_cvterm-environment_cvterm_id">environment_cvterm_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">PRIMARY KEY, NOT NULL</td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="environment_cvterm-environment_id">environment_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"><a href="#environment-environment_id">environment.environment_id</a></td>
+	<td class="FieldCellName"><a name="environment_cvterm-environment_id">environment_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"><a href="#environment-environment_id">environment.environment_id</a></td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="environment_cvterm-cvterm_id">cvterm_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
+	<td class="FieldCellName"><a name="environment_cvterm-cvterm_id">cvterm_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
 </tr>
 
 </table>
@@ -795,13 +677,11 @@ groups, as they do not fall on a particular chromosome). </td>
 </tr>
 
 <tr class="IndexCell">
-	<td>environment_cvterm_idx1</td>
-	<td>environment_id</td>
+	<td>environment_cvterm_idx1</td><td>environment_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>environment_cvterm_idx2</td>
-	<td>cvterm_id</td>
+	<td>environment_cvterm_idx2</td><td>cvterm_id</td>
 </tr>
 
 </table>
@@ -822,33 +702,27 @@ groups, as they do not fall on a particular chromosome). </td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>environment_cvterm_id</td>
+	<td>NOT NULL</td><td>environment_cvterm_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>environment_id</td>
+	<td>NOT NULL</td><td>environment_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>environment_id</td>
+	<td>FOREIGN KEY</td><td>environment_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>cvterm_id</td>
+	<td>NOT NULL</td><td>cvterm_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>cvterm_id</td>
+	<td>FOREIGN KEY</td><td>cvterm_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>UNIQUE</td>
-	<td>environment_id, cvterm_id</td>
+	<td>UNIQUE</td><td>environment_id, cvterm_id</td>
 </tr>
 
 </table>
@@ -861,12 +735,11 @@ groups, as they do not fall on a particular chromosome). </td>
 
 <a name="phenstatement" />
 
-<table class="TableHeader" width="100%">
+<table width="100%" class="TableHeader">
 	<tr class="TableHeaderRow">
 		<td class="TableHeaderCell"><h3>
 	phenstatement
-</h3></td>
-		<a name="phenstatement"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
+</h3></td> <a name="phenstatement"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
 	</tr>
 </table>
 
@@ -908,57 +781,27 @@ groups, as they do not fall on a particular chromosome). </td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="phenstatement-phenstatement_id">phenstatement_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">11</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">PRIMARY KEY, NOT NULL</td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="phenstatement-phenstatement_id">phenstatement_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">PRIMARY KEY, NOT NULL</td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="phenstatement-genotype_id">genotype_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"><a href="#genotype-genotype_id">genotype.genotype_id</a></td>
+	<td class="FieldCellName"><a name="phenstatement-genotype_id">genotype_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"><a href="#genotype-genotype_id">genotype.genotype_id</a></td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="phenstatement-environment_id">environment_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"><a href="#environment-environment_id">environment.environment_id</a></td>
+	<td class="FieldCellName"><a name="phenstatement-environment_id">environment_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"><a href="#environment-environment_id">environment.environment_id</a></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="phenstatement-phenotype_id">phenotype_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"><a href="#phenotype-phenotype_id">phenotype.phenotype_id</a></td>
+	<td class="FieldCellName"><a name="phenstatement-phenotype_id">phenotype_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"><a href="#phenotype-phenotype_id">phenotype.phenotype_id</a></td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="phenstatement-type_id">type_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
+	<td class="FieldCellName"><a name="phenstatement-type_id">type_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="phenstatement-pub_id">pub_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"><a href="#pub-pub_id">pub.pub_id</a></td>
+	<td class="FieldCellName"><a name="phenstatement-pub_id">pub_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"><a href="#pub-pub_id">pub.pub_id</a></td>
 </tr>
 
 </table>
@@ -979,13 +822,11 @@ groups, as they do not fall on a particular chromosome). </td>
 </tr>
 
 <tr class="IndexCell">
-	<td>phenstatement_idx1</td>
-	<td>genotype_id</td>
+	<td>phenstatement_idx1</td><td>genotype_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>phenstatement_idx2</td>
-	<td>phenotype_id</td>
+	<td>phenstatement_idx2</td><td>phenotype_id</td>
 </tr>
 
 </table>
@@ -1006,63 +847,51 @@ groups, as they do not fall on a particular chromosome). </td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>phenstatement_id</td>
+	<td>NOT NULL</td><td>phenstatement_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>genotype_id</td>
+	<td>NOT NULL</td><td>genotype_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>genotype_id</td>
+	<td>FOREIGN KEY</td><td>genotype_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>environment_id</td>
+	<td>NOT NULL</td><td>environment_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>environment_id</td>
+	<td>FOREIGN KEY</td><td>environment_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>phenotype_id</td>
+	<td>NOT NULL</td><td>phenotype_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>phenotype_id</td>
+	<td>FOREIGN KEY</td><td>phenotype_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>type_id</td>
+	<td>NOT NULL</td><td>type_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>type_id</td>
+	<td>FOREIGN KEY</td><td>type_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>pub_id</td>
+	<td>NOT NULL</td><td>pub_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>pub_id</td>
+	<td>FOREIGN KEY</td><td>pub_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>UNIQUE</td>
-	<td>genotype_id, phenotype_id, environment_id, type_id, pub_id</td>
+	<td>UNIQUE</td><td>genotype_id, phenotype_id, environment_id, type_id, pub_id</td>
 </tr>
 
 </table>
@@ -1075,12 +904,11 @@ groups, as they do not fall on a particular chromosome). </td>
 
 <a name="phendesc" />
 
-<table class="TableHeader" width="100%">
+<table width="100%" class="TableHeader">
 	<tr class="TableHeaderRow">
 		<td class="TableHeaderCell"><h3>
 	phendesc
-</h3></td>
-		<a name="phendesc"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
+</h3></td> <a name="phendesc"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
 	</tr>
 </table>
 
@@ -1122,57 +950,27 @@ groups, as they do not fall on a particular chromosome). </td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="phendesc-phendesc_id">phendesc_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">11</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">PRIMARY KEY, NOT NULL</td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="phendesc-phendesc_id">phendesc_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">PRIMARY KEY, NOT NULL</td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="phendesc-genotype_id">genotype_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"><a href="#genotype-genotype_id">genotype.genotype_id</a></td>
+	<td class="FieldCellName"><a name="phendesc-genotype_id">genotype_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"><a href="#genotype-genotype_id">genotype.genotype_id</a></td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="phendesc-environment_id">environment_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"><a href="#environment-environment_id">environment.environment_id</a></td>
+	<td class="FieldCellName"><a name="phendesc-environment_id">environment_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"><a href="#environment-environment_id">environment.environment_id</a></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="phendesc-description">description</a></td>
-	<td class="FieldCellType">text</td>
-	<td class="FieldCellSize">64000</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">NOT NULL</td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="phendesc-description">description</a></td> <td class="FieldCellType">text</td> <td class="FieldCellSize">64000</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">NOT NULL</td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="phendesc-type_id">type_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
+	<td class="FieldCellName"><a name="phendesc-type_id">type_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="phendesc-pub_id">pub_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"><a href="#pub-pub_id">pub.pub_id</a></td>
+	<td class="FieldCellName"><a name="phendesc-pub_id">pub_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"><a href="#pub-pub_id">pub.pub_id</a></td>
 </tr>
 
 </table>
@@ -1193,18 +991,15 @@ groups, as they do not fall on a particular chromosome). </td>
 </tr>
 
 <tr class="IndexCell">
-	<td>phendesc_idx1</td>
-	<td>genotype_id</td>
+	<td>phendesc_idx1</td><td>genotype_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>phendesc_idx2</td>
-	<td>environment_id</td>
+	<td>phendesc_idx2</td><td>environment_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>phendesc_idx3</td>
-	<td>pub_id</td>
+	<td>phendesc_idx3</td><td>pub_id</td>
 </tr>
 
 </table>
@@ -1225,58 +1020,47 @@ groups, as they do not fall on a particular chromosome). </td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>phendesc_id</td>
+	<td>NOT NULL</td><td>phendesc_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>genotype_id</td>
+	<td>NOT NULL</td><td>genotype_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>genotype_id</td>
+	<td>FOREIGN KEY</td><td>genotype_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>environment_id</td>
+	<td>NOT NULL</td><td>environment_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>environment_id</td>
+	<td>FOREIGN KEY</td><td>environment_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>description</td>
+	<td>NOT NULL</td><td>description</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>type_id</td>
+	<td>NOT NULL</td><td>type_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>type_id</td>
+	<td>FOREIGN KEY</td><td>type_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>pub_id</td>
+	<td>NOT NULL</td><td>pub_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>pub_id</td>
+	<td>FOREIGN KEY</td><td>pub_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>UNIQUE</td>
-	<td>genotype_id, environment_id, type_id, pub_id</td>
+	<td>UNIQUE</td><td>genotype_id, environment_id, type_id, pub_id</td>
 </tr>
 
 </table>
@@ -1293,8 +1077,7 @@ groups, as they do not fall on a particular chromosome). </td>
 	<tr class="TableHeaderRow">
 		<td class="TableHeaderCell"><h3>
 	phenotype_comparison
-</h3></td>
-		<a name="phenotype_comparison"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
+</h3></td> <a name="phenotype_comparison"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
 	</tr>
 </table>
 
@@ -1336,84 +1119,39 @@ groups, as they do not fall on a particular chromosome). </td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="phenotype_comparison-phenotype_comparison_id">phenotype_comparison_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">11</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">PRIMARY KEY, NOT NULL</td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="phenotype_comparison-phenotype_comparison_id">phenotype_comparison_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">PRIMARY KEY, NOT NULL</td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="phenotype_comparison-genotype1_id">genotype1_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"><a href="#genotype-genotype_id">genotype.genotype_id</a></td>
+	<td class="FieldCellName"><a name="phenotype_comparison-genotype1_id">genotype1_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"><a href="#genotype-genotype_id">genotype.genotype_id</a></td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="phenotype_comparison-environment1_id">environment1_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"><a href="#environment-environment_id">environment.environment_id</a></td>
+	<td class="FieldCellName"><a name="phenotype_comparison-environment1_id">environment1_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"><a href="#environment-environment_id">environment.environment_id</a></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="phenotype_comparison-genotype2_id">genotype2_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"><a href="#genotype-genotype_id">genotype.genotype_id</a></td>
+	<td class="FieldCellName"><a name="phenotype_comparison-genotype2_id">genotype2_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"><a href="#genotype-genotype_id">genotype.genotype_id</a></td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="phenotype_comparison-environment2_id">environment2_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"><a href="#environment-environment_id">environment.environment_id</a></td>
+	<td class="FieldCellName"><a name="phenotype_comparison-environment2_id">environment2_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"><a href="#environment-environment_id">environment.environment_id</a></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="phenotype_comparison-phenotype1_id">phenotype1_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"><a href="#phenotype-phenotype_id">phenotype.phenotype_id</a></td>
+	<td class="FieldCellName"><a name="phenotype_comparison-phenotype1_id">phenotype1_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"><a href="#phenotype-phenotype_id">phenotype.phenotype_id</a></td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="phenotype_comparison-phenotype2_id">phenotype2_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther"></td>
-	<td class="FieldCellFK"><a href="#phenotype-phenotype_id">phenotype.phenotype_id</a></td>
+	<td class="FieldCellName"><a name="phenotype_comparison-phenotype2_id">phenotype2_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther"></td> <td class="FieldCellFK"><a href="#phenotype-phenotype_id">phenotype.phenotype_id</a></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="phenotype_comparison-pub_id">pub_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"><a href="#pub-pub_id">pub.pub_id</a></td>
+	<td class="FieldCellName"><a name="phenotype_comparison-pub_id">pub_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"><a href="#pub-pub_id">pub.pub_id</a></td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="phenotype_comparison-organism_id">organism_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">NOT NULL</td>
-	<td class="FieldCellFK"><a href="#organism-organism_id">organism.organism_id</a></td>
+	<td class="FieldCellName"><a name="phenotype_comparison-organism_id">organism_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">NOT NULL</td> <td class="FieldCellFK"><a href="#organism-organism_id">organism.organism_id</a></td>
 </tr>
 
 </table>
@@ -1434,18 +1172,15 @@ groups, as they do not fall on a particular chromosome). </td>
 </tr>
 
 <tr class="IndexCell">
-	<td>phenotype_comparison_idx1</td>
-	<td>genotype1_id</td>
+	<td>phenotype_comparison_idx1</td><td>genotype1_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>phenotype_comparison_idx2</td>
-	<td>genotype2_id</td>
+	<td>phenotype_comparison_idx2</td><td>genotype2_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>phenotype_comparison_idx4</td>
-	<td>pub_id</td>
+	<td>phenotype_comparison_idx4</td><td>pub_id</td>
 </tr>
 
 </table>
@@ -1466,88 +1201,71 @@ groups, as they do not fall on a particular chromosome). </td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>phenotype_comparison_id</td>
+	<td>NOT NULL</td><td>phenotype_comparison_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>genotype1_id</td>
+	<td>NOT NULL</td><td>genotype1_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>genotype1_id</td>
+	<td>FOREIGN KEY</td><td>genotype1_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>environment1_id</td>
+	<td>NOT NULL</td><td>environment1_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>environment1_id</td>
+	<td>FOREIGN KEY</td><td>environment1_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>genotype2_id</td>
+	<td>NOT NULL</td><td>genotype2_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>genotype2_id</td>
+	<td>FOREIGN KEY</td><td>genotype2_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>environment2_id</td>
+	<td>NOT NULL</td><td>environment2_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>environment2_id</td>
+	<td>FOREIGN KEY</td><td>environment2_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>phenotype1_id</td>
+	<td>NOT NULL</td><td>phenotype1_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>phenotype1_id</td>
+	<td>FOREIGN KEY</td><td>phenotype1_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>phenotype2_id</td>
+	<td>FOREIGN KEY</td><td>phenotype2_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>pub_id</td>
+	<td>NOT NULL</td><td>pub_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>pub_id</td>
+	<td>FOREIGN KEY</td><td>pub_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>organism_id</td>
+	<td>NOT NULL</td><td>organism_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>organism_id</td>
+	<td>FOREIGN KEY</td><td>organism_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>UNIQUE</td>
-	<td>genotype1_id, environment1_id, genotype2_id, environment2_id, phenotype1_id, pub_id</td>
+	<td>UNIQUE</td><td>genotype1_id, environment1_id, genotype2_id, environment2_id, phenotype1_id, pub_id</td>
 </tr>
 
 </table>
@@ -1560,12 +1278,11 @@ groups, as they do not fall on a particular chromosome). </td>
 
 <a name="phenotype_comparison_cvterm" />
 
-<table class="TableHeader" width="100%">
+<table width="100%" class="TableHeader">
 	<tr class="TableHeaderRow">
 		<td class="TableHeaderCell"><h3>
 	phenotype_comparison_cvterm
-</h3></td>
-		<a name="phenotype_comparison_cvterm"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
+</h3></td> <a name="phenotype_comparison_cvterm"> <td align="right" class="TableHeaderCell"><a href="#top">Top</a></td>
 	</tr>
 </table>
 
@@ -1606,48 +1323,23 @@ groups, as they do not fall on a particular chromosome). </td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="phenotype_comparison_cvterm-phenotype_comparison_cvterm_id">phenotype_comparison_cvterm_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">11</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">PRIMARY KEY, NOT NULL</td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="phenotype_comparison_cvterm-phenotype_comparison_cvterm_id">phenotype_comparison_cvterm_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">PRIMARY KEY, NOT NULL</td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="phenotype_comparison_cvterm-phenotype_comparison_id">phenotype_comparison_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"><a href="#phenotype_comparison-phenotype_comparison_id">phenotype_comparison.phenotype_comparison_id</a></td>
+	<td class="FieldCellName"><a name="phenotype_comparison_cvterm-phenotype_comparison_id">phenotype_comparison_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"><a href="#phenotype_comparison-phenotype_comparison_id">phenotype_comparison.phenotype_comparison_id</a></td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="phenotype_comparison_cvterm-cvterm_id">cvterm_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
+	<td class="FieldCellName"><a name="phenotype_comparison_cvterm-cvterm_id">cvterm_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="phenotype_comparison_cvterm-pub_id">pub_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">NOT NULL</td>
-	<td class="FieldCellFK"><a href="#pub-pub_id">pub.pub_id</a></td>
+	<td class="FieldCellName"><a name="phenotype_comparison_cvterm-pub_id">pub_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">NOT NULL</td> <td class="FieldCellFK"><a href="#pub-pub_id">pub.pub_id</a></td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="phenotype_comparison_cvterm-rank">rank</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault">0</td>
-	<td class="FieldCellOther">NOT NULL</td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="phenotype_comparison_cvterm-rank">rank</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">10</td> <td class="FieldCellDefault">0</td> <td class="FieldCellOther">NOT NULL</td> <td class="FieldCellFK"></td>
 </tr>
 
 </table>
@@ -1668,13 +1360,11 @@ groups, as they do not fall on a particular chromosome). </td>
 </tr>
 
 <tr class="IndexCell">
-	<td>phenotype_comparison_cvterm_idx1</td>
-	<td>phenotype_comparison_id</td>
+	<td>phenotype_comparison_cvterm_idx1</td><td>phenotype_comparison_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>phenotype_comparison_cvterm_idx2</td>
-	<td>cvterm_id</td>
+	<td>phenotype_comparison_cvterm_idx2</td><td>cvterm_id</td>
 </tr>
 
 </table>
@@ -1695,48 +1385,39 @@ groups, as they do not fall on a particular chromosome). </td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>phenotype_comparison_cvterm_id</td>
+	<td>NOT NULL</td><td>phenotype_comparison_cvterm_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>phenotype_comparison_id</td>
+	<td>NOT NULL</td><td>phenotype_comparison_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>phenotype_comparison_id</td>
+	<td>FOREIGN KEY</td><td>phenotype_comparison_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>cvterm_id</td>
+	<td>NOT NULL</td><td>cvterm_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>cvterm_id</td>
+	<td>FOREIGN KEY</td><td>cvterm_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>pub_id</td>
+	<td>NOT NULL</td><td>pub_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>pub_id</td>
+	<td>FOREIGN KEY</td><td>pub_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>rank</td>
+	<td>NOT NULL</td><td>rank</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>UNIQUE</td>
-	<td>phenotype_comparison_id, cvterm_id</td>
+	<td>UNIQUE</td><td>phenotype_comparison_id, cvterm_id</td>
 </tr>
 
 </table>
@@ -1749,12 +1430,11 @@ groups, as they do not fall on a particular chromosome). </td>
 
 <a name="genotypeprop" />
 
-<table class="TableHeader" width="100%">
+<table width="100%" class="TableHeader">
 	<tr class="TableHeaderRow">
 		<td class="TableHeaderCell"><h3>
 	genotypeprop
-</h3></td>
-		<a name="genotypeprop"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
+</h3></td> <a name="genotypeprop"> <td class="TableHeaderCell" align="right"><a href="#top">Top</a></td>
 	</tr>
 </table>
 
@@ -1795,48 +1475,23 @@ groups, as they do not fall on a particular chromosome). </td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="genotypeprop-genotypeprop_id">genotypeprop_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">11</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">PRIMARY KEY, NOT NULL</td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="genotypeprop-genotypeprop_id">genotypeprop_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">PRIMARY KEY, NOT NULL</td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="genotypeprop-genotype_id">genotype_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"><a href="#genotype-genotype_id">genotype.genotype_id</a></td>
+	<td class="FieldCellName"><a name="genotypeprop-genotype_id">genotype_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"><a href="#genotype-genotype_id">genotype.genotype_id</a></td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="genotypeprop-type_id">type_id</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault"></td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
+	<td class="FieldCellName"><a name="genotypeprop-type_id">type_id</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">20</td> <td class="FieldCellDefault"></td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"><a href="#cvterm-cvterm_id">cvterm.cvterm_id</a></td>
 </tr>
 
 <tr class="tr-even">
-	<td class="FieldCellName"><a name="genotypeprop-value">value</a></td>
-	<td class="FieldCellType">text</td>
-	<td class="FieldCellSize">64000</td>
-	<td class="FieldCellDefault">NULL</td>
-	<td class="FieldCellOther"></td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="genotypeprop-value">value</a></td> <td class="FieldCellType">text</td> <td class="FieldCellSize">64000</td> <td class="FieldCellDefault">NULL</td> <td class="FieldCellOther"></td> <td class="FieldCellFK"></td>
 </tr>
 
 <tr class="tr-odd">
-	<td class="FieldCellName"><a name="genotypeprop-rank">rank</a></td>
-	<td class="FieldCellType">integer</td>
-	<td class="FieldCellSize">10</td>
-	<td class="FieldCellDefault">0</td>
-	<td class="FieldCellOther">UNIQUE, NOT NULL</td>
-	<td class="FieldCellFK"></td>
+	<td class="FieldCellName"><a name="genotypeprop-rank">rank</a></td> <td class="FieldCellType">integer</td> <td class="FieldCellSize">10</td> <td class="FieldCellDefault">0</td> <td class="FieldCellOther">UNIQUE, NOT NULL</td> <td class="FieldCellFK"></td>
 </tr>
 
 </table>
@@ -1857,13 +1512,11 @@ groups, as they do not fall on a particular chromosome). </td>
 </tr>
 
 <tr class="IndexCell">
-	<td>genotypeprop_idx1</td>
-	<td>genotype_id</td>
+	<td>genotypeprop_idx1</td><td>genotype_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>genotypeprop_idx2</td>
-	<td>type_id</td>
+	<td>genotypeprop_idx2</td><td>type_id</td>
 </tr>
 
 </table>
@@ -1884,38 +1537,31 @@ groups, as they do not fall on a particular chromosome). </td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>genotypeprop_id</td>
+	<td>NOT NULL</td><td>genotypeprop_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>genotype_id</td>
+	<td>NOT NULL</td><td>genotype_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>genotype_id</td>
+	<td>FOREIGN KEY</td><td>genotype_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>type_id</td>
+	<td>NOT NULL</td><td>type_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>FOREIGN KEY</td>
-	<td>type_id</td>
+	<td>FOREIGN KEY</td><td>type_id</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>NOT NULL</td>
-	<td>rank</td>
+	<td>NOT NULL</td><td>rank</td>
 </tr>
 
 <tr class="IndexCell">
-	<td>UNIQUE</td>
-	<td>genotype_id, type_id, rank</td>
+	<td>UNIQUE</td><td>genotype_id, type_id, rank</td>
 </tr>
 
 </table>
@@ -1923,7 +1569,7 @@ groups, as they do not fall on a particular chromosome). </td>
 <hr />
 
 Created by <a href="http://sqlfairy.sourceforge.net">
-SQL::Translator 0.11003</a>
+SQL::Translator 0.11020</a>
 
 </body>
 </html>
