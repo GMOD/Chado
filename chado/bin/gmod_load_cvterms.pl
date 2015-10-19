@@ -491,8 +491,7 @@ foreach my $new_ont(@onts) {
                       my $def_dbxref = $dblink->database() . ':' .  $dblink->primary_id();
                       $file_def_dbxrefs{uc($def_dbxref)}=1;
                       message("adding definition dbxref $def_dbxref to cvterm_dbxref\n");
-		      $def_dbxref = substr($def_dbxref, 0, 255);
-		      $db_index{$k}->add_secondary_dbxref($def_dbxref, 1); 
+                      $db_index{$k}->add_secondary_dbxref($def_dbxref, 1); 
                   }
               }
           }
@@ -542,7 +541,9 @@ foreach my $new_ont(@onts) {
 		      name   => $name,
                       is_obsolete=> $novel_terms{$k}->is_obsolete(),
 		    });
-                if ($existing_term) { message("TERM $k has name $name, which also exists for term id " . $existing_term->cvterm_id . " with accession " . $existing_term->dbxref->accession . "\n\n",1); }
+                if ($existing_term) { 
+		    message("TERM $k has name $name, which also exists for term id " . $existing_term->cvterm_id . " with accession " . $existing_term->dbxref->accession . "\n\n",1);
+		}
                 my $new_term= $schema->resultset("Cv::Cvterm")->create(
 		    { cv_id  =>$cv->cv_id(),
 		      name   => $name,
@@ -569,13 +570,12 @@ foreach my $new_ont(@onts) {
 
 		foreach my $i ($novel_terms{$k}->get_secondary_ids()) { #store secondary ids in cvterm_dbxref
 		    message("adding secondary dbxref '$i' to cvterm_dbxref\n");
-		    $i = substr($i, 0, 255);
+
 		    $new_term->add_secondary_dbxref($i);
 		}
 		foreach my $r ($novel_terms{$k}->get_dbxrefs() ) { #store definition's dbxrefs in cvterm_dbxref
 		    if (!$r->database || !$r->primary_id) { next; } # skip def. dbxrefs without both db_name and accession
 		    my $def_dbxref= $r->database() . ':' . $r->primary_id();
-		    $def_dbxref = substr($def_dbxref, 0, 255);
 		    message("adding definition dbxref $def_dbxref to cvterm_dbxref\n");
 		    $new_term->add_secondary_dbxref($def_dbxref, 1);
 		}
@@ -643,115 +643,140 @@ foreach my $new_ont(@onts) {
 	my $r_count = 0;
       RELATIONSHIP: foreach my $r (keys(%file_relationships)) { 
 	    $r_count++;
-	    if (!exists($db_relationships{$r})) {
+	
+	    if (!exists($db_relationships{$r} ) ) {
+	
 		if ($opt_v) { print STDERR "Novel relationship: $r\n"; }
 		elsif ($r_count % 100 == 0) { print STDERR "."; } 
 		print OUT "Novel relationship: $r\n" if $opt_o;
+	
+	    }
 		####
-		#convert the Bio::Ontology::OBOTerm objects to Bio::Chado::Schema::Cv::Cvterm objects
-		my $subject_accession = $file_relationships{$r}->subject_term()->identifier();
-
-		my ($s_db, $s_acc) = split ':', $subject_accession;
-		my ($subject_dbxref)= $schema->resultset("Cv::Cvterm")->search()->
-                    search_related(
-                        'dbxref',
-                        { accession => $s_acc,
-                          db_id     => $db->db_id(),
-                        } )->single;
-		if (!$subject_dbxref ) { 
-		    message("dbxref does not exist for subject term '$s_acc'.Skipping..\n" ,1);
+	    #convert the Bio::Ontology::OBOTerm objects to Bio::Chado::Schema::Cv::Cvterm objects
+	    my $subject_accession = $file_relationships{$r}->subject_term()->identifier();
+	    
+	    my ($s_db, $s_acc) = split ':', $subject_accession;
+	    my ($subject_dbxref)= $schema->resultset("Cv::Cvterm")->search()->
+		search_related(
+		    'dbxref',
+		    { accession => $s_acc,
+		      db_id     => $db->db_id(),
+		    } )->single;
+	    if (!$subject_dbxref ) { 
+		message("dbxref does not exist for subject term '$s_acc'.Skipping..\n" ,1);
+		next RELATIONSHIP;
+	    }
+	    my ($subject_term)= $schema->resultset('Cv::Cvterm')->find(
+		{ cv_id => $cv->cv_id(),
+		  dbxref_id => $subject_dbxref->dbxref_id(),
+		});
+	    
+	    if (!$subject_term ) {
+		message("cvterm does not exist for subject term '$subject_accession'.Skipping..\n" ,1);
+		next RELATIONSHIP;
+	    }
+	    my $object_accession = $file_relationships{$r}->object_term()->identifier();
+	    my ($o_db, $o_acc) = split ':', $object_accession;
+	    my ($object_dbxref)= $schema->resultset("Cv::Cvterm")->search()->
+		search_related(
+		    'dbxref',
+		    { accession => $o_acc,
+		      db_id     => $db->db_id(),
+		    } )->single;
+	    
+	    if (!$object_dbxref ) {
+		message("dbxref does not exist for object term $o_acc . SKIPPING!\n",1);
+		next RELATIONSHIP;
+	    }
+	    my ($object_term)= $schema->resultset('Cv::Cvterm')->find(
+		{ cv_id => $cv->cv_id(),
+		  dbxref_id => $object_dbxref->dbxref_id(),
+		});
+	    if (!$object_term ) {
+		message("cvterm does not exist for object term $object_accession . SKIPPING!\n",1);
+		next RELATIONSHIP;
+	    }
+	    ############################################
+	    push @novel_relationships, $r;
+	    
+	    my $predicate_term_name = $file_relationships{$r}->predicate_term()->name();
+	    my $db_rel_term_name ;
+	    if ( exists( $db_relationships{$r} )  ) {
+		$db_rel_term_name = $db_relationships{$r}->type()->name();
+	    }
+	    
+###################
+	    my $predicate_term;
+	    my ($rel_db)= $schema->resultset('General::Db')->search( { name => 'OBO_REL' } );
+	    ($predicate_term) = $schema->resultset('General::Dbxref')->search(
+		{ 'lower(accession)' => { 'like' , lc($predicate_term_name) },
+		  db_id     => $rel_db->db_id(),
+		})->search_related('cvterm') if $rel_db;
+	    # this is not a relationship_ontology term
+	    if (!$predicate_term) {
+		my ($predicate_dbxref) = $schema->resultset('General::Db')->search( { name => $opt_s } )->search_related('dbxrefs', { accession => $predicate_term_name });
+		($predicate_term) = $schema->resultset("Cv::Cvterm")->find(
+		    { dbxref_id => $predicate_dbxref->dbxref_id } ) if $predicate_dbxref;
+		# cvterm has a relationshiptype term with the dbxref_id of $predicate_term_name
+		if ($predicate_term) {
+		    die("predicate term $predicate_term_name (cvterm id = " . $predicate_term->cvterm_id . " is not stored as relationshiptype in your database!!\n") if $predicate_term->is_relationshiptype !=1 ;
+		    # this happens when the predicate term is stored with the wrong cv
+		    #(e.g. GO predicate terms should have the cv_id of the
+		    # default namespace of the ontology (gene_ontology)
+		    # and not of one of the 3 components )
+		    $predicate_term->update( { cv_id => $default_cv->cv_id } ) ;
+		} else { # no cvterm exists with this dbxref, create a new one
+		    $predicate_term = $schema->resultset('Cv::Cvterm')->create_with(
+			{ name   => $predicate_term_name,
+			  cv     => $default_cv,
+			  db     => $opt_s,
+			  dbxref => $predicate_term_name,
+			});
+		    $predicate_term->is_relationshiptype(1);
+		    $predicate_term->update;
+		    message("Stored new relationshiptype '" .  $predicate_term_name . "'\n",1);
+		}
+		if (!$predicate_term) {
+		    die "The predicate term $predicate_term_name does not exist in the database\n";
+		}
+	    }
+	    if (!$opt_t) {
+		message("Storing relationship $r. type cv_id=" . $predicate_term->cv_id() ."\n" ,1);
+		if ( $subject_term->cv_id != $object_term->cv_id ) {
+		    message("Wait!  subject term has cv namespace " . $subject_term->cv->name . " which is different from the namespace of the object term (" . $object_term->cv->name . "). Cross referencing relationships across namespaces is not supported (yet.. ) SKIPPING this relationship! \n");
 		    next RELATIONSHIP;
 		}
-		my ($subject_term)= $schema->resultset('Cv::Cvterm')->find(
-		    { cv_id => $cv->cv_id(),
-		      dbxref_id => $subject_dbxref->dbxref_id(),
-		    });
-
-		if (!$subject_term ) {
-		    message("cvterm does not exist for subject term '$subject_accession'.Skipping..\n" ,1);
-		    next RELATIONSHIP;
-		}
-		my $object_accession = $file_relationships{$r}->object_term()->identifier();
-		my ($o_db, $o_acc) = split ':', $object_accession;
-		my ($object_dbxref)= $schema->resultset("Cv::Cvterm")->search()->
-                    search_related(
-                        'dbxref',
-                        { accession => $o_acc,
-                          db_id     => $db->db_id(),
-                        } )->single;
-
-		if (!$object_dbxref ) {
-		    message("dbxref does not exist for object term $o_acc . SKIPPING!\n",1);
-		    next RELATIONSHIP;
-		}
-		my ($object_term)= $schema->resultset('Cv::Cvterm')->find(
-		    { cv_id => $cv->cv_id(),
-		      dbxref_id => $object_dbxref->dbxref_id(),
-		    });
-		if (!$object_term ) {
-		    message("cvterm does not exist for object term $object_accession . SKIPPING!\n",1);
-		    next RELATIONSHIP;
-		}
-		############################################
-                push @novel_relationships, $r;
-		my $predicate_term_name = $file_relationships{$r}->predicate_term()->name();
-
-		my $predicate_term;
-		my ($rel_db)= $schema->resultset('General::Db')->search( { name => 'OBO_REL' } );
-		($predicate_term) = $schema->resultset('General::Dbxref')->search(
-		    { 'lower(accession)' => { 'like' , lc($predicate_term_name) },
-		      db_id     => $rel_db->db_id(),
-		    })->search_related('cvterm') if $rel_db;
-		# this is not a relationship_ontology term
-                if (!$predicate_term) {
-                    my ($predicate_dbxref) = $schema->resultset('General::Db')->search( { name => $opt_s } )->search_related('dbxrefs', { accession => $predicate_term_name });
-                    ($predicate_term) = $schema->resultset("Cv::Cvterm")->find(
-                        { dbxref_id => $predicate_dbxref->dbxref_id } ) if $predicate_dbxref;
-                    # cvterm has a relationshiptype term with the dbxref_id of $predicate_term_name
-                    if ($predicate_term) {
-                        die("predicate term $predicate_term_name (cvterm id = " . $predicate_term->cvterm_id . " is not stored as relationshiptype in your database!!\n") if $predicate_term->is_relationshiptype !=1 ;
-                        # this happens when the predicate term is stored with the wrong cv
-                        #(e.g. GO predicate terms should have the cv_id of the
-                        # default namespace of the ontology (gene_ontology)
-                        # and not of one of the 3 components )
-                        $predicate_term->update( { cv_id => $default_cv->cv_id } ) ;
-                    } else { # no cvterm exists with this dbxref, create a new one
-                        $predicate_term = $schema->resultset('Cv::Cvterm')->create_with(
-                            { name   => $predicate_term_name,
-                              cv     => $default_cv,
-                              db     => $opt_s,
-                              dbxref => $predicate_term_name,
-                            });
-                        $predicate_term->is_relationshiptype(1);
-                        $predicate_term->update;
-                        message("Stored new relationshiptype '" .  $predicate_term_name . "'\n",1);
-                    }
-                    if (!$predicate_term) {
-			die "The predicate term $predicate_term_name does not exist in the database\n";
-		    }
-		}
-		if (!$opt_t) {
-		    message("Storing relationship $r. type cv_id=" . $predicate_term->cv_id() ."\n" ,1);
-		    if ( $subject_term->cv_id != $object_term->cv_id ) {
-                        message("Wait!  subjcet term has cv namespace " . $subject_term->cv->name . " which is different from the namespace of the object term (" . $object_term->cv->name . "). Cross referencing relationships across namespaces is not supported (yet.. ) SKIPPING this relationship! \n");
-                        next RELATIONSHIP;
-                    }
-                    my $new_rel = $schema->resultset('Cv::CvtermRelationship')->create(
+		
+		if (!exists( $db_relationships{$r} ) ) { 
+		    message("Inserting new relationship ...\n", 1);
+		    my $new_rel = $schema->resultset('Cv::CvtermRelationship')->create(
 			{ subject_id => $subject_term->cvterm_id(),
 			  object_id  => $object_term->cvterm_id(),
 			  type_id    => $predicate_term->cvterm_id(),
 			}
 			);
+		} elsif ( lc($predicate_term_name) ne lc($db_rel_term_name) && $opt_u  && exists($file_relationships{$r} ) ) {
+		    message("file rel name = $predicate_term_name, db_rel_name = $db_rel_term_name \n\n", 1);
+		    #find CvtermRelationship
+		    my $file_predicate_term = $schema->resultset("Cv::Cvterm")->search(
+			{
+			    'lower(name)' => lc($file_relationships{$r}->predicate_term->name ),
+			    cv_id       => $default_cv->cv_id,
+			} )->single;
+		    if ( $file_predicate_term  ) { 
+			$db_relationships{$r}->type_id( $file_predicate_term->cvterm_id ) ;
+			$db_relationships{$r}->update;
+		    }
 		}
 	    }
       }
 	message($ontology_name." : ". scalar(@novel_relationships)." novel relationships among ".(scalar(keys(%file_relationships)))." were found and stored.\n", 1);
-
+	
 	if ($opt_t) {
 	    die "TEST RUN! rolling back\n";
 	}
     };
-
+    
     try {
 	$schema->txn_do($coderef);
 	message("Committing! \n If you are using cvtermpath you should now run gmod_make_cvtermpath.pl . See the perldoc for more info. \n\n", 1);
