@@ -1,5 +1,12 @@
 $Id: INSTALL.Chado,v 1.10 2008-11-04 20:36:20 scottcain Exp $
 
+* IMPORTANT NOTE for the 1.31 release:
+
+While this packages can be used to both update older Chado schemas and
+install new ones, the newly installed schemas will be of limited utility
+due to issues with the Relationship Ontology/Relations Ontology.  When
+those issues are sorted out, we will create a new release.  
+
 * COMMAND-LINE INSTALL
 
 If you experience problems, please email them to the gmod-schema mailing list
