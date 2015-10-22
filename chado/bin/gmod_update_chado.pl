@@ -81,6 +81,12 @@ my $dbuser = $db_conf->user;
 my $dbport = $db_conf->port;
 my $dbhost = $db_conf->host;
 my $dbname = $db_conf->name;
+my $schema = $db_conf->schema;
+
+unless ($schema eq 'public') {
+    system("cp $path $path".".orig");
+    system("perl -pi -e 's/public/$schema/g' $path");
+}
 
 my $syscommand = "cat $path | psql -U $dbuser -p $dbport -h $dbhost $dbname";
 system($syscommand) == 0 or die "failed updating database";
