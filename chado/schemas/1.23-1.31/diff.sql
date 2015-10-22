@@ -2261,7 +2261,7 @@ CREATE OR REPLACE FUNCTION groupinside(bigint, bigint, character varying) RETURN
   WHERE fmin >= $1 AND fmax <= $2
 $_$;
 
-SET search_path = public, frange, qpg_catalog;
+SET search_path = public, frange,pg_catalog;
 
 --
 -- Name: cvtermpath; Type: TABLE; Schema: public; Owner: chado; Tablespace: 

@@ -8,6 +8,7 @@ use Getopt::Long;
 use Bio::GMOD::Config;
 use Bio::GMOD::DB::Config;
 use ExtUtils::MakeMaker;  #to get prompt
+use Cwd;
 
 =head1 NAME
 
@@ -76,6 +77,7 @@ END
 
 #build path to get updates from
 my $path = "$gmod_root/src/chado/schemas/$current_version-$version/diff.sql";
+my $cwd  = getcwd;
 
 my $dbuser = $db_conf->user;
 my $dbport = $db_conf->port;
@@ -83,12 +85,12 @@ my $dbhost = $db_conf->host;
 my $dbname = $db_conf->name;
 my $schema = $db_conf->schema;
 
+system("cp $path $cwd");
 unless ($schema eq 'public') {
-    system("cp $path $path".".orig");
-    system("perl -pi -e 's/public/$schema/g' $path");
+    system("perl -pi -e 's/public/$schema/g' diff.sql");
 }
 
-my $syscommand = "cat $path | psql -U $dbuser -p $dbport -h $dbhost $dbname";
+my $syscommand = "cat diff.sql | psql -U $dbuser -p $dbport -h $dbhost $dbname";
 system($syscommand) == 0 or die "failed updating database";
 
 #now update the schema version in the chadoprop table
