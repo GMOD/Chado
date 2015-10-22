@@ -1,8 +1,13 @@
-Version 1.24 Mon Mar  4 17:18:47 EST 2013
+Version 1.31 Thu Oct 22 12:12:09 EDT 2015
+* The "make update" functionality should now work with non-public schemas.
+* Dramatic (but non-destructive) changes to the schema.  Several added
+tables and all primary/foreign keys are bigints instead of integers.
 * Added a warning message for the GFF bulk loader if part_of isn't found.
 * Fixed ncbi_taxonomy loader to load entire NCBI taxonomy (Naama)
 * Patched gmod_bulk_load_gff3.pl (provided by Alexie P) to fix the 
 "orgainism from data" option.
+* Patched gmod_bulk_load_gff3.pl (provided by Eric Rasche) to warn
+only when part_of isn't found.
 
 Version 1.23 Thu Dec  1 14:45:22 EST 2011
 * Added $VERSION to Bio::GMOD::DB::Config so that when installing 
