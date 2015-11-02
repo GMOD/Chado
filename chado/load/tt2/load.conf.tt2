@@ -43,7 +43,8 @@
   <!-- ontologies -->
   <!--            -->
   <ontology name="Relationship Ontology" order="1">
-    <file type="obo"    local="obo/OBO_REL/ro.obo" remote="http://www.obofoundry.org/ro/ro.obo" method="lwp-mirror"/>
+    <!-- temporary copy of ro.obo until Chado can be updated to work with the new Relations Ontology -->
+    <file type="obo"    local="obo/OBO_REL/ro.obo" remote="https://gist.githubusercontent.com/scottcain/10e255c991a41bcf0187/raw/7faba8c6f26766f5a686eb681f5cb2f48e49b78a/ro.obo" method="lwp-mirror"/>
   </ontology>
 
 
