@@ -53025,3 +53025,7 @@ FROM pub s, feature_pub fs
 WHERE fs.feature_id= $1 AND fs.pub_id = s.pub_id
 $_$;
 
+create index feature_relationship_idx1b on feature_relationship (object_id, subject_id, type_id);
+create index featureloc_idx1b on featureloc (feature_id, fmin, fmax);
+create index feature_idx1b on feature (feature_id, dbxref_id) where dbxref_id is not null;
+

@@ -72,11 +72,11 @@ CREATE VIEW db_dbxref_count AS
 COMMENT ON VIEW db_dbxref_count IS 'per-db dbxref counts';
 
 CREATE OR REPLACE FUNCTION store_db (VARCHAR) 
-  RETURNS INT AS 
+  RETURNS BIGINT AS 
 'DECLARE
    v_name             ALIAS FOR $1;
 
-   v_db_id            INTEGER;
+   v_db_id            BIGINT;
  BEGIN
     SELECT INTO v_db_id db_id
       FROM db
@@ -93,13 +93,13 @@ CREATE OR REPLACE FUNCTION store_db (VARCHAR)
 ' LANGUAGE 'plpgsql';
   
 CREATE OR REPLACE FUNCTION store_dbxref (VARCHAR,VARCHAR) 
-  RETURNS INT AS 
+  RETURNS BIGINT AS 
 'DECLARE
    v_dbname                ALIAS FOR $1;
    v_accession             ALIAS FOR $2;
 
-   v_db_id                 INTEGER;
-   v_dbxref_id             INTEGER;
+   v_db_id                 BIGINT;
+   v_dbxref_id             BIGINT;
  BEGIN
     SELECT INTO v_db_id
       store_db(v_dbname);
@@ -604,7 +604,7 @@ paths (cvtermpaths) broken down by relationship_type. num_paths is the
 total # of paths of the specified type in which the subject_id of the
 path is in the named cv. See also: cv_distinct_relations';
 
-CREATE OR REPLACE FUNCTION _get_all_subject_ids(integer) RETURNS SETOF cvtermpath AS
+CREATE OR REPLACE FUNCTION _get_all_subject_ids(bigint) RETURNS SETOF cvtermpath AS
 '
 DECLARE
     root alias for $1;
@@ -625,7 +625,7 @@ LANGUAGE 'plpgsql';
 
 ---arg: parent term id
 ---return: all children term id and their parent term id with relationship type id
-CREATE OR REPLACE FUNCTION get_all_subject_ids(integer) RETURNS SETOF cvtermpath AS
+CREATE OR REPLACE FUNCTION get_all_subject_ids(bigint) RETURNS SETOF cvtermpath AS
 '
 DECLARE
     root alias for $1;
@@ -648,7 +648,7 @@ END;
 '
 LANGUAGE 'plpgsql';
 
-CREATE OR REPLACE FUNCTION get_graph_below(integer) RETURNS SETOF cvtermpath AS
+CREATE OR REPLACE FUNCTION get_graph_below(bigint) RETURNS SETOF cvtermpath AS
 '
 DECLARE
     root alias for $1;
@@ -669,7 +669,7 @@ END;
 LANGUAGE 'plpgsql';
 
 
-CREATE OR REPLACE FUNCTION get_graph_above(integer) RETURNS SETOF cvtermpath AS
+CREATE OR REPLACE FUNCTION get_graph_above(bigint) RETURNS SETOF cvtermpath AS
 '
 DECLARE
     leaf alias for $1;
@@ -689,7 +689,7 @@ END;
 '
 LANGUAGE 'plpgsql';
 
-CREATE OR REPLACE FUNCTION _get_all_object_ids(integer) RETURNS SETOF cvtermpath AS
+CREATE OR REPLACE FUNCTION _get_all_object_ids(bigint) RETURNS SETOF cvtermpath AS
 '
 DECLARE
     leaf alias for $1;
@@ -710,7 +710,7 @@ LANGUAGE 'plpgsql';
 
 ---arg: child term id
 ---return: all parent term id and their childrent term id with relationship type id
-CREATE OR REPLACE FUNCTION get_all_object_ids(integer) RETURNS SETOF cvtermpath AS
+CREATE OR REPLACE FUNCTION get_all_object_ids(bigint) RETURNS SETOF cvtermpath AS
 '
 DECLARE
     leaf alias for $1;
@@ -755,7 +755,7 @@ END;
 LANGUAGE 'plpgsql';
 --- example: select * from fill_cvtermpath(7); where 7 is cv_id for an ontology
 --- fill path from the node to its children and their children
-CREATE OR REPLACE FUNCTION _fill_cvtermpath4node(INTEGER, INTEGER, INTEGER, INTEGER, INTEGER) RETURNS INTEGER AS
+CREATE OR REPLACE FUNCTION _fill_cvtermpath4node(BIGINT, BIGINT, BIGINT, BIGINT, INTEGER) RETURNS INTEGER AS
 '
 DECLARE
     origin alias for $1;
@@ -784,12 +784,12 @@ END;
 LANGUAGE 'plpgsql';
 
 
-CREATE OR REPLACE FUNCTION _fill_cvtermpath4root(INTEGER, INTEGER) RETURNS INTEGER AS
+CREATE OR REPLACE FUNCTION _fill_cvtermpath4root(BIGINT, BIGINT) RETURNS INTEGER AS
 '
 DECLARE
     rootid alias for $1;
     cvid alias for $2;
-    ttype int;
+    ttype bigint;
     cterm cvterm_relationship%ROWTYPE;
     child cvterm_relationship%ROWTYPE;
 
@@ -806,7 +806,7 @@ END;
 '
 LANGUAGE 'plpgsql';
 
-CREATE OR REPLACE FUNCTION fill_cvtermpath(INTEGER) RETURNS INTEGER AS
+CREATE OR REPLACE FUNCTION fill_cvtermpath(BIGINT) RETURNS INTEGER AS
 '
 DECLARE
     cvid alias for $1;
@@ -828,7 +828,7 @@ CREATE OR REPLACE FUNCTION fill_cvtermpath(cv.name%TYPE) RETURNS INTEGER AS
 '
 DECLARE
     cvname alias for $1;
-    cv_id   int;
+    cv_id   bigint;
     rtn     int;
 BEGIN
 
@@ -839,7 +839,7 @@ END;
 '
 LANGUAGE 'plpgsql';
 
-CREATE OR REPLACE FUNCTION _fill_cvtermpath4node2detect_cycle(INTEGER, INTEGER, INTEGER, INTEGER, INTEGER) RETURNS INTEGER AS
+CREATE OR REPLACE FUNCTION _fill_cvtermpath4node2detect_cycle(BIGINT, BIGINT, BIGINT, BIGINT, INTEGER) RETURNS BIGINT AS
 '
 DECLARE
     origin alias for $1;
@@ -851,7 +851,7 @@ DECLARE
     exist_c int;
     ccount  int;
     ecount  int;
-    rtn     int;
+    rtn     bigint;
 BEGIN
 
     EXECUTE ''SELECT * FROM tmpcvtermpath p1, tmpcvtermpath p2 WHERE p1.subject_id=p2.object_id AND p1.object_id=p2.subject_id AND p1.object_id = ''|| origin || '' AND p2.subject_id = '' || child_id || ''AND '' || depth || ''> 0'';
@@ -890,16 +890,16 @@ END;
 LANGUAGE 'plpgsql';
 
 
-CREATE OR REPLACE FUNCTION _fill_cvtermpath4root2detect_cycle(INTEGER, INTEGER) RETURNS INTEGER AS
+CREATE OR REPLACE FUNCTION _fill_cvtermpath4root2detect_cycle(BIGINT, BIGINT) RETURNS BIGINT AS
 '
 DECLARE
     rootid alias for $1;
     cvid alias for $2;
-    ttype int;
+    ttype bigint;
     ccount int;
     cterm cvterm_relationship%ROWTYPE;
     child cvterm_relationship%ROWTYPE;
-    rtn     int;
+    rtn     bigint;
 BEGIN
 
     SELECT INTO ttype cvterm_id FROM cvterm WHERE (name = ''isa'' OR name = ''is_a'');
@@ -928,12 +928,12 @@ END;
 '
 LANGUAGE 'plpgsql';
 
-CREATE OR REPLACE FUNCTION get_cycle_cvterm_id(INTEGER, INTEGER) RETURNS INTEGER AS
+CREATE OR REPLACE FUNCTION get_cycle_cvterm_id(BIGINT, BIGINT) RETURNS BIGINT AS
 '
 DECLARE
     cvid alias for $1;
     rootid alias for $2;
-    rtn     int;
+    rtn     bigint;
 BEGIN
 
     CREATE TEMP TABLE tmpcvtermpath(object_id bigint, subject_id bigint, cv_id bigint, type_id bigint, pathdistance int);
@@ -950,12 +950,12 @@ END;
 '
 LANGUAGE 'plpgsql';
 
-CREATE OR REPLACE FUNCTION get_cycle_cvterm_ids(INTEGER) RETURNS SETOF INTEGER AS
+CREATE OR REPLACE FUNCTION get_cycle_cvterm_ids(BIGINT) RETURNS SETOF BIGINT AS
 '
 DECLARE
     cvid alias for $1;
     root cvterm%ROWTYPE;
-    rtn     int;
+    rtn     bigint;
 BEGIN
 
 
@@ -970,12 +970,12 @@ END;
 '
 LANGUAGE 'plpgsql';
 
-CREATE OR REPLACE FUNCTION get_cycle_cvterm_id(INTEGER) RETURNS INTEGER AS
+CREATE OR REPLACE FUNCTION get_cycle_cvterm_id(BIGINT) RETURNS BIGINT AS
 '
 DECLARE
     cvid alias for $1;
     root cvterm%ROWTYPE;
-    rtn     int;
+    rtn     bigint;
 BEGIN
 
     CREATE TEMP TABLE tmpcvtermpath(object_id bigint, subject_id bigint, cv_id bigint, type_id bigint, pathdistance int);
@@ -994,12 +994,12 @@ END;
 '
 LANGUAGE 'plpgsql';
 
-CREATE OR REPLACE FUNCTION get_cycle_cvterm_id(cv.name%TYPE) RETURNS INTEGER AS
+CREATE OR REPLACE FUNCTION get_cycle_cvterm_id(cv.name%TYPE) RETURNS BIGINT AS
 '
 DECLARE
     cvname alias for $1;
     cv_id bigint;
-    rtn int;
+    rtn bigint;
 BEGIN
 
     SELECT INTO cv_id cv.cv_id from cv WHERE cv.name = cvname;
@@ -1486,13 +1486,13 @@ SELECT organism_id
  ' LANGUAGE 'sql';
 
 CREATE OR REPLACE FUNCTION store_organism (VARCHAR,VARCHAR,VARCHAR) 
-  RETURNS INT AS 
+  RETURNS BIGINT AS 
 'DECLARE
    v_genus            ALIAS FOR $1;
    v_species          ALIAS FOR $2;
    v_common_name      ALIAS FOR $3;
 
-   v_organism_id      INTEGER;
+   v_organism_id      BIGINT;
  BEGIN
     SELECT INTO v_organism_id organism_id
       FROM organism
@@ -1558,6 +1558,7 @@ create index feature_idx2 on feature (organism_id);
 create index feature_idx3 on feature (type_id);
 create index feature_idx4 on feature (uniquename);
 create index feature_idx5 on feature (lower(name));
+create index feature_idx1b on feature (feature_id, dbxref_id) where dbxref_id is not null;
 
 ALTER TABLE feature ALTER residues SET STORAGE EXTERNAL;
 
@@ -1666,6 +1667,7 @@ create table featureloc (
 create index featureloc_idx1 on featureloc (feature_id);
 create index featureloc_idx2 on featureloc (srcfeature_id);
 create index featureloc_idx3 on featureloc (srcfeature_id,fmin,fmax);
+create index featureloc_idx1b on featureloc (feature_id, fmin, fmax);
 
 COMMENT ON TABLE featureloc IS 'The location of a feature relative to
 another feature. Important: interbase coordinates are used. This is
@@ -1913,6 +1915,7 @@ create table feature_relationship (
 create index feature_relationship_idx1 on feature_relationship (subject_id);
 create index feature_relationship_idx2 on feature_relationship (object_id);
 create index feature_relationship_idx3 on feature_relationship (type_id);
+create index feature_relationship_idx1b on feature_relationship (object_id, subject_id, type_id);
 
 COMMENT ON TABLE feature_relationship IS 'Features can be arranged in
 graphs, e.g. "exon part_of transcript part_of gene"; If type is
@@ -2202,12 +2205,12 @@ CREATE SCHEMA genetic_code;
 SET search_path = genetic_code,public,pg_catalog;
 
 CREATE TABLE gencode (
-        gencode_id      INTEGER PRIMARY KEY NOT NULL,
+        gencode_id      BIGINT PRIMARY KEY NOT NULL,
         organismstr     VARCHAR(512) NOT NULL
 );
 
 CREATE TABLE gencode_codon_aa (
-        gencode_id      INTEGER NOT NULL REFERENCES gencode(gencode_id),
+        gencode_id      BIGINT NOT NULL REFERENCES gencode(gencode_id),
         codon           CHAR(3) NOT NULL,
         aa              CHAR(1) NOT NULL,
         CONSTRAINT gencode_codon_unique UNIQUE( gencode_id, codon )
@@ -2215,7 +2218,7 @@ CREATE TABLE gencode_codon_aa (
 CREATE INDEX gencode_codon_aa_i1 ON gencode_codon_aa(gencode_id,codon,aa);
 
 CREATE TABLE gencode_startcodon (
-        gencode_id      INTEGER NOT NULL REFERENCES gencode(gencode_id),
+        gencode_id      BIGINT NOT NULL REFERENCES gencode(gencode_id),
         codon           CHAR(3),
         CONSTRAINT gencode_startcodon_unique UNIQUE( gencode_id, codon )
 );
@@ -2232,7 +2235,7 @@ LANGUAGE 'sql';
 -- create a range box
 -- (make this immutable so we can index it)
 CREATE OR REPLACE FUNCTION boxrange (bigint, bigint) RETURNS box AS
- 'SELECT box (create_point(CAST(0 AS bigint), $1), create_point($2,500000000))'
+ 'SELECT box (create_point(0, $1), create_point($2,500000000))'
 LANGUAGE 'sql' IMMUTABLE;
 
 -- create a query box
@@ -2257,7 +2260,7 @@ CREATE OR REPLACE FUNCTION featureloc_slice(varchar, bigint, bigint)
    AND srcf.name = $1 '
 LANGUAGE 'sql';
 
-CREATE OR REPLACE FUNCTION featureloc_slice(int, bigint, bigint)
+CREATE OR REPLACE FUNCTION featureloc_slice(bigint, bigint, bigint)
   RETURNS setof featureloc AS
   'SELECT * 
    FROM featureloc 
@@ -2349,13 +2352,13 @@ CREATE OR REPLACE FUNCTION reverse_complement(TEXT) RETURNS TEXT AS
 LANGUAGE 'sql';
 
 -- DNA to AA
-CREATE OR REPLACE FUNCTION translate_dna(TEXT,INT) RETURNS TEXT AS 
+CREATE OR REPLACE FUNCTION translate_dna(TEXT,BIGINT) RETURNS TEXT AS 
 '
  DECLARE 
   dnaseq ALIAS FOR $1;
   gcode ALIAS FOR $2;
   translation TEXT;
-  dnaseqlen INT;
+  dnaseqlen BIGINT;
   codon CHAR(3);
   aa CHAR(1);
   i INT;
@@ -2379,7 +2382,7 @@ CREATE OR REPLACE FUNCTION translate_dna(TEXT) RETURNS TEXT AS
 LANGUAGE 'sql';
 
 
-CREATE OR REPLACE FUNCTION translate_codon(TEXT,INT) RETURNS CHAR AS
+CREATE OR REPLACE FUNCTION translate_codon(TEXT,BIGINT) RETURNS CHAR AS
  'SELECT aa FROM genetic_code.gencode_codon_aa WHERE codon=$1 AND gencode_id=$2'
 LANGUAGE 'sql';
 
@@ -2515,19 +2518,19 @@ CREATE OR REPLACE FUNCTION share_exons () RETURNS void AS '
 --feature.type_id of the parent transcript type (typically, mRNA, although
 --non coding transcript types should work too).
 
-CREATE OR REPLACE FUNCTION order_exons (integer) RETURNS void AS '
+CREATE OR REPLACE FUNCTION order_exons (bigint) RETURNS void AS '
   DECLARE
     parent_type      ALIAS FOR $1;
-    exon_id          int;
-    part_of          int;
-    exon_type        int;
+    exon_id          bigint;
+    part_of          bigint;
+    exon_type        bigint;
     strand           int;
     arow             RECORD;
     order_by         varchar;
     rowcount         int;
     exon_count       int;
     ordered_exons    int;    
-    transcript_id    int;
+    transcript_id    bigint;
     transcript_row   feature%ROWTYPE;
   BEGIN
     SELECT INTO part_of cvterm_id FROM cvterm WHERE name=''part_of''
@@ -2581,8 +2584,8 @@ CREATE OR REPLACE FUNCTION order_exons (integer) RETURNS void AS '
   END;
 ' LANGUAGE 'plpgsql';
 -- down the graph: eg from  chromosome to contig
-CREATE OR REPLACE FUNCTION project_point_up(int,int,int,int)
- RETURNS int AS
+CREATE OR REPLACE FUNCTION project_point_up(bigint,bigint,bigint,bigint)
+ RETURNS bigint AS
 'SELECT
   CASE WHEN $4<0
    THEN $3-$1             -- rev strand
@@ -2591,8 +2594,8 @@ CREATE OR REPLACE FUNCTION project_point_up(int,int,int,int)
 LANGUAGE 'sql'; 
 
 -- down the graph: eg from contig to chromosome
-CREATE OR REPLACE FUNCTION project_point_down(int,int,int,int)
- RETURNS int AS
+CREATE OR REPLACE FUNCTION project_point_down(bigint,bigint,bigint,bigint)
+ RETURNS bigint AS
 'SELECT
   CASE WHEN $4<0
    THEN $3-$1
@@ -2600,7 +2603,7 @@ CREATE OR REPLACE FUNCTION project_point_down(int,int,int,int)
   END AS p'
 LANGUAGE 'sql'; 
 
-CREATE OR REPLACE FUNCTION project_featureloc_up(int,int)
+CREATE OR REPLACE FUNCTION project_featureloc_up(bigint,bigint)
  RETURNS featureloc AS
 '
 DECLARE
@@ -2609,8 +2612,8 @@ DECLARE
     in_featureloc featureloc%ROWTYPE;
     up_featureloc featureloc%ROWTYPE;
     nu_featureloc featureloc%ROWTYPE;
-    nu_fmin INT;
-    nu_fmax INT;
+    nu_fmin BIGINT;
+    nu_fmax BIGINT;
     nu_strand INT;
 BEGIN
  SELECT INTO in_featureloc
@@ -2654,15 +2657,15 @@ END
 '   
 LANGUAGE 'plpgsql';
 
-CREATE OR REPLACE FUNCTION project_point_g2t(int,int,int)
- RETURNS INT AS '
+CREATE OR REPLACE FUNCTION project_point_g2t(bigint,bigint,bigint)
+ RETURNS BIGINT AS '
  DECLARE
     in_p             alias for $1;
     srcf_id          alias for $2;
     t_id             alias for $3;
     e_floc           featureloc%ROWTYPE;
-    out_p            INT;
-    exon_cvterm_id   INT;
+    out_p            BIGINT;
+    exon_cvterm_id   BIGINT;
 BEGIN
  SELECT INTO exon_cvterm_id get_feature_type_id(''exon'');
  SELECT INTO out_p
@@ -37684,7 +37687,7 @@ LANGUAGE 'sql';
  
 
 
-CREATE OR REPLACE FUNCTION feature_subalignments(integer) RETURNS SETOF featureloc AS '
+CREATE OR REPLACE FUNCTION feature_subalignments(bigint) RETURNS SETOF featureloc AS '
 DECLARE
   return_data featureloc%ROWTYPE;
   f_id ALIAS FOR $1;
@@ -37693,8 +37696,8 @@ DECLARE
 
   s text;
 
-  fmin integer;
-  slen integer;
+  fmin bigint;
+  slen bigint;
 BEGIN
   --RAISE NOTICE ''feature_id is %'', featureloc_data.feature_id;
   SELECT INTO feature_data * FROM feature WHERE feature_id = f_id;
@@ -38045,7 +38048,7 @@ CREATE TYPE soi_type AS (
     object_id bigint
 );
 
-CREATE OR REPLACE FUNCTION _fill_cvtermpath4soinode(INTEGER, INTEGER, INTEGER, INTEGER, INTEGER) RETURNS INTEGER AS
+CREATE OR REPLACE FUNCTION _fill_cvtermpath4soinode(BIGINT, BIGINT, BIGINT, BIGINT, INTEGER) RETURNS INTEGER AS
 '
 DECLARE
     origin alias for $1;
@@ -38075,12 +38078,12 @@ END;
 '
 LANGUAGE 'plpgsql';
 
-CREATE OR REPLACE FUNCTION _fill_cvtermpath4soi(INTEGER, INTEGER) RETURNS INTEGER AS
+CREATE OR REPLACE FUNCTION _fill_cvtermpath4soi(BIGINT, BIGINT) RETURNS INTEGER AS
 '
 DECLARE
     rootid alias for $1;
     cvid alias for $2;
-    ttype int;
+    ttype bigint;
     cterm soi_type%ROWTYPE;
 
 BEGIN
@@ -38129,7 +38132,7 @@ BEGIN
     INSERT INTO cvterm (name, cv_id) VALUES(soi_term, soi_cvid);
     SELECT INTO soiterm_id cvterm_id FROM cvterm WHERE name = soi_term;
 
-    CREATE TEMP TABLE tmpcvtr (tmp_type INT, type_id bigint, subject_id bigint, object_id bigint);
+    CREATE TEMP TABLE tmpcvtr (tmp_type BIGINT, type_id bigint, subject_id bigint, object_id bigint);
     CREATE UNIQUE INDEX u_tmpcvtr ON tmpcvtr(subject_id, object_id);
 
     INSERT INTO tmpcvtr (tmp_type, type_id, subject_id, object_id)
@@ -38258,7 +38261,7 @@ END;
 LANGUAGE 'plpgsql';
 
 
-CREATE OR REPLACE FUNCTION get_sub_feature_ids(integer) RETURNS SETOF feature_by_fx_type AS
+CREATE OR REPLACE FUNCTION get_sub_feature_ids(bigint) RETURNS SETOF feature_by_fx_type AS
 '
 DECLARE
     root alias for $1;
@@ -38277,7 +38280,7 @@ END;
 '
 LANGUAGE 'plpgsql';
 
-CREATE OR REPLACE FUNCTION get_up_feature_ids(integer) RETURNS SETOF feature_by_fx_type AS
+CREATE OR REPLACE FUNCTION get_up_feature_ids(bigint) RETURNS SETOF feature_by_fx_type AS
 '
 DECLARE
     leaf alias for $1;
@@ -38295,7 +38298,7 @@ END;
 '
 LANGUAGE 'plpgsql';
 
-CREATE OR REPLACE FUNCTION get_sub_feature_ids(integer, integer) RETURNS SETOF feature_by_fx_type AS
+CREATE OR REPLACE FUNCTION get_sub_feature_ids(bigint, integer) RETURNS SETOF feature_by_fx_type AS
 '
 DECLARE
     root alias for $1;
@@ -38316,7 +38319,7 @@ END;
 LANGUAGE 'plpgsql';
 
 --- depth is reversed and meanless when union with results from get_sub_feature_ids
-CREATE OR REPLACE FUNCTION get_up_feature_ids(integer, integer) RETURNS SETOF feature_by_fx_type AS
+CREATE OR REPLACE FUNCTION get_up_feature_ids(bigint, integer) RETURNS SETOF feature_by_fx_type AS
 '
 DECLARE
     leaf alias for $1;
@@ -38831,12 +38834,12 @@ create index analysis_pub_idx2 on analysis_pub (pub_id);
 COMMENT ON TABLE analysis_pub IS 'Provenance. Linking table between analyses and the publications that mention them.';
 
 CREATE OR REPLACE FUNCTION store_analysis (VARCHAR,VARCHAR,VARCHAR) 
-  RETURNS INT AS 
+  RETURNS BIGINT AS 
 'DECLARE
    v_program            ALIAS FOR $1;
    v_programversion     ALIAS FOR $2;
    v_sourcename         ALIAS FOR $3;
-   pkval                INTEGER;
+   pkval                BIGINT;
  BEGIN
     SELECT INTO pkval analysis_id
       FROM analysis
@@ -41994,7 +41997,7 @@ LEFT JOIN analysisfeature af ON (f.feature_id = af.feature_id);
 -- data in the same format as the gffatts view so that 
 -- it can be easily converted to GFF attributes.
 
-CREATE FUNCTION  gfffeatureatts (integer)
+CREATE FUNCTION  gfffeatureatts (bigint)
 RETURNS SETOF gffatts
 AS
 '
@@ -42025,12 +42028,12 @@ LANGUAGE SQL;
 -- functions for creating coordinate based functions
 --
 -- create a point
-CREATE OR REPLACE FUNCTION featureslice(int, int) RETURNS setof featureloc AS
+CREATE OR REPLACE FUNCTION featureslice(bigint, bigint) RETURNS setof featureloc AS
   'SELECT * from featureloc where boxquery($1, $2) @ boxrange(fmin,fmax)'
 LANGUAGE 'sql';
 
 --uses the gff3atts to create a GFF3 compliant attribute string
-CREATE OR REPLACE FUNCTION gffattstring (integer) RETURNS varchar AS
+CREATE OR REPLACE FUNCTION gffattstring (bigint) RETURNS varchar AS
 'DECLARE
   return_string      varchar;
   f_id               ALIAS FOR $1;
@@ -42039,7 +42042,7 @@ CREATE OR REPLACE FUNCTION gffattstring (integer) RETURNS varchar AS
   name               varchar;
   uniquename         varchar;
   parent             varchar;
-  escape_loc         int; 
+  escape_loc         bigint; 
 BEGIN
   --Get name from feature.name
   --Get ID from feature.uniquename
