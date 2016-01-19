@@ -8,6 +8,10 @@ tables and all primary/foreign keys are bigints instead of integers.
 "orgainism from data" option.
 * Patched gmod_bulk_load_gff3.pl (provided by Eric Rasche) to warn
 only when part_of isn't found.
+* Significantly shrunk the amount of data in the "initialize" script to 
+remove several types of data: all organisms but human, arraydesign data,
+statistical terms in cvterm, and the analysis entries.
+
 
 Version 1.23 Thu Dec  1 14:45:22 EST 2011
 * Added $VERSION to Bio::GMOD::DB::Config so that when installing 
