@@ -926,6 +926,7 @@ create index feature_idx2 on feature (organism_id);
 create index feature_idx3 on feature (type_id);
 create index feature_idx4 on feature (uniquename);
 create index feature_idx5 on feature (lower(name));
+create index feature_idx1b on feature (feature_id, dbxref_id) where dbxref_id is not null;
 
 ALTER TABLE feature ALTER residues SET STORAGE EXTERNAL;
 
@@ -1034,6 +1035,7 @@ create table featureloc (
 create index featureloc_idx1 on featureloc (feature_id);
 create index featureloc_idx2 on featureloc (srcfeature_id);
 create index featureloc_idx3 on featureloc (srcfeature_id,fmin,fmax);
+create index featureloc_idx1b on featureloc (feature_id, fmin, fmax);
 
 COMMENT ON TABLE featureloc IS 'The location of a feature relative to
 another feature. Important: interbase coordinates are used. This is
@@ -1281,6 +1283,7 @@ create table feature_relationship (
 create index feature_relationship_idx1 on feature_relationship (subject_id);
 create index feature_relationship_idx2 on feature_relationship (object_id);
 create index feature_relationship_idx3 on feature_relationship (type_id);
+create index feature_relationship_idx1b on feature_relationship (object_id, subject_id, type_id);
 
 COMMENT ON TABLE feature_relationship IS 'Features can be arranged in
 graphs, e.g. "exon part_of transcript part_of gene"; If type is

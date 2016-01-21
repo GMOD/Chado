@@ -386,9 +386,13 @@ sub ACTION_ontologies {
           die "failed: $?";
         }
 
+        my $user = $db_user ? "-u $db_user" : '';
+        my $pass = $db_pass ? "-p $db_pass" : '';
 
         $sys_call = join( ' ',
           "stag-storenode.pl -d 'dbi:Pg:dbname=$db_name;host=$db_host;port=$db_port'",
+          $user,
+          $pass,
           catfile( $conf->{'path'}{'data'}, $deffile->{'local'}.'xml')
         );
 
