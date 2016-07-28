@@ -218,7 +218,7 @@ if ($opt_t) {
     print STDERR "Trial mode - rolling back all changes at the end.\n";
 }
 if ($opt_u) { print STDERR "This script will UPDATE cvterms stored in your database from the input file! \n"; }
-else { print STDERR "WARNING: If your databse is already population with cvterms, not running in UPDATE mode (option -u) may cause database conflicts, such as violating unique constraints!\n"; }
+else { print STDERR "WARNING: If your databse is already populated with cvterms, not running in UPDATE mode (option -u) may cause database conflicts, such as violating unique constraints!\n"; }
 
 print STDERR "Default for -s: $opt_s (specifies the database names for Dbxref objects)\n";
 
