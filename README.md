@@ -1,11 +1,10 @@
-$Id: README,v 1.14 2007-04-12 19:01:50 briano Exp $
-
-INTRODUCTION
-------------
+# Chado
 
 Chado is a modular schema for handling all kinds of biological
 data.  It is intended to be used as both a primary datastore schema as
 well as a warehouse-style schema.
+
+## Introduction
 
 Chado was originally conceived as the next generation Flybase
 database, combining the sequence annotation database gadfly with the
@@ -15,23 +14,25 @@ other projects.
 
 The modules currently in chado are:
 
-Audit                                  - database audits
-Companalysis                    - data from computational analysis
-Contact                              - people and groups
-Controlled Vocabulary (cv) - controlled vocabularies and ontologies
-Expression                         - summarized RNA and protein expresssion
-General                              - identifiers
-Genetic                              - genetic data and genotypes
-Library                               - descriptions of molecular libraries
-Mage                                  - microarray data
-Map                                    - maps without sequence
-Organism                            - species
-Phenotype                          - phenotypic data
-Phylogeny                          - phylogenetic trees
-Publication (pub)                - publications and references
-Sequence                            - sequences and sequence features
-Stock                                  - specimens and biological collections
-WWW -
+Module                     | Description
+-------------------------- | ------------------------------
+Audit                      | database audits
+Companalysis               | data from computational analysis
+Contact                    | people and groups
+Controlled Vocabulary (cv) | controlled vocabularies and ontologies
+Expression                 | summarized RNA and protein expresssion
+General                    | identifiers
+Genetic                    | genetic data and genotypes
+Library                    | descriptions of molecular libraries
+Mage                       | microarray data
+Map                        | maps without sequence
+Organism                   | species
+Phenotype                  | phenotypic data
+Phylogeny                  | phylogenetic trees
+Publication (pub)          | publications and references
+Sequence                   | sequences and sequence features
+Stock                      | specimens and biological collections
+WWW                        | generic classes for web interfaces
 
 For documentation on the various modules, see http://www.gmod.org.
 
@@ -77,15 +78,12 @@ be found in the chado/modules directory.  The main Chado developers
 are currently using PostgreSQL.
 
 
-INSTALLATION
-------------
+## Installation
 
-Please read the included INSTALL.Chado document for instructions on how to
+Please read the included [INSTALL.Chado](./INSTALL.Chado) document for instructions on how to
 install the Chado schema.
 
-
-
-CHADO SUPPORT
+## Chado Support
 -------------
 
 Please see our website for more information on Chado and the GMOD project:
@@ -101,7 +99,6 @@ You can browse the schema CVS repository here:
     http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/gmod/schema/
 
 
-AUTHORS
--------
+## Authors
+
 Chris Mungall, David Emmert and the GMOD team
-October 2, 2003
