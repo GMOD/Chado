@@ -84,7 +84,6 @@ Please read the included [INSTALL.Chado](./INSTALL.Chado) document for instructi
 install the Chado schema.
 
 ## Chado Support
--------------
 
 Please see our website for more information on Chado and the GMOD project:
 
