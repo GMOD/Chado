@@ -1,9 +1,0 @@
-This directory is for our experiments with Chado to Wiki, Wiki to Chado, and eventually a round trip.
-
-Goal 1:
-Query chado for one gene
-Make a wiki page with one table containing gene name, description, synonyms
-
-Components needed
-Chado to intermediate text - Eric via ModWare
-intermediate text to wiki page - Jim
