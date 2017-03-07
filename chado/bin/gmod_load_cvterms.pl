@@ -452,15 +452,29 @@ foreach my $new_ont(@onts) {
                   ###############################
                   # deal with synonyms here... 
                   my %file_synonyms = ();
-                  foreach my $s ($file_index{$k}->get_synonyms()) { 
+		  my %loaded_synonyms = ();
+		  
+		  foreach my $s ($file_index{$k}->get_synonyms()) { 
                       $s=~ s/\s+$//; 
                       $s =~ s/\\//g;
-                      $file_synonyms{uc($s)}=1;
-
-                      message("...adding synonym  '$s'  to the database...\n");
-                      $db_index{$k}->add_synonym($s);
-                  }
-                  foreach my $s ($db_index{$k}->search_related('cvtermsynonyms')) {
+		      
+		      my ($s_name, $s_type, $s_xref) = ($s =~ /^"(.*)"\s(.*\s?)(\[.*\])/);
+		      $s_type=~ s/\s+$//;
+		      $s_name=~ s/\s+$//;
+		      if ($s_name) { $file_synonyms{uc($s_name)}=1; } else { $file_synonyms{uc($s)} = 1; }
+                      #if (!$s_name || $loaded_synonyms{$s_name} || $loaded_synonyms{$s} ) { next; } #skip duplicate synonyms
+		    
+		      if ( $db_index{$k}->search_related('cvtermsynonyms' , { synonym => $s_name } )->first )  { next;  }  #skip existing synonyms
+		      message("#######adding synonym name '$s_name'  to the database with type '$s_type'...\n");
+		      if ($s_type) {
+			  $db_index{$k}->add_synonym($s_name, { synonym_type => $s_type , autocreate => 1});  #adds synonym with type
+			  $loaded_synonyms{$s_name} = 1;
+		      } else { 
+			  $db_index{$k}->add_synonym($s);
+			  $loaded_synonyms{$s} = 1;
+		      }
+		  }
+		  foreach my $s ($db_index{$k}->search_related('cvtermsynonyms')) {
                       my $s_name= $s->get_column('synonym');
                       if (!exists($file_synonyms{uc($s_name)}) ) { 
                           message( "Note: deleting synonym ' " . $s->synonym() . "' from cvterm ". $db_index{$k}->get_column('name') . "...\n",1);
@@ -561,12 +575,27 @@ foreach my $new_ont(@onts) {
 		my $comment = $novel_terms{$k}->comment();
 		$new_term->create_cvtermprops( { comment => $comment } , { autocreate => 1 } ) if $comment;
                 #store synonyms in cvtermsynonym
+		###
+		my %loaded_synonyms = ();
 		foreach my $s ($novel_terms{$k}->get_synonyms() ) {
 		    $s=~ s/\s+$//;
 		    $s =~ s/\\//g;
-		    message("...adding synonym  '$s'  to the database...\n");
-		    $new_term->add_synonym($s);  #need to add a type_id to each synonym!
+
+		    my ($s_name, $s_type, $s_xref) = ($s =~ /^"(.*)"\s(.*\s?)(\[.*\])/);
+
+		    $s_type=~ s/\s+$//;
+		    $s_name=~ s/\s+$//;
+		    if (!$s_name || $loaded_synonyms{$s_name}) { next; } #skip duplicate synonyms
+		    message("...adding $s synonym name '$s_name'  to the database with type $s_type...\n");
+		    if ($s_type) {
+			$new_term->add_synonym($s_name, { synonym_type => $s_type , autocreate => 1});  #adds synonym with type
+			$loaded_synonyms{$s_name} = 1;
+		    } else { 
+			$new_term->add_synonym($s);
+			$loaded_synonyms{$s} = 1;
+		    }
 		}
+		###
 
 		foreach my $i ($novel_terms{$k}->get_secondary_ids()) { #store secondary ids in cvterm_dbxref
 		    message("adding secondary dbxref '$i' to cvterm_dbxref\n");
