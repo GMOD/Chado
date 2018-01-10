@@ -97,10 +97,14 @@ create table expressionprop (
     foreign key (type_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
     value text null,
     rank int not null default 0,
+      FOREIGN KEY (cvalue_id) REFERENCES cvterm (cvterm_id) ON DELETE SET NULL,
     constraint expressionprop_c1 unique (expression_id,type_id,rank)
 );
 create index expressionprop_idx1 on expressionprop (expression_id);
 create index expressionprop_idx2 on expressionprop (type_id);
+CREATE INDEX expressionprop_idx3 ON expressionprop (cvalue_id);
+COMMENT ON COLUMN expressionprop.cvalue_id IS 'The value of the property if that value should be the name of a controlled vocabulary term.  It is preferred that a property either use the value or cvalue_id column but not both.  For example, if the property type is "color" then the cvalue_id could be a term named "green".';
+
 
 
 -- ================================================
@@ -153,13 +157,18 @@ create table feature_expressionprop (
        foreign key (type_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
        value text null,
        rank int not null default 0,
+       cvalue_id bigint,
+  FOREIGN KEY (cvalue_id) REFERENCES cvterm (cvterm_id) ON DELETE SET NULL,
        constraint feature_expressionprop_c1 unique (feature_expression_id,type_id,rank)
 );
 create index feature_expressionprop_idx1 on feature_expressionprop (feature_expression_id);
 create index feature_expressionprop_idx2 on feature_expressionprop (type_id);
+create index feature_expressionprop_idx3 on feature_expressionprop (cvalue_id);
 
 COMMENT ON TABLE feature_expressionprop IS 'Extensible properties for
 feature_expression (comments, for example). Modeled on feature_cvtermprop.';
+COMMENT ON COLUMN feature_expressionprop.cvalue_id IS 'The value of the property if that value should be the name of a controlled vocabulary term.  It is preferred that a property either use the value or cvalue_id column but not both.  For example, if the property type is "color" then the cvalue_id could be a term named "green".';
+
 
 
 -- ================================================

@@ -104,12 +104,16 @@ create table libraryprop (
     foreign key (type_id) references cvterm (cvterm_id),
     value text null,
     rank int not null default 0,
+    cvalue_id bigint,
+  FOREIGN KEY (cvalue_id) REFERENCES cvterm (cvterm_id) ON DELETE SET NULL,
     constraint libraryprop_c1 unique (library_id,type_id,rank)
 );
 create index libraryprop_idx1 on libraryprop (library_id);
 create index libraryprop_idx2 on libraryprop (type_id);
+create index libraryprop_idx3 on libraryprop (cvalue_id);
 
 COMMENT ON TABLE libraryprop IS 'Tag-value properties - follows standard chado model.';
+COMMENT ON COLUMN libraryprop.cvalue_id IS 'The value of the property if that value should be the name of a controlled vocabulary term.  It is preferred that a property either use the value or cvalue_id column but not both.  For example, if the property type is "color" then the cvalue_id could be a term named "green".';
 
 
 -- ================================================
@@ -227,12 +231,16 @@ create table library_expressionprop (
     foreign key (type_id) references cvterm (cvterm_id),
     value text null,
     rank int not null default 0,
+    cvalue_id bigint,
+  FOREIGN KEY (cvalue_id) REFERENCES cvterm (cvterm_id) ON DELETE SET NULL,
     constraint library_expressionprop_c1 unique (library_expression_id,type_id,rank)
 );
 create index library_expressionprop_idx1 on library_expressionprop (library_expression_id);
 create index library_expressionprop_idx2 on library_expressionprop (type_id);
+create index library_expressionprop_idx3 on library_expressionprop (cvalue_id);
 
 COMMENT ON TABLE library_expressionprop IS 'Attributes of a library_expression relationship.';
+COMMENT ON COLUMN library_expressionprop.cvalue_id IS 'The value of the property if that value should be the name of a controlled vocabulary term.  It is preferred that a property either use the value or cvalue_id column but not both.  For example, if the property type is "color" then the cvalue_id could be a term named "green".';
 
 
 -- ================================================
@@ -248,12 +256,16 @@ create table library_featureprop (
     foreign key (type_id) references cvterm (cvterm_id),
     value text null,
     rank int not null default 0,
+     cvalue_id bigint,
+  FOREIGN KEY (cvalue_id) REFERENCES cvterm (cvterm_id) ON DELETE SET NULL,
     constraint library_featureprop_c1 unique (library_feature_id,type_id,rank)
 );
 create index library_featureprop_idx1 on library_featureprop (library_feature_id);
 create index library_featureprop_idx2 on library_featureprop (type_id);
+create index library_featureprop_idx3 on library_featureprop (cvalue_id);
 
 COMMENT ON TABLE library_featureprop IS 'Attributes of a library_feature relationship.';
+COMMENT ON COLUMN library_featureprop.cvalue_id IS 'The value of the property if that value should be the name of a controlled vocabulary term.  It is preferred that a property either use the value or cvalue_id column but not both.  For example, if the property type is "color" then the cvalue_id could be a term named "green".';
 
 -- ================================================
 -- TABLE: library_relationship
