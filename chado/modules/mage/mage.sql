@@ -182,7 +182,7 @@ COMMENT ON TABLE arraydesignprop IS 'Extra array design properties that are not 
 create table assay (
     assay_id bigserial not null,
     primary key (assay_id),
-    arraydesign_id bigint not null,
+    arraydesign_id bigint,
     foreign key (arraydesign_id) references arraydesign (arraydesign_id) on delete cascade INITIALLY DEFERRED,
     protocol_id bigint null,
     foreign key (protocol_id) references protocol (protocol_id) on delete set null INITIALLY DEFERRED,
@@ -202,9 +202,7 @@ create index assay_idx2 on assay (protocol_id);
 create index assay_idx3 on assay (operator_id);
 create index assay_idx4 on assay (dbxref_id);
 
-COMMENT ON TABLE assay IS 'An assay consists of a physical instance of
-an array, combined with the conditions used to create the array
-(protocols, technician information). The assay can be thought of as a hybridization.';
+COMMENT ON TABLE assay IS 'An assay consists of an experiment for a single biosample, for example a microarray or an RNASeq library sequence set. An assay can be thought of as an experiment to quantify expression of a sample.';
 
 -- ================================================
 -- TABLE: assayprop
@@ -414,7 +412,7 @@ create index acquisition_idx1 on acquisition (assay_id);
 create index acquisition_idx2 on acquisition (protocol_id);
 create index acquisition_idx3 on acquisition (channel_id);
 
-COMMENT ON TABLE acquisition IS 'This represents the scanning of hybridized material. The output of this process is typically a digital image of an array.';
+COMMENT ON TABLE acquisition IS 'This represents the acquisition technique. In the case of a microarray, it is scanning, in the case of a sequencer, it is sequencing. The output of this process is a digital image of an array for a microarray or a set of digital images or nucleotide base calls for a sequencer.';
 
 -- ================================================
 -- TABLE: acquisitionprop
@@ -484,7 +482,7 @@ create index quantification_idx2 on quantification (operator_id);
 create index quantification_idx3 on quantification (protocol_id);
 create index quantification_idx4 on quantification (analysis_id);
 
-COMMENT ON TABLE quantification IS 'Quantification is the transformation of an image acquisition to numeric data. This typically involves statistical procedures.';
+COMMENT ON TABLE quantification IS ' Quantification is the transformation of an image or set of sequences to numeric expression data. This typically involves statistical procedures.';
 
 -- ================================================
 -- TABLE: quantificationprop
@@ -561,7 +559,7 @@ create table element (
     primary key (element_id),
     feature_id bigint null,
     foreign key (feature_id) references feature (feature_id) on delete set null INITIALLY DEFERRED,
-    arraydesign_id bigint not null,
+    arraydesign_id bigint,
     foreign key (arraydesign_id) references arraydesign (arraydesign_id) on delete cascade INITIALLY DEFERRED,
     type_id bigint null,
     foreign key (type_id) references cvterm (cvterm_id) on delete set null INITIALLY DEFERRED,
@@ -574,7 +572,7 @@ create index element_idx2 on element (arraydesign_id);
 create index element_idx3 on element (type_id);
 create index element_idx4 on element (dbxref_id);
 
-COMMENT ON TABLE element IS 'Represents a feature of the array. This is typically a region of the array coated or bound to DNA.';
+COMMENT ON TABLE element IS 'For a microarray, represents a feature of the array. This is typically a region of the array coated or bound to DNA. For RNASeq, represents a feature sequence that is used for aligning and quantifying reads.';
 
 -- ================================================
 -- TABLE: element_result
@@ -594,7 +592,7 @@ create index elementresult_idx1 on elementresult (element_id);
 create index elementresult_idx2 on elementresult (quantification_id);
 create index elementresult_idx3 on elementresult (signal);
 
-COMMENT ON TABLE elementresult IS 'An element on an array produces a measurement when hybridized to a biomaterial (traceable through quantification_id). This is the base data from which tables that actually contain data inherit.';
+COMMENT ON TABLE elementresult IS 'Expression signal. In the case of a microarray, the hybridization signal. In the case of RNAseq, the read count. May be normalized or raw, as specified in the acquisition record.';
 
 -- ================================================
 -- TABLE: element_relationship
