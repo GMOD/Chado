@@ -27,6 +27,8 @@ create table analysis (
     sourceversion varchar(255),
     sourceuri text,
     timeexecuted timestamp not null default current_timestamp,
+    type_id bigint,
+    foreign key (type_id) references cvterm (cvterm_id),
     constraint analysis_c1 unique (program,programversion,sourcename)
 );
 COMMENT ON TABLE analysis IS 'An analysis is a particular type of a
@@ -42,6 +44,7 @@ COMMENT ON COLUMN analysis.programversion IS 'Version description, e.g. TBLASTX 
 COMMENT ON COLUMN analysis.algorithm IS 'Algorithm name, e.g. blast.';
 COMMENT ON COLUMN analysis.sourcename IS 'Source name, e.g. cDNA, SwissProt.';
 COMMENT ON COLUMN analysis.sourceuri IS 'This is an optional, permanent URL or URI for the source of the  analysis. The idea is that someone could recreate the analysis directly by going to this URI and fetching the source data (e.g. the blast database, or the training model).';
+COMMENT ON COLUMN analysis.type_id IS 'An optional cvterm_id that specifies what type of analysis this record is.  Prior to 1.4, analysis type was set with an analysisprop.';
 
 -- ================================================
 -- TABLE: analysisprop
