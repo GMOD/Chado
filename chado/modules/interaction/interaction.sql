@@ -55,10 +55,14 @@ create table interactionprop (
     foreign key (type_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
     value text null,
     rank int not null default 0,
+    cvalue_id bigint,
+  FOREIGN KEY (cvalue_id) REFERENCES cvterm (cvterm_id) ON DELETE SET NULL,
     constraint interactionprop_c1 unique (interaction_id,type_id,rank)
 );
 create index interactionprop_idx1 on interactionprop (interaction_id);
 create index interactionprop_idx2 on interactionprop (type_id);
+create index interactionprop_idx3 on interactionprop (cvalue_id);
+COMMENT ON COLUMN interactionprop.cvalue_id IS 'The value of the property if that value should be the name of a controlled vocabulary term.  It is preferred that a property either use the value or cvalue_id column but not both.  For example, if the property type is "color" then the cvalue_id could be a term named "green".';
 
 
 -- ================================================
@@ -132,10 +136,15 @@ create table interaction_expressionprop (
     foreign key (type_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
     value text null,
     rank int not null default 0,
+    cvalue_id bigint,
+  FOREIGN KEY (cvalue_id) REFERENCES cvterm (cvterm_id) ON DELETE SET NULL,
     constraint interaction_expressionprop_c1 unique (interaction_expression_id,type_id,rank)
 );
 create index interaction_expressionprop_idx1 on interaction_expressionprop (interaction_expression_id);
 create index interaction_expressionprop_idx2 on interaction_expressionprop (type_id);
+create index interaction_expressionprop_idx3 on interaction_expressionprop (cvalue_id);
+
+COMMENT ON COLUMN interaction_expressionprop.cvalue_id IS 'The value of the property if that value should be the name of a controlled vocabulary term.  It is preferred that a property either use the value or cvalue_id column but not both.  For example, if the property type is "color" then the cvalue_id could be a term named "green".';
 
 
 -- ================================================
