@@ -80,7 +80,7 @@ create table stockprop (
        rank int not null default 0,
        cvalue_id bigint,
        FOREIGN KEY (cvalue_id) REFERENCES cvterm (cvterm_id) ON DELETE SET NULL,
-       constraint stockprop_c1 unique (stock_id,type_id,rank),
+       constraint stockprop_c1 unique (stock_id,type_id,rank)
 );
 create index stockprop_idx1 on stockprop (stock_id);
 create index stockprop_idx2 on stockprop (type_id);

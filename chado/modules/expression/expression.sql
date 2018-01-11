@@ -97,12 +97,14 @@ create table expressionprop (
     foreign key (type_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
     value text null,
     rank int not null default 0,
-      FOREIGN KEY (cvalue_id) REFERENCES cvterm (cvterm_id) ON DELETE SET NULL,
+    cvalue_id bigint,
+    FOREIGN KEY (cvalue_id) REFERENCES cvterm (cvterm_id) ON DELETE SET NULL,
     constraint expressionprop_c1 unique (expression_id,type_id,rank)
 );
 create index expressionprop_idx1 on expressionprop (expression_id);
 create index expressionprop_idx2 on expressionprop (type_id);
 CREATE INDEX expressionprop_idx3 ON expressionprop (cvalue_id);
+
 COMMENT ON COLUMN expressionprop.cvalue_id IS 'The value of the property if that value should be the name of a controlled vocabulary term.  It is preferred that a property either use the value or cvalue_id column but not both.  For example, if the property type is "color" then the cvalue_id could be a term named "green".';
 
 

@@ -56,7 +56,8 @@ create table analysisprop (
     foreign key (type_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
     value text,
     rank int not null default 0,
-   FOREIGN KEY (cvalue_id) REFERENCES cvterm (cvterm_id) ON DELETE SET NULL,
+    cvalue_id bigint,
+    FOREIGN KEY (cvalue_id) REFERENCES cvterm (cvterm_id) ON DELETE SET NULL,
     constraint analysisprop_c1 unique (analysis_id,type_id,rank)
 );
 create index analysisprop_idx1 on analysisprop (analysis_id);
