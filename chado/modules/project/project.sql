@@ -13,6 +13,7 @@
 -- :import analysis from companalysis
 -- :import feature from sequence
 -- :import stock from stock
+-- :import biomaterial from mage
 -- =================================================================
 
 
@@ -25,6 +26,8 @@ create table project (
     primary key (project_id),
     name varchar(255) not null,
     description text,
+    type_id bigint NOT NULL,
+	FOREIGN KEY (type_id) REFERENCES cvterm (cvterm_id) ON DELETE CASCADE,
     constraint project_c1 unique (name)
 );
 
@@ -187,3 +190,23 @@ CREATE INDEX project_stock_idx2 ON project_stock USING btree (project_id);
 
 
 COMMENT ON TABLE project_stock IS 'This table is intended associate records in the stock table with a project.';
+
+-- ================================================
+-- TABLE: biomaterial_project
+-- ================================================
+
+
+CREATE TABLE biomaterial_project (
+    biomaterial_project_id bigserial primary key NOT NULL,
+    biomaterial_id bigint NOT NULL,
+    project_id bigint NOT NULL,
+    CONSTRAINT biomaterial_project_c1 UNIQUE (biomaterial_id, project_id),
+    FOREIGN KEY (biomaterial_id) REFERENCES biomaterial(biomaterial_id) ON DELETE CASCADE,
+    FOREIGN KEY (project_id) REFERENCES project(project_id) ON DELETE CASCADE
+);
+
+CREATE INDEX biomaterial_project_idx1 ON biomaterial_project USING btree (biomaterial_id);
+CREATE INDEX biomaterial_project_idx2 ON biomaterial_project USING btree (project_id);
+
+
+COMMENT ON TABLE project_stock IS 'This table is intended associate records in the biomaterial table with a project.';
