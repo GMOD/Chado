@@ -34,12 +34,11 @@ CREATE TABLE contactprop (
     type_id bigint NOT NULL,
     value text,
     rank integer DEFAULT 0 NOT NULL,
+    cvalue_id bigint,
     CONSTRAINT contactprop_c1 UNIQUE (contact_id, type_id, rank),    
     FOREIGN KEY (contact_id) REFERENCES contact(contact_id) ON DELETE CASCADE,
-    FOREIGN KEY (type_id) REFERENCES cvterm(cvterm_id) ON DELETE CASCADE
-    	cvalue_id bigint,
-  FOREIGN KEY (cvalue_id) REFERENCES cvterm (cvterm_id) ON DELETE SET NULL,
-
+    FOREIGN KEY (type_id) REFERENCES cvterm(cvterm_id) ON DELETE CASCADE,
+    FOREIGN KEY (cvalue_id) REFERENCES cvterm (cvterm_id) ON DELETE SET NULL
 );
 
 CREATE INDEX contactprop_idx1 ON contactprop USING btree (contact_id);

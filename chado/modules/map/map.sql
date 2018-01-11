@@ -95,7 +95,7 @@ CREATE TABLE featureposprop (
     CONSTRAINT featureposprop_c1 UNIQUE (featurepos_id, type_id, rank),
     FOREIGN KEY (featurepos_id) REFERENCES featurepos(featurepos_id) ON DELETE CASCADE,
     FOREIGN KEY (type_id) REFERENCES cvterm(cvterm_id) ON DELETE CASCADE,
-    FOREIGN KEY (cvalue_id) REFERENCES cvterm (cvterm_id) ON DELETE SET NULL,
+    FOREIGN KEY (cvalue_id) REFERENCES cvterm (cvterm_id) ON DELETE SET NULL
 );
 
 CREATE INDEX featureposprop_idx1 ON featureposprop USING btree (featurepos_id);
