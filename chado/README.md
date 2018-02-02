@@ -68,22 +68,19 @@ are currently using PostgreSQL.
 
 ## Installation
 
-Please read the included INSTALL.Chado document for instructions on how to
-install the Chado schema.
+For manual installation instructions, please read the included
+[INSTALL.Chado](./INSTALL.Chado.md) document for instructions on how to install
+the Chado schema.
+
+Alternatively [Chado schema dumps](https://github.com/erasche/chado-schema-builder/releases) and [docker
+images](https://github.com/erasche/docker-chado) are available if you are just
+looking to experiment around with Chado.
 
 ## Support
 
-Please see our website for more information on Chado and the GMOD project:
+Please see our website for more information on Chado and the GMOD project: http://www.gmod.org/
+You can send questions to the Chado mailing list: gmod-schema@lists.sourceforge.net
 
-    http://www.gmod.org/
-
-You can send questions to the Chado mailing list:
-
-    gmod-schema@lists.sourceforge.net
-
-You can browse the schema CVS repository here:
-
-    http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/gmod/schema/
 
 
 ## Authors
