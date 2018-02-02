@@ -30,7 +30,6 @@ Phylogeny                  | phylogenetic trees
 Publication (pub)          | publications and references
 Sequence                   | sequences and sequence features
 Stock                      | specimens and biological collections
-WWW -
 
 For documentation on the various modules, please see the [GMOD Wiki](http://gmod.org/wiki/Category:Chado_Modules).
 
