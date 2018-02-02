@@ -1,7 +1,4 @@
-$Id: README,v 1.14 2007-04-12 19:01:50 briano Exp $
-
-INTRODUCTION
-------------
+# Chado
 
 Chado is a modular schema for handling all kinds of biological
 data.  It is intended to be used as both a primary datastore schema as
@@ -15,25 +12,27 @@ other projects.
 
 The modules currently in chado are:
 
-Audit                                  - database audits
-Companalysis                    - data from computational analysis
-Contact                              - people and groups
-Controlled Vocabulary (cv) - controlled vocabularies and ontologies
-Expression                         - summarized RNA and protein expresssion
-General                              - identifiers
-Genetic                              - genetic data and genotypes
-Library                               - descriptions of molecular libraries
-Mage                                  - microarray data
-Map                                    - maps without sequence
-Organism                            - species
-Phenotype                          - phenotypic data
-Phylogeny                          - phylogenetic trees
-Publication (pub)                - publications and references
-Sequence                            - sequences and sequence features
-Stock                                  - specimens and biological collections
+Module                     | Purpose
+-------------------------- | -----------------------
+Audit                      | database audits
+Companalysis               | data from computational analysis
+Contact                    | people and groups
+Controlled Vocabulary (cv) | controlled vocabularies and ontologies
+Expression                 | summarized RNA and protein expresssion
+General                    | identifiers
+Genetic                    | genetic data and genotypes
+Library                    | descriptions of molecular libraries
+Mage                       | microarray data
+Map                        | maps without sequence
+Organism                   | species
+Phenotype                  | phenotypic data
+Phylogeny                  | phylogenetic trees
+Publication (pub)          | publications and references
+Sequence                   | sequences and sequence features
+Stock                      | specimens and biological collections
 WWW -
 
-For documentation on the various modules, see http://www.gmod.org.
+For documentation on the various modules, please see the [GMOD Wiki](http://gmod.org/wiki/Category:Chado_Modules).
 
 Other modules are possible; the existing modules cover a very large
 variety of use cases.
@@ -45,48 +44,35 @@ the sequence module.
 
 Some (but not all) of the use cases we have discussed are:
 
-* Central dogma genome annotations
-
-* Genes that break the central dogma (of which there are many
+- Central dogma genome annotations
+- Genes that break the central dogma (of which there are many
   Annotated in fly, including polycistronic transcripts, transplicing,
   selenocysteine readthroughs, rna editing, ....)
-
-* Sequence variation data, including SNPs, transposable element
+- Sequence variation data, including SNPs, transposable element
   insertions, indels, ... how this relates to phenotypes, how these
   effect the central dogma....
-
-* Non-wildtype data, including representing a wildtype transcriptome
+- Non-wildtype data, including representing a wildtype transcriptome
   and proteome on a non wildtype genome; implicit and explicit central
   dogma examples for mutant strains
-
-* Complex phenotypic data
-
-* Ontologies structured as graphs; querying over graph ontologies
+- Complex phenotypic data
+- Ontologies structured as graphs; querying over graph ontologies
   non-recursively by pre-computing the closure
-
-* Sequence ontology
-
-* Comparative data
-
-* Genetic interactions
-
-* Transgene constructs, complex genetic experiments and their results
+- Sequence ontology
+- Comparative data
+- Genetic interactions
+- Transgene constructs, complex genetic experiments and their results
 
 The core schema is DBMS independent.  The SQL table create files can
 be found in the chado/modules directory.  The main Chado developers
 are currently using PostgreSQL.
 
 
-INSTALLATION
-------------
+## Installation
 
 Please read the included INSTALL.Chado document for instructions on how to
 install the Chado schema.
 
-
-
-CHADO SUPPORT
--------------
+## Support
 
 Please see our website for more information on Chado and the GMOD project:
 
@@ -101,7 +87,7 @@ You can browse the schema CVS repository here:
     http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/gmod/schema/
 
 
-AUTHORS
--------
+## Authors
+
 Chris Mungall, David Emmert and the GMOD team
 October 2, 2003
