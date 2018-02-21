@@ -312,10 +312,13 @@ create table featureprop (
     foreign key (type_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
     value text null,
     rank int not null default 0,
+    cvalue_id bigint,
+    FOREIGN KEY (cvalue_id) REFERENCES cvterm (cvterm_id) ON DELETE SET NULL,
     constraint featureprop_c1 unique (feature_id,type_id,rank)
 );
 create index featureprop_idx1 on featureprop (feature_id);
 create index featureprop_idx2 on featureprop (type_id);
+CREATE INDEX featureprop_idx3 ON featureprop (cvalue_id);
 
 COMMENT ON TABLE featureprop IS 'A feature can have any number of slot-value property tags attached to it. This is an alternative to hardcoding a list of columns in the relational schema, and is completely extensible.';
 
@@ -335,6 +338,8 @@ default 0 value should be used';
 
 COMMENT ON INDEX featureprop_c1 IS 'For any one feature, multivalued
 property-value pairs must be differentiated by rank.';
+
+COMMENT ON COLUMN featureprop.cvalue_id IS 'The value of the property if that value should be the name of a controlled vocabulary term.  It is preferred that a property either use the value or cvalue_id column but not both.  For example, if the property type is "color" then the cvalue_id could be a term named "green".';
 
 
 -- ================================================
