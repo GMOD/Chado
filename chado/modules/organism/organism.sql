@@ -82,12 +82,16 @@ create table organismprop (
     foreign key (type_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
     value text null,
     rank int not null default 0,
+    cvalue_id bigint,
+  FOREIGN KEY (cvalue_id) REFERENCES cvterm (cvterm_id) ON DELETE SET NULL,
     constraint organismprop_c1 unique (organism_id,type_id,rank)
 );
 create index organismprop_idx1 on organismprop (organism_id);
 create index organismprop_idx2 on organismprop (type_id);
+create index organismprop_idx3 on organismprop (cvalue_id);
 
 COMMENT ON TABLE organismprop IS 'Tag-value properties - follows standard chado model.';
+COMMENT ON COLUMN organismprop.cvalue_id IS 'The value of the property if that value should be the name of a controlled vocabulary term.  It is preferred that a property either use the value or cvalue_id column but not both.  For example, if the property type is "color" then the cvalue_id could be a term named "green".';
 
 
 -- ================================================

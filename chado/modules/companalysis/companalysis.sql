@@ -56,10 +56,16 @@ create table analysisprop (
     foreign key (type_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
     value text,
     rank int not null default 0,
+    cvalue_id bigint,
+    FOREIGN KEY (cvalue_id) REFERENCES cvterm (cvterm_id) ON DELETE SET NULL,
     constraint analysisprop_c1 unique (analysis_id,type_id,rank)
 );
 create index analysisprop_idx1 on analysisprop (analysis_id);
 create index analysisprop_idx2 on analysisprop (type_id);
+CREATE index analysisprop_idx3 ON analysisprop (cvalue_id);
+
+COMMENT ON COLUMN analysisprop.cvalue_id IS 'The value of the property if that value should be the name of a controlled vocabulary term.  It is preferred that a property either use the value or cvalue_id column but not both.  For example, if the property type is "color" then the cvalue_id could be a term named "green".';
+
 
 -- ================================================
 -- TABLE: analysisfeature
@@ -105,10 +111,16 @@ CREATE TABLE analysisfeatureprop (
     type_id bigint NOT NULL REFERENCES cvterm(cvterm_id) ON DELETE CASCADE DEFERRABLE INITIALLY DEFERRED,
     value TEXT,
     rank int NOT NULL,
+    cvalue_id bigint,
+    FOREIGN KEY (cvalue_id) REFERENCES cvterm (cvterm_id) ON DELETE SET NULL,
     CONSTRAINT analysisfeature_id_type_id_rank UNIQUE(analysisfeature_id, type_id, rank)
 );
 create index analysisfeatureprop_idx1 on analysisfeatureprop (analysisfeature_id);
 create index analysisfeatureprop_idx2 on analysisfeatureprop (type_id);
+create index analysisfeatureprop_idx3 on analysisfeatureprop (cvalue_id);
+
+COMMENT ON COLUMN analysisfeatureprop.cvalue_id IS 'The value of the property if that value should be the name of a controlled vocabulary term.  It is preferred that a property either use the value or cvalue_id column but not both.  For example, if the property type is "color" then the cvalue_id could be a term named "green".';
+
 
 -- ================================================
 -- TABLE: analysis_dbxref
