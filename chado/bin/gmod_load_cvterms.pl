@@ -253,6 +253,9 @@ message("Default namespace is " . $default_ont->name . " \n" , 1);
 
 my $default_cv= $schema->resultset('Cv::Cv')->find_or_create( { name => $default_ont->name } , { key => 'cv_c1' }, );
 
+my $db = $schema->resultset("General::Db")->find_or_create( 
+    { name => $opt_s }, { key => 'db_c1' }, );
+
 foreach my $new_ont(@onts) {
     my $coderef = sub {
 	my $new_ont_name=$new_ont->name();
@@ -287,8 +290,6 @@ foreach my $new_ont(@onts) {
 	my %file_relationships = (); # relationships currently defined in the file
 	my %db_relationships = ();
 	######
-	my $db = $schema->resultset("General::Db")->find_or_create( 
-	    { name => $opt_s }, { key => 'db_c1' }, );
 
 	print STDERR "Getting all the terms of the new ontology...\n";
 	my (@all_file_terms) = $new_ont->get_all_terms();
@@ -809,8 +810,10 @@ foreach my $new_ont(@onts) {
     try {
 	$schema->txn_do($coderef);
 	message("Committing! \n If you are using cvtermpath you should now run gmod_make_cvtermpath.pl . See the perldoc for more info. \n\n", 1);
+	$schema->storage->txn_commit ;
     } catch {
 	# Transaction failed
+	$schema->storage->txn_rollback ;
 	die "An error occured! Rolling back! " . $_ . "\n";
     };
 }
