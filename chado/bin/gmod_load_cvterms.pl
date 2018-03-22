@@ -813,8 +813,8 @@ foreach my $new_ont(@onts) {
 	$schema->storage->txn_commit ;
     } catch {
 	# Transaction failed
-	$schema->storage->txn_rollback ;
 	die "An error occured! Rolling back! " . $_ . "\n";
+	$schema->storage->txn_rollback ;
     };
 }
 
