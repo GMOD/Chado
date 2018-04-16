@@ -742,20 +742,25 @@ foreach my $new_ont(@onts) {
 		{ 'lower(accession)' => { 'like' , lc($predicate_term_name) },
 		  db_id     => $rel_db->db_id(),
 		})->search_related('cvterm') if $rel_db;
+################
 	    # this is not a relationship_ontology term
-	    if (!$predicate_term) {
+	    if (!$predicate_term ) {
 		my ($predicate_dbxref) = $schema->resultset('General::Db')->search( { name => $opt_s } )->search_related('dbxrefs', { accession => $predicate_term_name });
 		($predicate_term) = $schema->resultset("Cv::Cvterm")->find(
-		    { dbxref_id => $predicate_dbxref->dbxref_id } ) if $predicate_dbxref;
+		    { 
+			dbxref_id => $predicate_dbxref->dbxref_id,
+			cv_id     => $cv->cv_id,
+		    } ) if $predicate_dbxref;
 		# cvterm has a relationshiptype term with the dbxref_id of $predicate_term_name
 		if ($predicate_term) {
 		    die("predicate term $predicate_term_name (cvterm id = " . $predicate_term->cvterm_id . " is not stored as relationshiptype in your database!!\n") if $predicate_term->is_relationshiptype !=1 ;
-		    # this happens when the predicate term is stored with the wrong cv
+		
+		    # this happens when the predicate term is stored with a cv that is different from the default
 		    #(e.g. GO predicate terms should have the cv_id of the
 		    # default namespace of the ontology (gene_ontology)
 		    # and not of one of the 3 components )
-		    $predicate_term->update( { cv_id => $default_cv->cv_id } ) ;
-		} else { # no cvterm exists with this dbxref, create a new one
+		  
+		} else { 
 		    $predicate_term = $schema->resultset('Cv::Cvterm')->create_with(
 			{ name   => $predicate_term_name,
 			  cv     => $default_cv,
@@ -764,10 +769,16 @@ foreach my $new_ont(@onts) {
 			});
 		    $predicate_term->is_relationshiptype(1);
 		    $predicate_term->update;
-		    message("Stored new relationshiptype '" .  $predicate_term_name . "'\n",1);
+		    message("Stored new relationshiptype '" .  $predicate_term_name . $predicate_term->cv_id . "'\n",1);
 		}
 		if (!$predicate_term) {
 		    die "The predicate term $predicate_term_name does not exist in the database\n";
+		}
+		#In other cases, such as with crop ontologies, we may want to have the typedef stored
+		#with the same cv as the term itself
+		if ($opt_s ne 'GO' || $opt_s ne 'PO') {
+		    $predicate_term->cv_id($cv->cv_id);
+		    $predicate_term->update();
 		}
 	    }
 	    if (!$opt_t) {
@@ -791,7 +802,7 @@ foreach my $new_ont(@onts) {
 		    my $file_predicate_term = $schema->resultset("Cv::Cvterm")->search(
 			{
 			    'lower(name)' => lc($file_relationships{$r}->predicate_term->name ),
-			    cv_id       => $default_cv->cv_id,
+			    cv_id       => $predicate_term->cv->cv_id || $default_cv->cv_id,
 			} )->single;
 		    if ( $file_predicate_term  ) { 
 			$db_relationships{$r}->type_id( $file_predicate_term->cvterm_id ) ;
