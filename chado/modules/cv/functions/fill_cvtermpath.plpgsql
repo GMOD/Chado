@@ -1,3 +1,12 @@
+-- set the search_path to the current_schema
+-- so that we can use SET SEARCH_PATH FROM CURRENT
+-- in some function definitions.
+-- see https://github.com/GMOD/Chado/issues/65
+SELECT set_config('search_path',
+  string_agg(quote_ident(s),','),
+  false)
+FROM unnest(current_schemas(false)) s;
+
 --- example: select * from fill_cvtermpath(7); where 7 is cv_id for an ontology
 --- fill path from the node to its children and their children
 CREATE OR REPLACE FUNCTION _fill_cvtermpath4node(INTEGER, INTEGER, INTEGER, INTEGER, INTEGER) RETURNS INTEGER AS
@@ -67,7 +76,7 @@ BEGIN
     RETURN 1;
 END;   
 '
-LANGUAGE 'plpgsql';
+LANGUAGE 'plpgsql' SET SEARCH_PATH FROM CURRENT;
 
 CREATE OR REPLACE FUNCTION fill_cvtermpath(cv.name%TYPE) RETURNS INTEGER AS
 '
@@ -82,4 +91,4 @@ BEGIN
     RETURN rtn;
 END;   
 '
-LANGUAGE 'plpgsql';
+LANGUAGE 'plpgsql' SET SEARCH_PATH FROM CURRENT;
