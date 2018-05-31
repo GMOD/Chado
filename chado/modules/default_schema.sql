@@ -2229,18 +2229,11 @@ CREATE OR REPLACE FUNCTION create_point (bigint, bigint) RETURNS point AS
  'SELECT point ($1, $2)'
 LANGUAGE 'sql';
 
--- set the search_path to the current_schema
--- see https://github.com/GMOD/Chado/issues/65
-SELECT set_config('search_path',
-  string_agg(quote_ident(s),','),
-  false)
-FROM unnest(current_schemas(false)) s;
-
 -- create a range box
 -- (make this immutable so we can index it)
 CREATE OR REPLACE FUNCTION boxrange (bigint, bigint) RETURNS box AS
  'SELECT box (create_point(0, $1), create_point($2,500000000))'
-LANGUAGE 'sql' IMMUTABLE SET SEARCH_PATH FROM CURRENT;
+LANGUAGE 'sql' IMMUTABLE;
 
 -- create a query box
 CREATE OR REPLACE FUNCTION boxquery (bigint, bigint) RETURNS box AS
@@ -2312,7 +2305,7 @@ LANGUAGE 'sql';
 
 CREATE OR REPLACE FUNCTION boxrange (bigint, bigint, bigint) RETURNS box AS
  'SELECT box (create_point($1, $2), create_point($1,$3))'
-LANGUAGE 'sql' IMMUTABLE SET SEARCH_PATH FROM CURRENT;
+LANGUAGE 'sql' IMMUTABLE;
 
 -- create a query box
 CREATE OR REPLACE FUNCTION boxquery (bigint, bigint, bigint) RETURNS box AS
