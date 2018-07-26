@@ -821,7 +821,7 @@ foreach my $new_ont(@onts) {
     try {
 	$schema->txn_do($coderef);
 	message("Committing! \n If you are using cvtermpath you should now run gmod_make_cvtermpath.pl . See the perldoc for more info. \n\n", 1);
-	$schema->storage->txn_commit ;
+	#$schema->storage->txn_commit ;
     } catch {
 	# Transaction failed
 	die "An error occured! Rolling back! " . $_ . "\n";
