@@ -80,7 +80,7 @@ are currently using PostgreSQL.
 
 ## Installation
 
-Please read the included [INSTALL.Chado](./INSTALL.Chado.md) document for instructions on how to
+Please read the included [INSTALL.Chado.md](./INSTALL.Chado.md) document for instructions on how to
 install the Chado schema.
 
 ## Chado Support
