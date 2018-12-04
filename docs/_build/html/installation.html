@@ -1,0 +1,139 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Installation &#8212; Chado  documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Modules" href="modules.html" />
+    <link rel="prev" title="Chado Documentation" href="index.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="installation">
+<h1>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="installing-chado">
+<h2>Installing Chado<a class="headerlink" href="#installing-chado" title="Permalink to this headline">¶</a></h2>
+<p>First you will need database software, or Relational Database Management System (RDBMS). The recommended RDBMS for Chado currently is <a class="reference external" href="http://www.postgresql.org/">Postgres</a>. Postgres is free software, usually used on a Unix operating system such as Linux or Mac OS X. You can also install Postgres, and Chado, on Windows but most Chado installations are found on some version of Unix - you’ll probably get the best support by choosing Unix. (See <a class="reference external" href="http://gmod.org/wiki/Databases_and_GMOD">Databases and GMOD</a> for more discussion.) Once you’ve installed your RDBMS you can install Chado.</p>
+<div class="section" id="download-a-stable-release-of-chado">
+<h3>Download a Stable Release of Chado<a class="headerlink" href="#download-a-stable-release-of-chado" title="Permalink to this headline">¶</a></h3>
+<p>See Downloads</p>
+</div>
+<div class="section" id="chado-from-svn">
+<h3>Chado From SVN<a class="headerlink" href="#chado-from-svn" title="Permalink to this headline">¶</a></h3>
+<p>You can get the most up-to-date, not even released yet, version of Chado from <a class="reference external" href="http://gmod.org/wiki/Subversion">Subversion</a>. To get a copy of the latest Chado source, enter this at the command line:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>svn co https://svn.code.sf.net/p/gmod/svn/schema/trunk
+</pre></div>
+</div>
+<p>Once the package has been downloaded cd to the <code class="docutils literal notranslate"><span class="pre">trunk/chado</span></code> directory.</p>
+<p>Follow the instructions in the <code class="docutils literal notranslate"><span class="pre">INSTALL.Chado</span></code> file, including the installation of the prerequisites. Or, read <a class="reference external" href="http://gmod.svn.sourceforge.net/viewvc/gmod/schema/trunk/chado/INSTALL.Chado">the file online</a>.</p>
+<p>Loading Data
+After completing these steps, you can load your chado schema with data in a number of ways:</p>
+<p>Load RefSeq into Chado HOWTO
+Load GFF into Chado HOWTO
+Using XORT
+You can also use the application Apollo to curate data in Chado.</p>
+</div>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">Chado</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Installation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#installing-chado">Installing Chado</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="modules.html">Modules</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="index.html" title="previous chapter">Chado Documentation</a></li>
+      <li>Next: <a href="modules.html" title="next chapter">Modules</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2018, Chado.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/installation.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
