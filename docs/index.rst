@@ -15,6 +15,7 @@ Chado is a relational database schema that underlies many GMOD installations. It
 
   installation
   modules
+  best_practices
 
 
 Mailing List
@@ -23,9 +24,8 @@ Mailing List
 .. csv-table:: Chado Mailing List
   :header: "Mailing List Link", "Description", "Archive(s)"
 
-  "https://lists.sourceforge.net/lists/listinfo/gmod-schema", "All issues regarding Chado, Chado::AutoDBI, and Bio::Chado::Schema", "http://dir.gmane.org/gmane.science.biology.gmod.schema, http://gmod.827538.n3.nabble.com/Chado-f815597.html, http://sourceforge.net/mailarchive/forum.php?forum_name=gmod-schema"
-
-  "https://lists.sourceforge.net/lists/listinfo/gmod-schema-cmts", "Chado code updates", http://sourceforge.net/mailarchive/forum.php?forum_name=gmod-schema-cmts
+  "`GMOD-schema <https://lists.sourceforge.net/lists/listinfo/gmod-schema>`_", "All issues regarding Chado, Chado::AutoDBI, and Bio::Chado::Schema", "`Gmane <http://dir.gmane.org/gmane.science.biology.gmod.schema>`_, `Nabble (2010/05+) <http://gmod.827538.n3.nabble.com/Chado-f815597.html>`_, `Sourceforge <http://sourceforge.net/mailarchive/forum.php?forum_name=gmod-schema>`_"
+  "`GMOD commits <https://lists.sourceforge.net/lists/listinfo/gmod-schema-cmts>`_", "Chado code updates", `Sourceforge Archive <http://sourceforge.net/mailarchive/forum.php?forum_name=gmod-schema-cmts>`_
 
 
 Pronunciation

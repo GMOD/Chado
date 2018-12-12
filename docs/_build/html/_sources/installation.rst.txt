@@ -25,12 +25,15 @@ You can get the most up-to-date, not even released yet, version of Chado from `S
 
 Once the package has been downloaded cd to the ``trunk/chado`` directory.
 
-Follow the instructions in the ``INSTALL.Chado`` file, including the installation of the prerequisites. Or, read `the file online <http://gmod.svn.sourceforge.net/viewvc/gmod/schema/trunk/chado/INSTALL.Chado>`_.
+Follow the instructions in the ``INSTALL.Chado`` file, including the installation of the prerequisites. Or, `read the file online <http://gmod.svn.sourceforge.net/viewvc/gmod/schema/trunk/chado/INSTALL.Chado>`_.
 
 Loading Data
-After completing these steps, you can load your chado schema with data in a number of ways:
+-------------
 
-Load RefSeq into Chado HOWTO
-Load GFF into Chado HOWTO
-Using XORT
-You can also use the application Apollo to curate data in Chado.
+After completing these steps, you can load your Chado schema with data in a number of ways:
+
+Load RefSeq into Chado HOWTO http://gmod.org/wiki/Load_RefSeq_Into_Chado
+Load GFF into Chado HOWTO http://gmod.org/wiki/Load_GFF_Into_Chado
+Using XORT http://gmod.org/wiki/XORT
+
+You can also use the application `Apollo <http://gmod.org/wiki/Apollo>`_ to curate data in Chado.
