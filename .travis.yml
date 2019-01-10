@@ -1,0 +1,8 @@
+language: generic
+  
+services:
+  - postgres
+
+run:
+
+  - psql -U postgres -d postgres -a -f ./chado/schemas/1.31/default_schema.sql
