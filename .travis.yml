@@ -1,8 +1,10 @@
 language: generic
-  
+
 services:
   - postgres
 
 run:
 
   - psql -U postgres -d postgres -a -f ./chado/schemas/1.31/default_schema.sql
+  - apt-get install -y apt-utils nodejs build-essential yarn && wget https://repo1.maven.org/maven2/org/flywaydb/flyway-commandline/4.1.2/flyway-commandline-4.1.2-linux-x64.tar.gz && tar -xvf flyway-commandline-4.1.2-linux-x64.tar.gz && rm flyway-commandline-4.1.2-linux-x64.tar.gz
+  - which flyway
