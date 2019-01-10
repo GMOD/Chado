@@ -1,10 +1,9 @@
 language: generic
 
 services:
-  - postgres
+  - postgresql
   - docker
 
 run:
-
   - psql -U postgres -d postgres -a -f ./chado/schemas/1.31/default_schema.sql
   - docker run --rm --name flyway -v ./migrations/:/flyway/sql boxfuse/flyway -url=jdbc:postgresql://localhost:5432/drupal -user=postgres migrate
