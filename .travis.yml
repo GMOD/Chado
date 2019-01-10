@@ -6,4 +6,4 @@ services:
 
 script:
   - psql -U postgres -d postgres -q -a -f ./chado/schemas/1.31/default_schema.sql > log.txt
-  - docker run --rm --name flyway -v migrations/:/flyway/sql boxfuse/flyway -url=jdbc:postgresql://localhost:5432/drupal -user=postgres -password=postgres migrate
+  - docker run --rm --name flyway -v "$(pwd)/migrations"/:/flyway/sql boxfuse/flyway -url=jdbc:postgresql://localhost:5432/drupal -user=postgres -password=postgres migrate
