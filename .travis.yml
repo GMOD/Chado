@@ -1,13 +1,9 @@
-language: generic
+language: java
 
 services:
   - postgresql
-  - docker
-
-before_script:
-
 
 script:
-  - psql -U postgres -d travis_ci_test -q -a -f ./chado/schemas/1.31/default_schema.sql > log.txt
+  - psql -U postgres -d postgres -q -a -f ./chado/schemas/1.31/default_schema.sql > log.txt
   - export HOST_IP_ADDRESS="$(/sbin/ip route|awk '/default/ { print $3 }')"
-  - docker run --rm --name flyway -v "$(pwd)/migrations":/flyway/sql boxfuse/flyway -url=jdbc:postgresql://"${HOST_IP_ADDRESS}":5432/postgres -user=postgres migrate
+  - ./gradle flywayMigrate -i

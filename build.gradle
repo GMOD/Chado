@@ -1,0 +1,8 @@
+plugins {
+    id "org.flywaydb.flyway" version "5.2.4"
+}
+
+flyway {
+    url = "jdbc:postgresql://"${HOST_IP_ADDRESS}":5432/postgres"
+    user = 'postgres'
+}
