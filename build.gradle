@@ -8,9 +8,6 @@ plugins {
 }
 task assemble{}
 
-apply plugin: "java"
-sourceCompatibility = 1.8
-
 flyway {
     url = "jdbc:postgresql://127.0.0.1:5432/postgres"
     user = 'postgres'
