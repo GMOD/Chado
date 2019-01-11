@@ -11,4 +11,4 @@ before_script:
 script:
   - psql -U postgres -d travis_ci_test -q -a -f ./chado/schemas/1.31/default_schema.sql > log.txt
   - sqlip=$(ip -4 addr show docker0 | grep -oP '(?<=inet\s)\d+(\.\d+){3}')
-  - docker run --rm --name flyway -v "$(pwd)/migrations":/flyway/sql boxfuse/flyway -url=jdbc:postgresql://"${sqlip}":5432/travis_ci_test?ssl=true -user=postgres -password=postgres migrate
+  - docker run --rm --name flyway -v "$(pwd)/migrations":/flyway/sql boxfuse/flyway -url=jdbc:postgresql://"${sqlip}":5432/travis_ci_test -user=postgres -password=postgres migrate
