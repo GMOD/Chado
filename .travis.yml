@@ -14,4 +14,6 @@ script:
   - export HOST_IP_ADDRESS="$(/sbin/ip route|awk '/default/ { print $3 }')"
   - gradle build
   - gradle flywayBaseline
+  - gradle flywayInfo
   - gradle flywayMigrate
+  - gradle flywayInfo
