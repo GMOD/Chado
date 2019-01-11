@@ -1,3 +1,5 @@
+task assemble{}
+
 buildscript {
    dependencies {
    classpath 'org.postgresql:postgresql:42.2.5'
