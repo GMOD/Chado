@@ -1,4 +1,4 @@
-Best Practices
+Chado Best Practices
 ==============
 
 Chado is a generic `schema <http://gmod.org/wiki/Glossary#Database_Schema>`_, which means anyone writing software to query or write to chado (either `middleware <http://gmod.org/wiki/GMOD_Middleware>`_ or applications) should be aware of the different ways in which data can be  stored. We want to strike a nice balance between ﬂexibility and extensibility on the one hand, and strong typing and rigor on the other. We want to avoid the situation we have with GenBank entries where there are a dozen ways of representing a gene model, but we need to be able to cope with the constant surprises biology throws at us in an attempt to confound our nice computable models. This page on Best Practices represents the collective wisdom of those who use
@@ -115,4 +115,72 @@ Apollo by default treats pseudogenes using the first method, above. It may also 
 Singleton Feature
 -----------------
 
-Many types of features are singletons - that is they are not related to other features through the feature_relationship table. Storage of these is basic and as one may expect. Singleton features present no major problems. Unlike genes, which typically have parts (with the parts having subparts), singletons do not form feature graphs (or rather, they form feature graphs consisting of single nodes). Singleton features are located relative to other features (usually the genome, but once can have singletons that are located relative to other features - this may not be supported by all applications)
+Many types of features are singletons - that is they are not related to other features through the feature_relationship table. Storage of these is basic and as one may expect. Singleton features present no major problems. Unlike genes, which typically have parts (with the parts having subparts), singletons do not form feature graphs (or rather, they form feature graphs consisting of single nodes). Singleton features are located relative to other features (usually the genome, but once can have singletons that are located relative to other features - this may not be supported by all applications).
+
+Application support for singletons
+``````````````````````````````````
+
+*  Supported by `Apollo <http://genomearchitect.github.io/>`_
+*  Supported by `GBrowse <http://gmod.org/wiki/GBrowse>`_
+
+Apollo supports singletons provided they are located relative to the genome (singletons located relative to other features will be ignored). It may be necessary to configure apollo to make the feature type "1-level".
+
+
+Trans-spliced Gene
+------------------
+A trans-spliced gene has one or more transcripts in which that transcript may be spliced together from different parts of the genome.
+
+A trans-spliced transcript is spliced from exons coming from different parts of the genome. The distance between each trans-spliced part may be large, or it may be in the same location on the opposite strand.
+
+Most *C. elegans* genes have a trans-spliced leader sequence. This is different from the trans-splicing involved in *Drosophila*, where we observe what appears to be two transcripts on separate strands (both containing coding sequence) joining together in a single functional transcript.
+
+There are two proposals for dealing with this. One treats the trans-spliced transcript as a single transcripts, with exons coming from different locations. The other treats the trans-spliced transcript as a mature transcript created from two distinct primary transcripts. Note that these proposals focus on the *Drosophila* example. A solution for the *C. elegans* example has not been proposed.
+
+We treat this as an ordinary gene model, but relax our rules for exon locations in a transcript. For example, for the canonical *Drosophila* trans-spliced gene, we would allow transcripts to have exons on different strands. Note that in Chado, exon ordering comes from *feature_relationship.rank* (between exon and transcript), not from the featureloc of the exon. Chado has no problem with this. However, some software may make assumptions that all exons are on the same strand, or may try to order exons by their location to get a transcript sequence. This software will have unintended consequences with trans-spliced genes modeled using this proposal.
+
+We would introduce extra transcripts, and have relations between the transcripts. Only the mature, spliced, transcript would have a relation to the polypeptide. This may model the biology better. However, it introduces a major departure from the canonical gene model. For this reason this proposal is unlikely to be adopted.
+
+Application support for Trans-spliced Genes
+```````````````````````````````````````````
+
+*  `Apollo <http://genomearchitect.github.io/>`_: status unclear
+*  `GBrowse <http://gmod.org/wiki/GBrowse>`_: status unclear
+
+Transposon
+----------
+
+Transposons can be annotated as singleton features or as complex annotations. You would create a feature of type transposon insertion, with a loc of type 0 for insertion sites when the insertion is absent, 1 if present, and -1 (?) to link to the "template" -- generic representation of the transposon?
+
+A transposon may consist of various parts such as `long_terminal_repeat <http://www.sequenceontology.org/browser/current_svn/term/SO:0000286>`_ and gene models coding for genes like gag, pol, and env. These parts may have all decayed over time. Transposon annotation typically ignores these subtleties as all that is usually required is a singleton-feature of type `transposable_element <http://www.sequenceontology.org/browser/current_svn/term/SO:0000101>`_. In this case, there is no difficulty.
+
+If one requires detailed transposon annotation then one is entering uncharted water as far as both Chado and annotation tools are concerned (which is why this scenario is marked as still needing best practices below).
+
+Gene with Implicit Features Manifested
+--------------------------------------
+
+Some feature types such as introns are not normally manifested as rows in chado. They are normally derived on-the-fly from the gaps between consecutive exons. See for an example. Occasionally it may be desirable to store the introns as actual rows in the feature table - for example in a report database.
+
+Unlocalized Gene
+----------------
+
+A gene without sequence based localization.
+
+Many chado instances are purely concerned with genome annotation - in these cases it would be strange to have genes or other features such as transcripts with no localization (i.e. no featurelocs). However, this scenario is actually common when Chado is used in a wider context. We may learn of the existence of genes through non-sequence evidence such as genetics. When we have no sequence-based localization it is perfectly valid to have gene features with no featurelocs. When the time comes to create genome annotations for these, we just 'fill out' the gene feature by adding transcript and exon features.
+
+Application support for unlocalized genes
+`````````````````````````````````````````
+
+*  Supported by `Apollo <http://genomearchitect.github.io/>`_
+*  Supported by `GBrowse <http://gmod.org/wiki/GBrowse>`_
+
+GBrowse supports this scenario in that unlocalized features will be ignored from the genome viewer, which is appropriate.
+
+Apollo supports this scenario in that unlocalized features will be ignored, which is appropriate behaviour for a genome annotation tool. 
+
+Things that still need best practices
+-------------------------------------
+
+* Operons
+* Dicistronic genes (similar to operons) - See `Intro to Chado Feature Graphs <http://gmod.org/wiki/Introduction_to_Chado#Feature_Graphs>`_ for a proposed solution for storing dicistronic genes.
+* Gene with Regulatory Elements - Regulatory elements may be implicitly or explicitly associated with a gene.
+* Detailed Transposons Annotations - If one requires detailed transposon annotation then one is entering uncharted water as far as both Chado and annotation tools are concerned (which is why this scenario is marked as still needing best practices). One option would be to treat each transposon part as distinct singletons, but this may be unsatisfactory as one may desire to have the appropriate part_of relations between the parts.
