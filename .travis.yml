@@ -1,8 +1,19 @@
-language: generic
-  
+language: java
+
+jdk:
+  - oraclejdk8
+
 services:
-  - postgres
+  - postgresql
 
-run:
+addons:
+  postgresql: "9.6"
 
-  - psql -U postgres -d postgres -a -f ./chado/schemas/1.31/default_schema.sql
+script:
+  - psql -U postgres -d postgres -q -a -f ./chado/schemas/1.31/default_schema.sql > log.txt
+  - export HOST_IP_ADDRESS="$(/sbin/ip route|awk '/default/ { print $3 }')"
+  - gradle build
+  - gradle flywayBaseline
+  - gradle flywayInfo
+  - gradle flywayMigrate
+  - gradle flywayInfo
