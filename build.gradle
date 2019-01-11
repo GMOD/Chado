@@ -3,6 +3,6 @@ plugins {
 }
 
 flyway {
-    url = "jdbc:postgresql://"${HOST_IP_ADDRESS}":5432/postgres"
+    url = "jdbc:postgresql://"{$HOST_IP_ADDRESS}":5432/postgres"
     user = 'postgres'
 }
