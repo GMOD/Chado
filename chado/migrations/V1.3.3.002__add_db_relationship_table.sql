@@ -14,9 +14,9 @@ create index db_relationship_idx2 on db_relationship USING btree (subject_id);
 create index db_relationship_idx3 on db_relationship USING btree (object_id);
 
 COMMENT ON TABLE db_relationship IS 'Specifies relationships between databases.  This is
-particularly useful for ontologies that use multiple prefix IDs for it's vocabularies. For example,
+particularly useful for ontologies that use multiple prefix IDs for its vocabularies. For example,
 the EDAM ontology uses the prefixes "data", "format", "operation" and others. Each of these would
 have a record in the db table.  An "EDAM" record could be added for the entire ontology to the
 db table and the previous records could be linked as "part_of" EDAM.  As another example
 databases housing cross-references may have sub databases such as NCBI (e.g. Taxonomy, SRA, etc).
-This table can use a 'part_of' record to link all of them to NCBI.
+This table can use a "part_of" record to link all of them to NCBI.'
