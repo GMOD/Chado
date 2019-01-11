@@ -1,6 +1,4 @@
-task assemble{}
-
-buildscript {
+  buildscript {
    dependencies {
    classpath 'org.postgresql:postgresql:42.2.5'
    }
@@ -8,6 +6,7 @@ buildscript {
 plugins {
     id "org.flywaydb.flyway" version "5.2.4"
 }
+task assemble{}
 
 flyway {
     url = "jdbc:postgresql://" + System.getenv("HOST_IP_ADDRESS") + ":5432/postgres"
