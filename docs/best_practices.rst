@@ -22,7 +22,7 @@ The `central dogma <https://en.wikipedia.org/wiki/Central_dogma_of_molecular_bio
 
 Alternately spliced genes have a 1-to-many relation between gene and mRNA. Exons can be part_of more than one mRNA. No two distinct exon rows should have exact same `featureloc <http://gmod.org/wiki/Chado_Best_Practices#Table:_featureloc>`_ coordinates (this would indicate they are the same exon).
 
-Every feature must have a featureloc with rank=0 and locgroup=0. The value of the srcfeature_id column should be identical (i.e. all features are located relative to the same feature), except in rare circumstances such as when a feature crosses two contigs (software is not guaranteed to support this). The srcfeature_id can point to a `contig <http://www.sequenceontology.org/browser/current_release/term/SO:0000149>`_, a `chromosome <http://www.sequenceontology.org/browser/current_release/term/SO:0000340>`_, `chromosome_arm <http://www.sequenceontology.org/browser/current_release/term/SO:0000105>`_ or other appropriate assembly unit.
+Every localized feature must have a featureloc with rank=0 and locgroup=0 (see below for info on features with localization). The value of the srcfeature_id column should be identical (i.e. all features are located relative to the same feature), except in rare circumstances such as when a feature crosses two contigs (software is not guaranteed to support this). The srcfeature_id can point to a `contig <http://www.sequenceontology.org/browser/current_release/term/SO:0000149>`_, a `chromosome <http://www.sequenceontology.org/browser/current_release/term/SO:0000340>`_, `chromosome_arm <http://www.sequenceontology.org/browser/current_release/term/SO:0000105>`_ or other appropriate assembly unit.
 
 This scenario involves rows in the following tables:
 
@@ -49,6 +49,9 @@ This scenario involves rows in the following tables:
      - `polypeptide <http://www.sequenceontology.org/browser/current_release/term/SO:0000104>`_
      - at least 1
      - A protein-coding gene always produces a polypeptide, by definition. The polypeptide is located relative to the same genomic feature as the exons, mRNAs and gene. A single featureloc is used, with fmin and fmax indicating the start and stop codon positions (location is inclusive of stop codon). The polypeptide sequence should be specified as an amino acid sequence.
+
+Some feature types such as introns are not normally manifested as rows in chado. They are normally derived on-the-fly from the gaps between consecutive exons. See below for a discussion of adding these implicit features.
+
 
 Querying for Canonical Genes
 ----------------------------
@@ -209,15 +212,6 @@ Application support for Trans-spliced Genes
 *  `Apollo <http://genomearchitect.github.io/>`_: status unclear
 *  `GBrowse <http://gmod.org/wiki/GBrowse>`_: status unclear
 
-Transposon
-----------
-
-Transposons can be annotated as singleton features or as complex annotations. You would create a feature of type transposon insertion, with a loc of type 0 for insertion sites when the insertion is absent, 1 if present, and -1 (?) to link to the "template" -- generic representation of the transposon?
-
-A transposon may consist of various parts such as `long_terminal_repeat <http://www.sequenceontology.org/browser/current_svn/term/SO:0000286>`_ and gene models coding for genes like gag, pol, and env. These parts may have all decayed over time. Transposon annotation typically ignores these subtleties as all that is usually required is a singleton-feature of type `transposable_element <http://www.sequenceontology.org/browser/current_svn/term/SO:0000101>`_. In this case, there is no difficulty.
-
-If one requires detailed transposon annotation then one is entering uncharted water as far as both Chado and annotation tools are concerned (which is why this scenario is marked as still needing best practices below).
-
 Gene with Implicit Features Manifested
 --------------------------------------
 
@@ -244,4 +238,13 @@ Gene model types that still need best practices
 * Operons
 * Dicistronic genes (similar to operons) - See `Intro to Chado Feature Graphs <http://gmod.org/wiki/Introduction_to_Chado#Feature_Graphs>`_ for a proposed solution for storing dicistronic genes.
 * Gene with Regulatory Elements - Regulatory elements may be implicitly or explicitly associated with a gene.
-* Detailed Transposons Annotations - If one requires detailed transposon annotation then one is entering uncharted water as far as both Chado and annotation tools are concerned (which is why this scenario is marked as still needing best practices). One option would be to treat each transposon part as distinct singletons, but this may be unsatisfactory as one may desire to have the appropriate part_of relations between the parts.
+
+===========
+Transposons
+===========
+
+Transposons can be annotated as singleton features or as complex annotations. You would create a feature of type transposon insertion, with a loc of type 0 for insertion sites when the insertion is absent, 1 if present, and -1 (?) to link to the "template" -- generic representation of the transposon?
+
+A transposon may consist of various parts such as `long_terminal_repeat <http://www.sequenceontology.org/browser/current_svn/term/SO:0000286>`_ and gene models coding for genes like gag, pol, and env. These parts may have all decayed over time. Transposon annotation typically ignores these subtleties as all that is usually required is a singleton-feature of type `transposable_element <http://www.sequenceontology.org/browser/current_svn/term/SO:0000101>`_. In this case, there is no difficulty.
+
+If one requires detailed transposon annotation then one is entering uncharted water as far as both Chado and annotation tools are concerned (this scenario still needs best practices). One option would be to treat each transposon part as distinct singletons, but this may be unsatisfactory as one may desire to have the appropriate part_of relations between the parts.
