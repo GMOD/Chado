@@ -248,3 +248,162 @@ Transposons can be annotated as singleton features or as complex annotations. Yo
 A transposon may consist of various parts such as `long_terminal_repeat <http://www.sequenceontology.org/browser/current_svn/term/SO:0000286>`_ and gene models coding for genes like gag, pol, and env. These parts may have all decayed over time. Transposon annotation typically ignores these subtleties as all that is usually required is a singleton-feature of type `transposable_element <http://www.sequenceontology.org/browser/current_svn/term/SO:0000101>`_. In this case, there is no difficulty.
 
 If one requires detailed transposon annotation then one is entering uncharted water as far as both Chado and annotation tools are concerned (this scenario still needs best practices). One option would be to treat each transposon part as distinct singletons, but this may be unsatisfactory as one may desire to have the appropriate part_of relations between the parts.
+
+======================
+Genomic Rearrangements
+======================
+
+Inversions
+----------
+
+Create a feature of type inversion with location spanning the inverted region with rank 0. If there is a version of the sequence containing the inversion create a featureloc to the inverted region with rank 1. The ranks serve to distinguish the two versions in case several sequences carry one or the other, but the choice of which is 0 and which is 1 is arbitrary, unless 0 is used for "wild type".
+
+For example, for a rearrangement that exchanges the ends of two chromosomes A and B, create two features of Afrag and Bfrag of type rearranged segment, "locate" on A and B, then create features for A' and B' (post-rearrangement) and locate on B' and A', respectively. How to capture the fact that Afrag and Bfrag and A' and B' are part of same rearrangement? Use feature relations?
+
+Translocations
+--------------
+
+Create a feature of type translocation with a location spanning the translocated region, rank 0. Rank=1 is used for insertion locations: whether latent (i.e. the site of the insertion on a contig that lacks the insertion) or explicit (the site of the insertion on a contig that carries it). The coordinates are adjusted accordingly. Note that if CV terms are used instead of rank=0, rank=1, etc. than we can be clearer about this.
+
+Good point; we pondered adding a CV term to featureloc (I think it's still useful to have rank anyway - e.g. for multiple alignments).
+
+Still Needs Best Practices
+--------------------------
+* Deletions
+* Copy Number Variations
+
+
+======================================
+Single Nucleotide Polymorphisms (SNPs)
+======================================
+
+This outlines one way of modeling SNPs in chado. It also illustrates use of the featureloc table.
+
+Most of this applies to other variation features, but we will illustrate using SNPs for now to keep it simple.
+
+A SNP is represented as a single feature in chado.
+
+Let's take a basic example - a SNP that changes an A to a G on the genome.
+
+Here we would have one feature and two featurelocs.
+
+.. code-block:: sql
+
+ (feature
+   (name "SNP_01")
+   (featureloc
+     (srcfeature "Chromosome_arm_2L") ;;; dna feature identifier
+     (nbeg 1000000)
+     (nend 1000001)
+     (strand 1)
+     (residue_info "A")
+     (rank 0)
+     (locgroup 0))
+   (featureloc
+     (residue_info "G")
+     (rank 1)
+     (locgroup 0)))
+
+The first location is on the chromosome arm (presumably wild type). The second location has no srcfeature value (i.e. it is set to null). However, it is effectively paired with the first location. if we later wished to instantiate the mutant chromosome arm feature, we would fill in the second locgroup's srcfeature.
+
+Let's take another example - a SNP that has only been characterised at the protein level. This SNP changes an I to a V.
+
+.. code-block:: sql
+
+  (feature
+   (name "SNP_02")
+   (featureloc
+     (srcfeature "dpp-P1")    ;;; protein feature identifier
+     (nbeg 23)
+     (nend 24)
+     (strand 1)
+     (residue_info "I")
+     (rank 0)
+     (locgroup 0))
+   (featureloc
+     (residue_info "V")
+     (rank 1)
+     (locgroup 0)))
+
+Again, the second featureloc has no srcfeature. The mutant protein is implicit. The mutant protein sequence can be infered by taking the sequence of dpp-P1 and substituting the 24th residue with a V.
+
+To do a query for all SNPs that switch I to V or vice versa:
+
+.. code-block:: sql
+
+ SELECT snp.*
+  FROM
+   featureloc AS wildloc,
+   featureloc AS mutloc,
+   feature AS snp,
+   cvterm AS ftype
+  WHERE
+   snp.type_id = ftype.cvterm_id        AND
+   ftype.termname = 'snp'               AND
+   wildloc.feature_id = snp.feature_id  AND
+   mutloc.feature_id = snp.feature_id   AND
+   wildloc.locgroup = mutloc.locgroup   AND
+   wildloc.residue_info = 'I'           AND
+   mutloc.residue_info = 'I';
+
+Note that this query remains the same even if mutant protein features are instantiated as opposed to left implicit.
+
+Let's look at a more complex example. If we have a SNP that has been localised to the genome, and the SNP has an effect on a protein (Isoleucine to Threonine), and we want to redundantly store the SNP effect on the genome, transcript and translation.
+
+Note that in this example, the transcript is on the reverse strand, so the residue is reverse complemented.
+
+.. code-block:: sql
+
+ (feature
+  (name "SNP_03")
+
+.. code-block:: sql
+
+  ;; position on genome
+   (featureloc
+    (srcfeature "chrom_arm_3R")
+    (nbeg 2000000)
+    (nend 2000001)
+    (strand 1)
+    (residue_info "A")
+    (rank 0)                       ;; wild
+    (locgroup 0))
+   (featureloc
+    (residue_info "G")
+    (rank 1)                       ;; mutant
+    (locgroup 0))
+
+
+.. code-block:: sql
+
+  ;; position on transcript
+  (featureloc
+   (srcfeature "blah-transcript001")     ;; processed transcript ID
+   (nbeg 1000)
+   (nend 1001)
+   (strand 1)
+   (residue_info "T")
+   (rank 0)                       ;; wild
+   (locgroup 1))
+  (featureloc
+   (residue_info "C")
+   (rank 1)                       ;; mutant
+   (locgroup 1))
+
+.. code-block:: sql
+
+  ;; position on protein
+  (featureloc
+   (srcfeature "blah-protein001")    ;;; protein feature identifier
+   (nbeg 23)
+   (nend 24)
+   (strand 1)
+   (residue_info "I")
+   (rank 0)                       ;; wild
+   (locgroup 2))
+  (featureloc
+   (residue_info "T")
+   (rank 1)                       ;; mutant
+   (locgroup 2)))
+
+Here we have 6 locations for one SNP. The 6 locations can be imagined to be in a 2-D matrix. The purpose of rank and locgroup is to specify the column and row in the matrix.
