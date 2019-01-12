@@ -14,15 +14,9 @@ See also:
    :local:
    :depth: 2
 
-
-===========
-Gene Models
-===========
-This section describes how one describes commonly encountered
-gene models in Chado.
-
-Canonical Gene Model
---------------------
+=====================
+Canonical Gene Models
+=====================
 
 The `central dogma <https://en.wikipedia.org/wiki/Central_dogma_of_molecular_biology>`_ model states that "gene makes mRNA makes polypeptide" - for many people using Chado this may be the only data model that's relevant. This typical protein-coding gene model consists of one gene, one or more mRNAs, one or more exons, and at least one polypeptide.
 
@@ -82,6 +76,75 @@ Application support for canonical genes
 
 *  Supported by `Apollo <http://genomearchitect.github.io/>`_
 *  Supported by `GBrowse <http://gmod.org/wiki/GBrowse>`_
+
+====================
+Feature Localization
+====================
+
+All features with sequence annotation should be localized using featureloc.
+
+Localized features must have a featureloc with rank=0 and locgroup=0. This is the primary location of the feature. The location always indicates the boundaries of the feature. If the feature is composed of distinct subfeatures (e.g. a transcript composes of exons), then it is **not** permitted to use multiple featurelocs to indicate this. Instead, there must be rows for the subfeatures, each with their own featureloc.
+
+In a feature graph (i.e. a group of features connected via feature_relationship rows), all features will typically be localized relative to the same source feature (i.e. they will all have the same value for featureloc.srcfeature_id).
+
+Features are typically localized to some kind of genomic or assembly feature, but chado does not constrain you to using only this. For example, localizing features relative to a transcript or polypeptide or even exon is permitted, but unusual practices will most likely not be recognized by most software.
+
+Feature Localization to Contigs in Assembly
+-------------------------------------------
+
+In an assembled genome, it is common to locate relative to the top-level assembly units (e.g. chromosomes). However, it is also permissible to locate to smaller units such as `contigs <http://www.sequenceontology.org/browser/current_svn/term/SO:0000149>`_ or `golden_path_units <http://www.sequenceontology.org/browser/current_svn/term/SO:0000688>`_.
+
+If a genome assembly is not stable, it is common to locate relative to assembly units such as contigs. These contigs may then be localized relative to the top-level assembly units. This is known in chado terms as a location graph.
+
+We discuss here location graphs of depth 2. See also N-level assemblies. This scenario is often invisible to software interoperating with Chado. The software is free to only look at the main features and the contig-level feature and ignore the top-level assembly feature. It may sometimes be desirable to have software that can perform location transformations, mapping features from contigs to top-level units and back.
+
+Application support for localization to contigs
+```````````````````````````````````````````````
+
+*  `Apollo <http://genomearchitect.github.io/>`_: Status unclear
+*  `GBrowse <http://gmod.org/wiki/GBrowse>`_: Status unclear
+
+Apollo should be happy to treat contigs just as if they were top-level units as chromosome arms. However, the user may have to explicitly provide contigs if location queries are desired. For example, Apollo may retrieve nothing if the user asks for a certain range on "chromosome 4", and the features are located relative to contigs which are themselves on "chromosome 4".
+
+GBrowse may expect features to be located relative to top-level units such as chromosomes.
+
+Redundant Localizations to Different Assembly Levels
+----------------------------------------------------
+
+Features can be located relative to both contigs and top-level assembly units.
+
+Chado allows redundant feature localization using featureloc.locgroup > 0. This allows a database to have primary locations for features relative to contigs, and secondary locations relative to top-level units such as chromosomes. The converse is also allowed.
+
+However this scenario is discouraged unless the chado db admin knows what they are doing. They must implement solutions to ensure that featurelocs with varying locgroup do not get out of sync. These solutions are not part of the standard Chado software suite. Nevertheless, this scenario may be useful for advanced users in certain circumstances
+
+Application support for localization to different assembly levels
+`````````````````````````````````````````````````````````````````
+
+*  `Apollo <http://genomearchitect.github.io/>`_: Status unclear
+*  `GBrowse <http://gmod.org/wiki/GBrowse>`_: Status partial
+
+It is not clear if GBrowse uses locgroup in querying. If it constrains by locgroup, then this is essentially the same as feature localization to contigs in assembly.
+
+Not clear if Apollo uses locgroup in querying. If it constrains by locgroup, then this is essentially the same as feature localization to contigs in assembly. Apollo will not preserve redundant featurelocs when writing back to the database. This could lead to the database getting out of sync.
+
+N-level Assemblies
+------------------
+
+In theory it is possible (but rare) to have assemblies with variable depths, or with depths > 2. This scenario is rare. If required, then Chado can deal with this - there is no theoretical limit to the depth of a location graph. One can have annotated features located relative to minicontigs which are located relative to supercontigs which are located relative to chromosomes. Most software that interoperates with Chado will not be able to deal with this, so this scenario is discouraged except by advanced users who have no other option.
+
+Unlocalized Features
+--------------------
+
+A gene without sequence based localization.
+
+Many chado instances are purely concerned with genome annotation - in these cases it would be strange to have genes or other features such as transcripts with no localization (i.e. no featurelocs). However, this scenario is actually common when Chado is used in a wider context. We may learn of the existence of genes through non-sequence evidence such as genetics. When we have no sequence-based localization it is perfectly valid to have gene features with no featurelocs. When the time comes to create genome annotations for these, we just 'fill out' the gene feature by adding transcript and exon features.
+
+==========================
+Other Types of Gene Models
+==========================
+This section describes how one describes other commonly encountered
+gene models in Chado.
+
 
 Noncoding Genes
 ---------------
@@ -160,12 +223,10 @@ Gene with Implicit Features Manifested
 
 Some feature types such as introns are not normally manifested as rows in chado. They are normally derived on-the-fly from the gaps between consecutive exons. See for an example. Occasionally it may be desirable to store the introns as actual rows in the feature table - for example in a report database.
 
-Unlocalized Gene
-----------------
+Immature or Primary RNA
+-----------------------
 
-A gene without sequence based localization.
-
-Many chado instances are purely concerned with genome annotation - in these cases it would be strange to have genes or other features such as transcripts with no localization (i.e. no featurelocs). However, this scenario is actually common when Chado is used in a wider context. We may learn of the existence of genes through non-sequence evidence such as genetics. When we have no sequence-based localization it is perfectly valid to have gene features with no featurelocs. When the time comes to create genome annotations for these, we just 'fill out' the gene feature by adding transcript and exon features.
+Generally we do not explicitly represent primary RNA transcripts unless there is something useful to say about them. If one wants to instantiate these they would be represented as features, and the mature message would be related to the primary message with derived_from as type_id in the feature_relationship table.
 
 Application support for unlocalized genes
 `````````````````````````````````````````
@@ -175,10 +236,10 @@ Application support for unlocalized genes
 
 GBrowse supports this scenario in that unlocalized features will be ignored from the genome viewer, which is appropriate.
 
-Apollo supports this scenario in that unlocalized features will be ignored, which is appropriate behaviour for a genome annotation tool. 
+Apollo supports this scenario in that unlocalized features will be ignored, which is appropriate behaviour for a genome annotation tool.
 
-Things that still need best practices
--------------------------------------
+Gene model types that still need best practices
+-----------------------------------------------
 
 * Operons
 * Dicistronic genes (similar to operons) - See `Intro to Chado Feature Graphs <http://gmod.org/wiki/Introduction_to_Chado#Feature_Graphs>`_ for a proposed solution for storing dicistronic genes.
