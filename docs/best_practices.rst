@@ -407,3 +407,135 @@ Note that in this example, the transcript is on the reverse strand, so the resid
    (locgroup 2)))
 
 Here we have 6 locations for one SNP. The 6 locations can be imagined to be in a 2-D matrix. The purpose of rank and locgroup is to specify the column and row in the matrix.
+
+.. list-table::
+   :header-rows: 1
+
+   * - Allele
+     - Genome
+     - Transcript
+     - Protein
+   * - Wild-type
+     - A
+     - T
+     - I
+   * - Mutant
+     - G
+     - C
+     - T
+
+rank is used to group the strain and locgroup is used for the grouping within that strain. rank=0 should be used for the wildtype, but this is not always possible; locgroup=0 should be used for primary (as opposed to derived) location, this is not always possible. The important thing is consistency within a SNP to preserve the matrix.
+
+One can imagine rare (but entirely possible) cases where by a single SNP causes different protein level changes in two proteins (for instance, HIV carries a doubly encoded gene - i.e. the ORFs overlap but have different frames).
+
+Here we would want to add another locgroup, for the second protein.
+
+.. list-table::
+   :header-rows: 1
+
+   * - Allele
+     - Genome
+     - Transcript
+     - Protein1
+     - Protein2
+   * - Wild-type
+     - A
+     - T
+     - I
+     - Y
+   * - Mutant
+     - G
+     - C
+     - T
+     - H
+
+Again, if we don't need to instantiate the 2 mutant proteins, but their sequence can be reconstructed from the wild type proteins plus the corresponding mutation.
+
+Remember chado uses interbase coordinates, and postgresql substring counts from 1.
+
+The following query dynamically constructs mutant feature residues based on the wild type feature and the mutant residue changes. this should work for a variety of variation features, not just SNPs. Note that we need to use locgroup to properly group wild type/mutant pairs of locations, otherwise this query will give bad data.
+
+.. code-block:: sql
+
+ SELECT
+ snp.name,
+ wildfeat.name,
+ substr(wildfeat.residues,
+       1,
+       wildloc.nbeg) ||
+ mutloc.residue_info  ||
+ substr(wildfeat.residues,
+       wildloc.nend+1)
+ FROM
+  featureloc AS wildloc,
+  feature AS wildfeat,
+  featureloc AS mutloc,
+  feature AS snp,
+  cvterm AS ftype
+ WHERE
+  snp.type_id = ftype.cvterm_id         AND
+  ftype.termname = 'snp'                AND
+  wildloc.feature_id = snp.feature_id   AND
+  mutloc.feature_id = snp.feature_id    AND
+  wildloc.locgroup = mutloc.locgroup    AND
+  wildloc.srcfeature = wildfeat
+
+
+Extensions
+----------
+
+The above will also work if we have a polymorphic site with a number of different possibilities across multiple strains. We just extend the number of rows in the location matrix (i.e. we have rank > 1).
+
+We could also instantiate multiple SNPs, one per strain, and keep the locations pairwise.
+
+Similarities to Alignments
+--------------------------
+
+You should hopefully notice the parallels between modeling SNPs and modeling pairwise (e.g. BLAST) and multiple alignments. The difference is, alignments would always have locgroup=0, with the rank distinguishing query from subject. Also, with an HSP feature, the residue_info is used to store the alignment string.
+
+Redundant Storage of Coordinates on Different Assembly Levels
+-------------------------------------------------------------
+
+Some groups may find it advantageous to redundantly store features relative to both BACs and chromosomes (or to mini-contigs and scaffolds... choose your favourite assembly units). The approach outlined above works perfectly well with this, we would simple add another column in the location matrix (i.e. another wild type/mutant pair with a distinct locgroup). All queries should work the same.
+
+===================
+Sequence Alignments
+===================
+
+Results from BLAST
+------------------
+
+These steps will add a BLAST analysis to a Chado database. `Load_BLAST_Into_Chado <http://gmod.org/wiki/Load_BLAST_Into_Chado>`_ provides a worked example of this using BioPerl and GMOD scripts, bp_search2gff.pl and gmod_bulk_load_gff3.pl
+
+* Create a record for the BLAST search itself is an entry in the analysis table.
+* Create a feature for both the query and target sequences. If these have database accessions or identifiers then records in the dbxref table should be created for each.
+  * Optionally include the residues of the features.
+* Store the hits in both the feature and analysisfeature tables, as well as in the featureloc table, where the featureloc entry for the query sequence has a featureloc.rank of 0 and the featureloc.rank of the target sequence is 1. The SO term is match.
+  * Note: featureloc.locgroup is not used.
+* Store the HSPs in both the feature and analysisfeature tables, as well as in the featureloc table, where the featureloc entry for the query sequence has a featureloc.rank of 0 and the featureloc.rank of the target sequence is 1. The SO term is match_part.
+  * Note: featureloc.locgroup is not used.
+* Map the hits and the HSPs to each other via entries in the feature_relationship tables.
+* Standard scores (rawscore, normscore, significance, identity) are stored in the analysisfeature table. For BLAST searches those would correspond to bits, score, e-value and frac_identical.
+
+Still Needs Best practices
+--------------------------
+
+* Multiple Sequence alignments
+
+==============
+GO annotations
+==============
+
+The details on GO annotation can be found on the `Gene Ontology Consortium website <http://www.geneontology.org/>`_. GO annotations can be captured in the Chado schema using the CV and the SEQUENCE modules. The CV module can be used to store the GO Ontology. Details of the CV module can be found at CV module documentation. The actual GO annotation which is a association between Gene Product/Gene is stored in the Feature_cvterm table. It is recommended that the GO term should be associated with a Gene Product feature. But, it could be associated with Gene feature. The Evidence code and qualifier information are stored in the Feature_cvtermprop table. Feature_cvterm_Dbxref table should be used to store the external ids associated with the evidence code, and Feature_cvterm_pub should link publications to annotations. For example evidence IEA with dictyBase:DDB0185051
+
+
+==========================
+More Needed Best Practices
+==========================
+
+* Posttranslational Modifications
+* Genotypes
+* Phenotypes
+* Cleavage
+* Protein Complexes
+* Genome Versions
