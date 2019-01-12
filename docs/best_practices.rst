@@ -263,9 +263,7 @@ For example, for a rearrangement that exchanges the ends of two chromosomes A an
 Translocations
 --------------
 
-Create a feature of type translocation with a location spanning the translocated region, rank 0. Rank=1 is used for insertion locations: whether latent (i.e. the site of the insertion on a contig that lacks the insertion) or explicit (the site of the insertion on a contig that carries it). The coordinates are adjusted accordingly. Note that if CV terms are used instead of rank=0, rank=1, etc. than we can be clearer about this.
-
-Good point; we pondered adding a CV term to featureloc (I think it's still useful to have rank anyway - e.g. for multiple alignments).
+Create a feature of type translocation with a location spanning the translocated region, rank 0. Rank=1 is used for insertion locations: whether latent (i.e. the site of the insertion on a contig that lacks the insertion) or explicit (the site of the insertion on a contig that carries it). The coordinates are adjusted accordingly. 
 
 Still Needs Best Practices
 --------------------------
