@@ -11,13 +11,13 @@ Flyway creates a ``flyway_schema_history`` table in your Chado database.  Once F
 
 .. note::
 
-	Please the `Flyway getting started guide <https://flywaydb.org/getstarted/>`_ for more details before continuing.
+	Please read the `Flyway getting started guide <https://flywaydb.org/getstarted/>`_ for more details before continuing.
 
 
 Adding Flyway integration to an existing site
 ------------------------------------------------
 
-First, follow the `instructions for installing flyway <https://flywaydb.org/getstarted/firststeps/commandline>`_ using your distribution method of choice. You'll need to provide a ``flyway.conf`` file in your home directory which describes the connection details to your chado database.  Here is an example configuration file:
+First, follow the `instructions for installing Flyway <https://flywaydb.org/getstarted/firststeps/commandline>`_ using your distribution method of choice. You'll need to provide a ``flyway.conf`` file in your home directory which describes the connection details to your chado database.  Here is an example configuration file:
 
 .. code-block:: bash
 
@@ -29,7 +29,7 @@ First, follow the `instructions for installing flyway <https://flywaydb.org/gets
   flyway.validateOnMigrate=false
 
 
-Once flyway is configured properly, running ``flyway info`` should report a connected database.  The first step is to run ``flyway baseline``.  This tells Flyway what version of Chado to start at.  Chado switched to flyway prior to ``1.4``, so specifying ``flyway baseline 1.3``, or just ``flyway baseline`` (``1.0``) should be appropriate for your pre-existing database.  Now, running ``flyway info`` should list all of the migrations available to your database with their state as **Pending**.
+Once Flyway is configured properly, running ``flyway info`` should report a connected database.  The first step is to run ``flyway baseline``.  This tells Flyway what version of Chado to start at.  Chado switched to Flyway prior to ``1.4``, so specifying ``flyway baseline 1.3``, or just ``flyway baseline`` (``1.0``) should be appropriate for your pre-existing database.  Now, running ``flyway info`` should list all of the migrations available to your database with their state as **Pending**.
 
 
 .. code-block:: bash
@@ -43,7 +43,7 @@ Once flyway is configured properly, running ``flyway info`` should report a conn
     +-----------+---------+-----------------------+----------+---------------------+----------+
     | Category  | Version | Description           | Type     | Installed On        | State    |
     +-----------+---------+-----------------------+----------+---------------------+----------+
-    |           | 1       |  Flyway Baseline  | BASELINE | 2018-12-20 14:31:32 | Baseline |
+    |           | 1       |  Flyway Baseline      | BASELINE | 2018-12-20 14:31:32 | Baseline |
     | Versioned | 1.1     | try1                  | SQL      |                     | Pending  |
     +-----------+---------+-----------------------+----------+---------------------+----------+
 
@@ -52,7 +52,7 @@ Once flyway is configured properly, running ``flyway info`` should report a conn
 Updating a Chado database with Flyway
 -----------------------------------------------
 
-Once your migrations appear in flyway, you can run ``flyway migrate`` to execute all new migrations.  By default, flyway will run all pending Migrations greater than your current version.  When updates are pushed to Chado, you can simply update your Chado install (``git pull``) and run ``flyway migrate``.  Once a migration is run, ``flyway info`` will update the **State** of the migration from **Pending** to **Success**.
+Once your migrations appear in Flyway, you can run ``flyway migrate`` to execute all new migrations.  By default, Flyway will run all pending Migrations greater than your current version.  When updates are pushed to Chado, you can simply update your Chado install (``git pull``) and run ``flyway migrate``.  Once a migration is run, ``flyway info`` will update the **State** of the migration from **Pending** to **Success**.
 
 
 Writing new migrations
