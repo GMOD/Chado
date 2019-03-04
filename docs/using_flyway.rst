@@ -8,7 +8,10 @@ Flyway is a database migration tool.  As of Chado 1.4, the schema is distributed
 
 Flyway creates a ``flyway_schema_history`` table in your Chado database.  Once Flyway is configured, it will look for migrations (versioned SQL scripts) in your specified migration folder(s).  These migrations are tracked in the ``flyway_schema_history`` table, and will be run in order when you run the migrate command.  As the Chado schema is updated with new migrations, they can be tracked and updated with Flyway.
 
-I strongly suggest reading the `Flyway getting started guide <https://flywaydb.org/getstarted/>`_ for more details before continuing.
+
+.. note::
+
+	Please the `Flyway getting started guide <https://flywaydb.org/getstarted/>`_ for more details before continuing.
 
 
 Adding Flyway integration to an existing site
