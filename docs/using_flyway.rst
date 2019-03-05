@@ -47,7 +47,15 @@ Once Flyway is configured properly, running ``flyway info`` should report a conn
     | Versioned | 1.1     | try1                  | SQL      |                     | Pending  |
     +-----------+---------+-----------------------+----------+---------------------+----------+
 
+.. note::
 
+    Flyway will search for and automatically load the following config files if present:
+
+        - ``<install-dir>/conf/flyway.conf``
+        - ``<user-home>/flyway.conf``
+        - ``<current-dir>/flyway.conf``
+
+    For managing multiple development Chado databases on a single machine, we recommend placing your application-specific ``flyway.conf`` in the application root directory and then running Flyway commands from there.
 
 Updating a Chado database with Flyway
 -----------------------------------------------
