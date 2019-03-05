@@ -6,9 +6,12 @@ jdk:
 services:
   - postgresql
 
-addons:
-  postgresql: "9.2"
-  postgresql: "9.6"
+matrix:
+  include:
+    - addons:
+        postgresql: 9.3
+    - addons:
+        postgresql: 9.4
 
 script:
   - psql -U postgres -d postgres -q -a -f ./chado/schemas/1.31/default_schema.sql > log.txt
