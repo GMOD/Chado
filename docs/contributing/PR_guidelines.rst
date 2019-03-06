@@ -39,7 +39,7 @@ Guidelines
 Change Magnitude Definitions
 ------------------------------
 
-The following definitions attempt to provide guidance as to the magnitude of the change to the Chado database through providing examples. However, they are still very subjective and any disputes regarding magnitude of change should be put to the Chado PMC for a vote.
+The following definitions attempt to provide guidance as to the magnitude of the change to the Chado database through providing examples. However, they are not yet complete or exhaustive and may change as Chado governance evolves. If your change does not align with any of these examples, please justify where you feel it fits in the PR and the Chado PMC will vote based on that information.
 
 Small Changes
 ^^^^^^^^^^^^^^^
