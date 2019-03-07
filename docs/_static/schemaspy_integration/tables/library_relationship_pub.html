@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>library_relationship_pub -  Chado</title>
+  <!-- Tell the browser to be responsive to screen width -->
+  <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+  <link rel="icon" type="image/png" sizes="16x16" href="../favicon.ico">
+  <!-- Bootstrap 3.3.5 -->
+  <link rel="stylesheet" href="../bower/admin-lte/bootstrap/css/bootstrap.min.css">
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="../bower/font-awesome/css/font-awesome.min.css">
+  <!-- Ionicons -->
+  <link rel="stylesheet" href="../bower/ionicons/css/ionicons.min.css">
+  <!-- DataTables -->
+  <link rel="stylesheet" href="../bower/datatables.net-bs/css/dataTables.bootstrap.min.css">
+  <link rel="stylesheet" href="../bower/datatables.net-buttons-bs/css/buttons.bootstrap.min.css">
+  <!-- Code Mirror -->
+  <link rel="stylesheet" href="../bower/codemirror/codemirror.css">
+  <!-- Fonts -->
+  <link href='../fonts/indieflower/indie-flower.css' rel='stylesheet' type='text/css'>
+  <link href='../fonts/source-sans-pro/source-sans-pro.css' rel='stylesheet' type='text/css'>
+
+  <!-- Theme style -->
+  <link rel="stylesheet" href="../bower/admin-lte/dist/css/AdminLTE.min.css">
+  <!-- Salvattore -->
+  <link rel="stylesheet" href="../bower/salvattore/salvattore.css">
+  <!-- AdminLTE Skins. Choose a skin from the css/skins
+       folder instead of downloading all of them to reduce the load. -->
+  <link rel="stylesheet" href="../bower/admin-lte/dist/css/skins/_all-skins.min.css">
+  <!-- SchemaSpy -->
+  <link rel="stylesheet" href="../schemaSpy.css">
+  <!-- GMOD Chado Specific CSS -->
+  <link rel="stylesheet" href="../main.css">
+  
+  <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+  <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+  <!--[if lt IE 9]>
+  <script src="../bower/html5shiv/html5shiv.min.js"></script>
+  <script src="../bower/respond/respond.min.js"></script>
+  <![endif]-->
+</head>
+<!-- ADD THE CLASS layout-top-nav TO REMOVE THE SIDEBAR. -->
+<!-- Skins: skin-black, black-light, green-light, red-light, yellow-light, purple-light, blue-light -->
+<body class="hold-transition skin-black layout-top-nav">
+<div class="wrapper">
+  <header class="main-header">
+    <nav class="navbar navbar-static-top">
+      <div class="container">
+        <div class="navbar-header">
+          <a href="../index.html" class="navbar-brand" style="padding:0;">
+            <img src="../GMOD-cogs.png" class="gmod-logo" />
+            <span class="gmod-title">Chado</span>
+          </a>
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar-collapse">
+            <i class="fa fa-bars"></i>
+          </button>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-collapse pull-left" id="navbar-collapse">
+          <ul class="nav navbar-nav">
+            <li>
+              <a href="../index.html" title="All Chado Tables.">
+                Home</span>
+              </a>
+            </li>
+            <li>
+              <a href="../index.html" title="All Chado Tables.">
+                All Tables</span>
+              </a>
+            </li>
+            <li>
+              <a href="../constraints.html" title="All Constraints in Chado.">
+                All Constraints
+              </a>
+            </li>
+          </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+        <!-- Navbar Right Menu -->
+
+      </div>
+      <!-- /.container-fluid -->
+    </nav>
+  </header>
+  <!-- Main content -->
+  <!-- Full Width Column -->
+  <div class="content-wrapper">
+    
+    <div class="box box-solid">
+      <div class="box-body">
+        <p><span class="version-label">Schema Version:</span> 1.3</p>
+      </div>
+    </div>
+		
+          <!-- Content Header (Page header) -->
+      <section class="content-header">
+        <h1>library_relationship_pub</h1></br>
+		<div class="box box-primary">
+            <div class="box-header with-border">
+              <i class="fa fa-file-text-o"></i>
+              <h3 id="Description" class="box-title">Description</h3>
+              <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
+                </button>
+                <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
+              </div>			  
+            </div>
+            <!-- /.box-header -->
+            <div class="box-body clearfix">
+				<p><p>Provenance of library_relationship.</p></p>              
+            </div>
+            <!-- /.box-body -->
+		</div>
+		      </section>
+      <!-- Main content -->
+      <section class="content">
+		<div class="box box-primary">
+			<div class="box-header with-border">
+			  <span class="glyphicon glyphicon-list-alt" aria-hidden="true"></span>
+              <h3 id="Columns" class="box-title">Columns</h3>
+              <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
+                </button>
+                <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
+              </div>
+            </div>	
+            <div class="box-body">
+				<table id="standard_table" class="table table-bordered table-striped dataTable" role="grid">
+				<thead align='left'>
+				<tr>
+				  <th>Column</th>
+				  <th>Type</th>
+				  <th>Size</th>
+				  <th title='Columns in tables that are referenced by this column'>Foreign Key</th>
+				  <th title='Are nulls allowed?'>Nullable</th>
+				  <th title='Default value'>Default</th>
+				  <th title='Comments' class="toggle"><span>Comments</span></th>
+				</tr>
+				</thead>
+				<tbody>
+				<tr>
+				 <td class='primaryKey' title='Primary Key'><i class='icon ion-key iconkey' style='padding-left: 5px;'></i><span id="library_relationship_pub_id">library_relationship_pub_id</span></td>
+				 <td>bigserial</td>
+				 <td>19</td>
+				 <td>
+				  <table border='0' cellspacing='0' cellpadding='0'>
+				  </table>					 
+				 </td>
+				 <td title=''></td>
+				 <td>nextval(&#39;chado.library_relationship_pub_library_relationship_pub_id_seq&#39;::regclass)</td>
+				 <td></td>
+				</tr>
+				<tr>
+				 <td class='foreignKey' title='Foreign Key'><i class='icon ion-key iconkey' style='padding-left: 5px;'></i><span id="library_relationship_id">library_relationship_id</span></td>
+				 <td>int8</td>
+				 <td>19</td>
+				 <td>
+				  <table border='0' cellspacing='0' cellpadding='0'>
+				   <tr>
+					<td title="library_relationship_pub.library_relationship_id references library_relationship.library_relationship_id via library_relationship_pub_library_relationship_id_fkey">
+						<a href='library_relationship.html'>library_relationship</a><span class='relatedKey'>.library_relationship_id</span>
+					</td>
+					<td class="constraint detail">
+						library_relationship_pub_library_relationship_id_fkey <span title='Cascade on delete:&#10;Deletion of parent deletes child'>C</span>
+					</td>
+				   </tr>
+				  </table>					 
+				 </td>
+				 <td title=''></td>
+				 <td>null</td>
+				 <td></td>
+				</tr>
+				<tr>
+				 <td class='foreignKey' title='Foreign Key'><i class='icon ion-key iconkey' style='padding-left: 5px;'></i><span id="pub_id">pub_id</span></td>
+				 <td>int8</td>
+				 <td>19</td>
+				 <td>
+				  <table border='0' cellspacing='0' cellpadding='0'>
+				   <tr>
+					<td title="library_relationship_pub.pub_id references pub.pub_id via library_relationship_pub_pub_id_fkey">
+						<a href='pub.html'>pub</a><span class='relatedKey'>.pub_id</span>
+					</td>
+					<td class="constraint detail">
+						library_relationship_pub_pub_id_fkey <span title='Restrict delete:&#10;Parent cannot be deleted if children exist'>R</span>
+					</td>
+				   </tr>
+				  </table>					 
+				 </td>
+				 <td title=''></td>
+				 <td>null</td>
+				 <td></td>
+				</tr>
+								</tbody>
+				</table>
+				<p title='3 columns'>Table contained <span id="recordNumber">-1</span> rows<p/>
+			</div>
+		</div>
+		<div class="box box-primary">		
+			<div class="box-header with-border">
+              <i class="fa fa-sitemap"></i>
+
+              <h3 id="Indexes" class="box-title">Indexes</h3>
+
+              <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
+                </button>
+                <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
+              </div>
+            </div>	
+			<div class="box-body">
+				<table id="indexes_table" class="table table-bordered table-striped dataTable" role="grid">
+				<thead>
+				 <tr>
+				  <th>Constraint Name</th>
+				  <th>Type</th>
+				  <th>Sort</th>
+				  <th>Column(s)</th>
+				 </tr>
+				</thead>
+				<tbody>
+				 <tr>
+				  <td class='primaryKey' title='Primary Key'><i class='icon ion-key iconkey'></i> library_relationship_pub_pkey</td>
+				  <td>Primary key</td>
+				  <td><span title='Ascending'>Asc</span></td>
+				  <td>library_relationship_pub_id</td>
+				 </tr>				 
+				 <tr>
+				  <td class='uniqueKey' title='Unique Key'><i class='icon ion-key iconkey'></i> library_relationship_pub_c1</td>
+				  <td>Must be unique</td>
+				  <td><span title='Ascending'>Asc</span>/<span title='Ascending'>Asc</span></td>
+				  <td>library_relationship_id + pub_id</td>
+				 </tr>				 
+				 <tr>
+				  <td title='Indexed'>library_relationship_pub_idx1</td>
+				  <td>Performance</td>
+				  <td><span title='Ascending'>Asc</span></td>
+				  <td>library_relationship_id</td>
+				 </tr>				 
+				 <tr>
+				  <td title='Indexed'>library_relationship_pub_idx2</td>
+				  <td>Performance</td>
+				  <td><span title='Ascending'>Asc</span></td>
+				  <td>pub_id</td>
+				 </tr>				 
+				</tbody>
+				</table>   			  
+			</div><!-- /.box-body -->
+		</div>
+				<div class="box box-primary">		
+			<div class="box-header with-border">
+              <i class="fa fa-code-fork"></i>
+
+              <h3 id="Relationships" class="box-title">Relationships</h3>
+
+              <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
+                </button>
+                <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
+              </div>
+            </div>	
+			<div class="box-body">	
+			<div class="nav-tabs-custom" style="cursor: move;">
+				<p>The following entity relationship (ER) diagram shows the relationships involving the library_relationship_pub table. </p>
+            <!-- Tabs within a box -->
+			<h4>Show relationships within degrees of separation</h4>
+            <ul class="nav nav-tabs pull-left ui-sortable-handle">
+			  			              <li class="active"><a href="#oneDegreeImg-chart" data-toggle="tab" aria-expanded="true">One</a></li>			  			 
+			  			              <li class=""><a href="#twodegreesDegreeImg-chart" data-toggle="tab" aria-expanded="true">Two degrees</a></li>			  			 
+            </ul>
+            <div class="tab-content no-padding">            
+				<div class="chart tab-pane active" id="oneDegreeImg-chart" style="position: relative; overflow-x:auto;">					
+					<map id="oneDegreeRelationshipsDiagram" name="oneDegreeRelationshipsDiagram">
+<area shape="rect" id="node1" href="library_relationship_pub.html" title="library_relationship_pub" alt="" coords="284,58,649,217">
+<area shape="rect" id="node2" href="library_relationship.html" title="library_relationship" alt="" coords="5,5,240,187">
+<area shape="rect" id="node3" href="pub.html" title="pub" alt="" coords="47,205,199,382">
+</map>
+
+					<a name='diagram'><img id='oneDegreeImg' src='../diagrams/library_relationship_pub.1degree.png' usemap='#oneDegreeRelationshipsDiagram' class='diagram' border='0' alt='' align='left'></a>							
+				</div>
+				<div class="chart tab-pane " id="twodegreesDegreeImg-chart" style="position: relative; overflow-x:auto;">					
+					<map id="twoDegreesRelationshipsDiagram" name="twoDegreesRelationshipsDiagram">
+<area shape="rect" id="node1" href="analysis_pub.html" title="analysis_pub" alt="" coords="434,1165,609,1254">
+<area shape="rect" id="node2" href="pub.html" title="pub" alt="" coords="180,2569,332,2746">
+<area shape="rect" id="node4" href="cvterm.html" title="cvterm" alt="" coords="5,4155,136,4245">
+<area shape="rect" id="node3" href="cell_line_cvterm.html" title="cell_line_cvterm" alt="" coords="424,205,619,294">
+<area shape="rect" id="node5" href="cell_line_feature.html" title="cell_line_feature" alt="" coords="423,1771,619,1861">
+<area shape="rect" id="node6" href="cell_line_library.html" title="cell_line_library" alt="" coords="425,418,617,507">
+<area shape="rect" id="node7" href="library.html" title="library" alt="" coords="193,490,319,579">
+<area shape="rect" id="node8" href="cell_line_pub.html" title="cell_line_pub" alt="" coords="434,1878,609,1967">
+<area shape="rect" id="node9" href="cell_line_synonym.html" title="cell_line_synonym" alt="" coords="416,1985,627,2074">
+<area shape="rect" id="node10" href="cell_lineprop_pub.html" title="cell_lineprop_pub" alt="" coords="418,2091,625,2181">
+<area shape="rect" id="node11" href="expression_pub.html" title="expression_pub" alt="" coords="424,2198,619,2287">
+<area shape="rect" id="node12" href="feature_cvterm.html" title="feature_cvterm" alt="" coords="428,4833,615,4922">
+<area shape="rect" id="node13" href="feature_cvterm_pub.html" title="feature_cvterm_pub" alt="" coords="782,4455,1005,4545">
+<area shape="rect" id="node14" href="feature_expression.html" title="feature_expression" alt="" coords="413,2305,629,2394">
+<area shape="rect" id="node15" href="feature_pub.html" title="feature_pub" alt="" coords="438,2411,605,2501">
+<area shape="rect" id="node16" href="feature_relationship_pub.html" title="feature_relationship_pub" alt="" coords="393,2518,650,2607">
+<area shape="rect" id="node17" href="feature_relationshipprop_pub.html" title="feature_relationshipprop_pub" alt="" coords="376,2625,667,2714">
+<area shape="rect" id="node18" href="feature_synonym.html" title="feature_synonym" alt="" coords="420,2838,623,2927">
+<area shape="rect" id="node19" href="featureloc_pub.html" title="featureloc_pub" alt="" coords="428,2945,615,3034">
+<area shape="rect" id="node20" href="featuremap_pub.html" title="featuremap_pub" alt="" coords="423,3051,619,3141">
+<area shape="rect" id="node21" href="featureprop_pub.html" title="featureprop_pub" alt="" coords="422,3158,621,3247">
+<area shape="rect" id="node22" href="library_cvterm.html" title="library_cvterm" alt="" coords="430,311,613,401">
+<area shape="rect" id="node23" href="library_expression.html" title="library_expression" alt="" coords="415,525,627,614">
+<area shape="rect" id="node24" href="library_pub.html" title="library_pub" alt="" coords="440,631,603,721">
+<area shape="rect" id="node25" href="library_relationship.html" title="library_relationship" alt="" coords="404,5,639,187">
+<area shape="rect" id="node26" href="library_relationship_pub.html" title="library_relationship_pub" alt="" coords="711,785,1076,943">
+<area shape="rect" id="node27" href="library_synonym.html" title="library_synonym" alt="" coords="422,738,621,827">
+<area shape="rect" id="node28" href="libraryprop_pub.html" title="libraryprop_pub" alt="" coords="424,3265,619,3354">
+<area shape="rect" id="node29" href="nd_experiment_pub.html" title="nd_experiment_pub" alt="" coords="411,3371,632,3461">
+<area shape="rect" id="node30" href="organism_cvterm.html" title="organism_cvterm" alt="" coords="419,845,623,934">
+<area shape="rect" id="node31" href="organism_pub.html" title="organism_pub" alt="" coords="430,3478,613,3567">
+<area shape="rect" id="node32" href="organismprop_pub.html" title="organismprop_pub" alt="" coords="413,3585,629,3674">
+<area shape="rect" id="node33" href="phendesc.html" title="phendesc" alt="" coords="446,951,597,1041">
+<area shape="rect" id="node34" href="phenotype_comparison.html" title="phenotype_comparison" alt="" coords="398,2731,645,2821">
+<area shape="rect" id="node35" href="phenotype_comparison_cvterm.html" title="phenotype_comparison_cvterm" alt="" coords="742,2731,1045,2821">
+<area shape="rect" id="node36" href="phenstatement.html" title="phenstatement" alt="" coords="428,4262,615,4351">
+<area shape="rect" id="node37" href="phylonode_pub.html" title="phylonode_pub" alt="" coords="426,3691,617,3781">
+<area shape="rect" id="node38" href="phylotree_pub.html" title="phylotree_pub" alt="" coords="430,3798,613,3887">
+<area shape="rect" id="node39" href="project_pub.html" title="project_pub" alt="" coords="438,3905,605,3994">
+<area shape="rect" id="node40" href="protocol.html" title="protocol" alt="" coords="451,4369,592,4458">
+<area shape="rect" id="node41" href="pub_dbxref.html" title="pub_dbxref" alt="" coords="440,4011,603,4101">
+<area shape="rect" id="node42" href="pub_relationship.html" title="pub_relationship" alt="" coords="421,4155,621,4245">
+<area shape="rect" id="node43" href="pubauthor.html" title="pubauthor" alt="" coords="444,1058,599,1147">
+<area shape="rect" id="node44" href="pubprop.html" title="pubprop" alt="" coords="450,4475,593,4565">
+<area shape="rect" id="node45" href="stock_cvterm.html" title="stock_cvterm" alt="" coords="433,4582,609,4671">
+<area shape="rect" id="node46" href="stock_pub.html" title="stock_pub" alt="" coords="444,1271,599,1361">
+<area shape="rect" id="node47" href="stock_relationship_cvterm.html" title="stock_relationship_cvterm" alt="" coords="388,4726,655,4815">
+<area shape="rect" id="node48" href="stock_relationship_pub.html" title="stock_relationship_pub" alt="" coords="398,1378,645,1467">
+<area shape="rect" id="node49" href="stockprop_pub.html" title="stockprop_pub" alt="" coords="427,1485,615,1574">
+<area shape="rect" id="node50" href="study.html" title="study" alt="" coords="461,1591,582,1681">
+</map>
+
+					<a name='diagram'><img id='twodegreesDegreeImg' src='../diagrams/library_relationship_pub.2degrees.png' usemap='#twoDegreesRelationshipsDiagram' class='diagram' border='0' alt='' align='left'></a>							
+				</div>
+			  			</div>
+			</div>
+		  </div><!-- /.box-body -->
+		</div>
+	      </section>
+    
+  </div>
+  <!-- /.content-wrapper -->
+  <footer class="main-footer">
+    <div>
+      <div class="pull-right hidden-xs">
+        <a href="https://github.com/schemaspy/schemaspy" title="GitHub for SchemaSpy"><i class="fa fa-github-square fa-2x"></i></a>
+        <a href="http://stackoverflow.com/questions/tagged/schemaspy" title="StackOverflow for SchemaSpy"><i class="fa fa-stack-overflow fa-2x"></i></a>
+      </div>
+      <strong>Generated by <a href="http://schemaspy.org/" class="logo-text"><i class="fa fa-database"></i> SchemaSpy @project.version@</a></strong>
+    </div>
+    <!-- /.container -->
+  </footer>
+</div>
+<!-- ./wrapper -->
+
+<!-- jQuery 2.2.3 -->
+<script src="../bower/admin-lte/plugins/jQuery/jquery-2.2.3.min.js"></script>
+<script src="../bower/admin-lte/plugins/jQueryUI/jquery-ui.min.js"></script>
+<!-- Bootstrap 3.3.5 -->
+<script src="../bower/admin-lte/bootstrap/js/bootstrap.min.js"></script>
+<!-- DataTables -->
+<script src="../bower/datatables.net/jquery.dataTables.min.js"></script>
+<script src="../bower/datatables.net-bs/js/dataTables.bootstrap.min.js"></script>
+<script src="../bower/datatables.net-buttons/dataTables.buttons.min.js"></script>
+<script src="../bower/datatables.net-buttons-bs/js/buttons.bootstrap.min.js"></script>
+<script src="../bower/datatables.net-buttons/buttons.html5.min.js"></script>
+<script src="../bower/datatables.net-buttons/buttons.print.min.js"></script>
+<script src="../bower/datatables.net-buttons/buttons.colVis.min.js"></script>
+
+<!-- SlimScroll -->
+<script src="../bower/admin-lte/plugins/slimScroll/jquery.slimscroll.min.js"></script>
+<!-- FastClick -->
+<script src="../bower/admin-lte/plugins/fastclick/fastclick.js"></script>
+<!-- Salvattore -->
+<script src="../bower/salvattore/salvattore.min.js"></script>
+<!-- AnchorJS -->
+<script src="../bower/anchor-js/anchor.min.js"></script>
+<!-- CodeMirror -->
+<script src="../bower/codemirror/codemirror.js"></script>
+<script src="../bower/codemirror/sql.js"></script>
+<!-- AdminLTE App -->
+<script src="../bower/admin-lte/dist/js/app.min.js"></script>
+<script src="table.js"></script>
+<script src="../schemaSpy.js"></script>
+</body>
+</html>

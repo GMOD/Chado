@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>featureloc - chado Module</title>
+  <!-- Tell the browser to be responsive to screen width -->
+  <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+  <link rel="icon" type="image/png" sizes="16x16" href="../../favicon.ico">
+  <!-- Bootstrap 3.3.5 -->
+  <link rel="stylesheet" href="../bower/admin-lte/bootstrap/css/bootstrap.min.css">
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="../bower/font-awesome/css/font-awesome.min.css">
+  <!-- Ionicons -->
+  <link rel="stylesheet" href="../bower/ionicons/css/ionicons.min.css">
+  <!-- DataTables -->
+  <link rel="stylesheet" href="../bower/datatables.net-bs/css/dataTables.bootstrap.min.css">
+  <link rel="stylesheet" href="../bower/datatables.net-buttons-bs/css/buttons.bootstrap.min.css">
+  <!-- Code Mirror -->
+  <link rel="stylesheet" href="../bower/codemirror/codemirror.css">
+  <!-- Fonts -->
+  <link href='../fonts/indieflower/indie-flower.css' rel='stylesheet' type='text/css'>
+  <link href='../fonts/source-sans-pro/source-sans-pro.css' rel='stylesheet' type='text/css'>
+
+  <!-- Theme style -->
+  <link rel="stylesheet" href="../bower/admin-lte/dist/css/AdminLTE.min.css">
+  <!-- Salvattore -->
+  <link rel="stylesheet" href="../bower/salvattore/salvattore.css">
+  <!-- AdminLTE Skins. Choose a skin from the css/skins
+       folder instead of downloading all of them to reduce the load. -->
+  <link rel="stylesheet" href="../bower/admin-lte/dist/css/skins/_all-skins.min.css">
+  <!-- SchemaSpy -->
+  <link rel="stylesheet" href="../schemaSpy.css">
+  <!-- GMOD Chado Specific CSS -->
+  <link rel="stylesheet" href="../../main.css">
+  
+  <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+  <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+  <!--[if lt IE 9]>
+  <script src="../bower/html5shiv/html5shiv.min.js"></script>
+  <script src="../bower/respond/respond.min.js"></script>
+  <![endif]-->
+</head>
+<!-- ADD THE CLASS layout-top-nav TO REMOVE THE SIDEBAR. -->
+<!-- Skins: skin-black, black-light, green-light, red-light, yellow-light, purple-light, blue-light -->
+<body class="hold-transition skin-black layout-top-nav">
+<div class="wrapper">
+  <header class="main-header">
+    <nav class="navbar navbar-static-top">
+      <div class="container">
+        <div class="navbar-header">
+          <a href="../../index.html" class="navbar-brand" style="padding:0;">
+            <img src="../../GMOD-cogs.png" class="gmod-logo" />
+            <span class="gmod-title">Chado</span>
+          </a>
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar-collapse">
+            <i class="fa fa-bars"></i>
+          </button>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-collapse pull-left" id="navbar-collapse">
+          <ul class="nav navbar-nav">
+            <li>
+              <a href="../../index.html" title="All Chado Tables.">
+                All Tables</span>
+              </a>
+            </li>
+            <li>
+              <a href="../../constraints.html" title="All Constraints in Chado.">
+                All Constraints
+              </a>
+            </li>
+            <li>
+              <a href="../index.html" title="Tables in this module.">
+                Module Tables <span class="sr-only">(current)</span>
+              </a>
+            </li>            
+            <li>
+              <a href="../columns.html" title="Columns in this module.">
+                Module Columns
+              </a>
+            </li>
+            <li>
+              <a href="../constraints.html" title="Constraints defined by this module.">
+                Module Constraints
+              </a>
+            </li>
+            <li>
+              <a href="../relationships.html" title="Diagram of table relationships">
+                Module Relationships
+              </a>
+            </li>
+          </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+        <!-- Navbar Right Menu -->
+
+      </div>
+      <!-- /.container-fluid -->
+    </nav>
+  </header>
+  <!-- Main content -->
+  <!-- Full Width Column -->
+  <div class="content-wrapper">
+    
+    <div class="box box-solid">
+      <div class="box-body">
+        <p><span class="version-label">Schema Version:</span> 1.3 
+          <span class="version-label">Module</span>: chado</p>
+      </div>
+    </div>
+		
+          <!-- Content Header (Page header) -->
+      <section class="content-header">
+        <h1>featureloc</h1></br>
+		<div class="box box-primary">
+            <div class="box-header with-border">
+              <i class="fa fa-file-text-o"></i>
+              <h3 id="Description" class="box-title">Description</h3>
+              <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
+                </button>
+                <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
+              </div>			  
+            </div>
+            <!-- /.box-header -->
+            <div class="box-body clearfix">
+				<p><p>The location of a feature relative to another feature. Important: interbase coordinates are used. This is vital as it allows us to represent zero-length features e.g. splice sites, insertion points without an awkward fuzzy system. Features typically have exactly ONE location, but this need not be the case. Some features may not be localized (e.g. a gene that has been characterized genetically but no sequence or molecular information is available). Note on multiple locations: Each feature can have 0 or more locations. Multiple locations do NOT indicate non-contiguous locations (if a feature such as a transcript has a non-contiguous location, then the subfeatures such as exons should always be manifested). Instead, multiple featurelocs for a feature designate alternate locations or grouped locations; for instance, a feature designating a blast hit or hsp will have two locations, one on the query feature, one on the subject feature. Features representing sequence variation could have alternate locations instantiated on a feature on the mutant strain. The column:rank is used to differentiate these different locations. Reflexive locations should never be stored - this is for -proper- (i.e. non-self) locations only; nothing should be located relative to itself.</p></p>              
+            </div>
+            <!-- /.box-body -->
+		</div>
+		      </section>
+      <!-- Main content -->
+      <section class="content">
+		<div class="box box-primary">
+			<div class="box-header with-border">
+			  <span class="glyphicon glyphicon-list-alt" aria-hidden="true"></span>
+              <h3 id="Columns" class="box-title">Columns</h3>
+              <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
+                </button>
+                <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
+              </div>
+            </div>	
+            <div class="box-body">
+				<table id="standard_table" class="table table-bordered table-striped dataTable" role="grid">
+				<thead align='left'>
+				<tr>
+				  <th>Column</th>
+				  <th>Type</th>
+				  <th>Size</th>
+				  <th title='Columns in tables that are referenced by this column'>Foreign Key</th>
+				  <th title='Are nulls allowed?'>Nullable</th>
+				  <th title='Default value'>Default</th>
+				  <th title='Comments' class="toggle"><span>Comments</span></th>
+				</tr>
+				</thead>
+				<tbody>
+				<tr>
+				 <td class='primaryKey' title='Primary Key'><i class='icon ion-key iconkey' style='padding-left: 5px;'></i><span id="featureloc_id">featureloc_id</span></td>
+				 <td>bigserial</td>
+				 <td>19</td>
+				 <td>
+				  <table border='0' cellspacing='0' cellpadding='0'>
+				  </table>					 
+				 </td>
+				 <td title=''></td>
+				 <td>nextval(&#39;sequence.featureloc_featureloc_id_seq&#39;::regclass)</td>
+				 <td></td>
+				</tr>
+				<tr>
+				 <td class='foreignKey' title='Foreign Key'><i class='icon ion-key iconkey' style='padding-left: 5px;'></i><span id="feature_id">feature_id</span></td>
+				 <td>int8</td>
+				 <td>19</td>
+				 <td>
+				  <table border='0' cellspacing='0' cellpadding='0'>
+				   <tr>
+					<td title="featureloc.feature_id references feature.feature_id via featureloc_feature_id_fkey">
+						<a href='feature.html'>feature</a><span class='relatedKey'>.feature_id</span>
+					</td>
+					<td class="constraint detail">
+						featureloc_feature_id_fkey <span title='Cascade on delete:&#10;Deletion of parent deletes child'>C</span>
+					</td>
+				   </tr>
+				  </table>					 
+				 </td>
+				 <td title=''></td>
+				 <td>null</td>
+				 <td><p>The feature that is being located. Any feature can have zero or more featurelocs.</p></td>
+				</tr>
+				<tr>
+				 <td class='foreignKey' title='Foreign Key'><i class='icon ion-key iconkey' style='padding-left: 5px;'></i><span id="srcfeature_id">srcfeature_id</span></td>
+				 <td>int8</td>
+				 <td>19</td>
+				 <td>
+				  <table border='0' cellspacing='0' cellpadding='0'>
+				   <tr>
+					<td title="featureloc.srcfeature_id references feature.feature_id via featureloc_srcfeature_id_fkey">
+						<a href='feature.html'>feature</a><span class='relatedKey'>.feature_id</span>
+					</td>
+					<td class="constraint detail">
+						featureloc_srcfeature_id_fkey <span title='Null on delete:&#10;Foreign key to parent set to NULL when parent deleted'>N</span>
+					</td>
+				   </tr>
+				  </table>					 
+				 </td>
+				 <td title='nullable'>√</td>
+				 <td>null</td>
+				 <td><p>The source feature which this location is relative to. Every location is relative to another feature (however, this column is nullable, because the srcfeature may not be known). All locations are -proper- that is, nothing should be located relative to itself. No cycles are allowed in the featureloc graph.</p></td>
+				</tr>
+				<tr>
+				 <td class='indexedColumn' title='Indexed'><i class='fa fa-sitemap fa-rotate-120' style='padding-right: 5px;'></i><span id="fmin">fmin</span></td>
+				 <td>int8</td>
+				 <td>19</td>
+				 <td>
+				  <table border='0' cellspacing='0' cellpadding='0'>
+				  </table>					 
+				 </td>
+				 <td title='nullable'>√</td>
+				 <td>null</td>
+				 <td><p>The leftmost/minimal boundary in the linear range represented by the featureloc. Sometimes (e.g. in Bioperl) this is called -start- although this is confusing because it does not necessarily represent the 5-prime coordinate. Important: This is space-based (interbase) coordinates, counting from zero. To convert this to the leftmost position in a base-oriented system (eg GFF, Bioperl), add 1 to fmin.</p></td>
+				</tr>
+				<tr>
+				 <td><span id="is_fmin_partial">is_fmin_partial</span></td>
+				 <td>bool</td>
+				 <td>1</td>
+				 <td>
+				  <table border='0' cellspacing='0' cellpadding='0'>
+				  </table>					 
+				 </td>
+				 <td title=''></td>
+				 <td>false</td>
+				 <td><p>This is typically false, but may be true if the value for column:fmin is inaccurate or the leftmost part of the range is unknown/unbounded.</p></td>
+				</tr>
+				<tr>
+				 <td class='indexedColumn' title='Indexed'><i class='fa fa-sitemap fa-rotate-120' style='padding-right: 5px;'></i><span id="fmax">fmax</span></td>
+				 <td>int8</td>
+				 <td>19</td>
+				 <td>
+				  <table border='0' cellspacing='0' cellpadding='0'>
+				  </table>					 
+				 </td>
+				 <td title='nullable'>√</td>
+				 <td>null</td>
+				 <td><p>The rightmost/maximal boundary in the linear range represented by the featureloc. Sometimes (e.g. in bioperl) this is called -end- although this is confusing because it does not necessarily represent the 3-prime coordinate. Important: This is space-based (interbase) coordinates, counting from zero. No conversion is required to go from fmax to the rightmost coordinate in a base-oriented system that counts from 1 (e.g. GFF, Bioperl).</p></td>
+				</tr>
+				<tr>
+				 <td><span id="is_fmax_partial">is_fmax_partial</span></td>
+				 <td>bool</td>
+				 <td>1</td>
+				 <td>
+				  <table border='0' cellspacing='0' cellpadding='0'>
+				  </table>					 
+				 </td>
+				 <td title=''></td>
+				 <td>false</td>
+				 <td><p>This is typically false, but may be true if the value for column:fmax is inaccurate or the rightmost part of the range is unknown/unbounded.</p></td>
+				</tr>
+				<tr>
+				 <td><span id="strand">strand</span></td>
+				 <td>int2</td>
+				 <td>5</td>
+				 <td>
+				  <table border='0' cellspacing='0' cellpadding='0'>
+				  </table>					 
+				 </td>
+				 <td title='nullable'>√</td>
+				 <td>null</td>
+				 <td><p>The orientation/directionality of the location. Should be 0, -1 or +1.</p></td>
+				</tr>
+				<tr>
+				 <td><span id="phase">phase</span></td>
+				 <td>int4</td>
+				 <td>10</td>
+				 <td>
+				  <table border='0' cellspacing='0' cellpadding='0'>
+				  </table>					 
+				 </td>
+				 <td title='nullable'>√</td>
+				 <td>null</td>
+				 <td><p>Phase of translation with respect to srcfeature_id. Values are 0, 1, 2. It may not be possible to manifest this column for some features such as exons, because the phase is dependant on the spliceform (the same exon can appear in multiple spliceforms). This column is mostly useful for predicted exons and CDSs.</p></td>
+				</tr>
+				<tr>
+				 <td><span id="residue_info">residue_info</span></td>
+				 <td>text</td>
+				 <td>2147483647</td>
+				 <td>
+				  <table border='0' cellspacing='0' cellpadding='0'>
+				  </table>					 
+				 </td>
+				 <td title='nullable'>√</td>
+				 <td>null</td>
+				 <td><p>Alternative residues, when these differ from feature.residues. For instance, a SNP feature located on a wild and mutant protein would have different alternative residues. for alignment/similarity features, the alternative residues is used to represent the alignment string (CIGAR format). Note on variation features; even if we do not want to instantiate a mutant chromosome/contig feature, we can still represent a SNP etc with 2 locations, one (rank 0) on the genome, the other (rank 1) would have most fields null, except for alternative residues.</p></td>
+				</tr>
+				<tr>
+				 <td class='indexedColumn' title='Indexed'><i class='fa fa-sitemap fa-rotate-120' style='padding-right: 5px;'></i><span id="locgroup">locgroup</span></td>
+				 <td>int4</td>
+				 <td>10</td>
+				 <td>
+				  <table border='0' cellspacing='0' cellpadding='0'>
+				  </table>					 
+				 </td>
+				 <td title=''></td>
+				 <td>0</td>
+				 <td><p>This is used to manifest redundant, derivable extra locations for a feature. The default locgroup=0 is used for the DIRECT location of a feature. Important: most Chado users may never use featurelocs WITH logroup &gt; 0. Transitively derived locations are indicated with locgroup &gt; 0. For example, the position of an exon on a BAC and in global chromosome coordinates. This column is used to differentiate these groupings of locations. The default locgroup 0 is used for the main or primary location, from which the others can be derived via coordinate transformations. Another example of redundant locations is storing ORF coordinates relative to both transcript and genome. Redundant locations open the possibility of the database getting into inconsistent states; this schema gives us the flexibility of both warehouse instantiations with redundant locations (easier for querying) and management instantiations with no redundant locations. An example of using both locgroup and rank: imagine a feature indicating a conserved region between the chromosomes of two different species. We may want to keep redundant locations on both contigs and chromosomes. We would thus have 4 locations for the single conserved region feature - two distinct locgroups (contig level and chromosome level) and two distinct ranks (for the two species).</p></td>
+				</tr>
+				<tr>
+				 <td class='indexedColumn' title='Indexed'><i class='fa fa-sitemap fa-rotate-120' style='padding-right: 5px;'></i><span id="rank">rank</span></td>
+				 <td>int4</td>
+				 <td>10</td>
+				 <td>
+				  <table border='0' cellspacing='0' cellpadding='0'>
+				  </table>					 
+				 </td>
+				 <td title=''></td>
+				 <td>0</td>
+				 <td><p>Used when a feature has &gt;1 location, otherwise the default rank 0 is used. Some features (e.g. blast hits and HSPs) have two locations - one on the query and one on the subject. Rank is used to differentiate these. Rank=0 is always used for the query, Rank=1 for the subject. For multiple alignments, assignment of rank is arbitrary. Rank is also used for sequence_variant features, such as SNPs. Rank=0 indicates the wildtype (or baseline) feature, Rank=1 indicates the mutant (or compared) feature.</p></td>
+				</tr>
+								</tbody>
+				</table>
+				<p title='12 columns'>Table contained <span id="recordNumber">-1</span> rows<p/>
+			</div>
+		</div>
+		<div class="box box-primary">		
+			<div class="box-header with-border">
+              <i class="fa fa-sitemap"></i>
+
+              <h3 id="Indexes" class="box-title">Indexes</h3>
+
+              <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
+                </button>
+                <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
+              </div>
+            </div>	
+			<div class="box-body">
+				<table id="indexes_table" class="table table-bordered table-striped dataTable" role="grid">
+				<thead>
+				 <tr>
+				  <th>Constraint Name</th>
+				  <th>Type</th>
+				  <th>Sort</th>
+				  <th>Column(s)</th>
+				 </tr>
+				</thead>
+				<tbody>
+				 <tr>
+				  <td class='primaryKey' title='Primary Key'><i class='icon ion-key iconkey'></i> featureloc_pkey</td>
+				  <td>Primary key</td>
+				  <td><span title='Ascending'>Asc</span></td>
+				  <td>featureloc_id</td>
+				 </tr>				 
+				 <tr>
+				  <td class='uniqueKey' title='Unique Key'><i class='icon ion-key iconkey'></i> featureloc_c1</td>
+				  <td>Must be unique</td>
+				  <td><span title='Ascending'>Asc</span>/<span title='Ascending'>Asc</span>/<span title='Ascending'>Asc</span></td>
+				  <td>feature_id + locgroup + rank</td>
+				 </tr>				 
+				 <tr>
+				  <td title='Indexed'>featureloc_idx1</td>
+				  <td>Performance</td>
+				  <td><span title='Ascending'>Asc</span></td>
+				  <td>feature_id</td>
+				 </tr>				 
+				 <tr>
+				  <td title='Indexed'>featureloc_idx2</td>
+				  <td>Performance</td>
+				  <td><span title='Ascending'>Asc</span></td>
+				  <td>srcfeature_id</td>
+				 </tr>				 
+				 <tr>
+				  <td title='Indexed'>featureloc_idx3</td>
+				  <td>Performance</td>
+				  <td><span title='Ascending'>Asc</span>/<span title='Ascending'>Asc</span>/<span title='Ascending'>Asc</span></td>
+				  <td>srcfeature_id + fmin + fmax</td>
+				 </tr>				 
+				</tbody>
+				</table>   			  
+			</div><!-- /.box-body -->
+		</div>
+				<div class="box box-primary">		
+			<div class="box-header with-border">
+              <i class="fa fa-code-fork"></i>
+
+              <h3 id="Relationships" class="box-title">Relationships</h3>
+
+              <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
+                </button>
+                <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
+              </div>
+            </div>	
+			<div class="box-body">	
+			<div class="nav-tabs-custom" style="cursor: move;">
+				<p>The following entity relationship (ER) diagram shows the relationships involving the featureloc table. </p>
+				<p class="messages warning">These relationships often cross chado module boundries, in which case <strong>the table name will be prefixed with the module</strong> it is in. When querying these tables do not include the module name, as all chado tables are contained within the same schema.</p>
+            <!-- Tabs within a box -->
+			<h4>Show relationships within degrees of separation</h4>
+            <ul class="nav nav-tabs pull-left ui-sortable-handle">
+			  			              <li class="active"><a href="#oneDegreeImg-chart" data-toggle="tab" aria-expanded="true">One</a></li>			  			 
+			  			              <li class=""><a href="#twodegreesDegreeImg-chart" data-toggle="tab" aria-expanded="true">Two degrees</a></li>			  			 
+            </ul>
+            <div class="tab-content no-padding">            
+				<div class="chart tab-pane active" id="oneDegreeImg-chart" style="position: relative; overflow-x:auto;">					
+					<map id="oneDegreeRelationshipsDiagram" name="oneDegreeRelationshipsDiagram">
+<area shape="rect" id="node1" href="featureloc.html" title="featureloc" alt="" coords="242,31,542,454">
+<area shape="rect" id="node2" href="feature.html" title="feature" alt="" coords="6,78,197,343">
+<area shape="rect" id="node3" href="featureloc_pub.html" title="featureloc_pub" alt="" coords="587,5,783,158">
+</map>
+
+					<a name='diagram'><img id='oneDegreeImg' src='../diagrams/featureloc.1degree.png' usemap='#oneDegreeRelationshipsDiagram' class='diagram' border='0' alt='' align='left'></a>							
+				</div>
+				<div class="chart tab-pane " id="twodegreesDegreeImg-chart" style="position: relative; overflow-x:auto;">					
+					<map id="twoDegreesRelationshipsDiagram" name="twoDegreesRelationshipsDiagram">
+<area shape="rect" id="node1" title="cell_line.cell_line_feature" alt="" coords="526,1085,783,1174">
+<area shape="rect" id="node2" href="feature.html" title="feature" alt="" coords="269,1669,459,1934">
+<area shape="rect" id="node15" title="db.dbxref" alt="" coords="40,1198,189,1287">
+<area shape="rect" id="node16" title="organism.organism" alt="" coords="5,1730,224,1819">
+<area shape="rect" id="node17" title="cv.cvterm" alt="" coords="39,2206,190,2295">
+<area shape="rect" id="node3" title="companalysis.analysisfeature" alt="" coords="511,1191,799,1281">
+<area shape="rect" id="node4" title="expression.feature_expression" alt="" coords="506,1298,803,1387">
+<area shape="rect" id="node5" title="genetic.feature_genotype" alt="" coords="525,1405,784,1494">
+<area shape="rect" id="node6" title="library.library_feature" alt="" coords="538,1511,771,1601">
+<area shape="rect" id="node7" title="mage.element" alt="" coords="565,1618,744,1707">
+<area shape="rect" id="node8" title="mage.studyprop_feature" alt="" coords="528,1725,781,1814">
+<area shape="rect" id="node9" title="map.featurepos" alt="" coords="559,1831,750,1921">
+<area shape="rect" id="node10" title="map.featurerange" alt="" coords="552,1938,757,2027">
+<area shape="rect" id="node11" title="natural_diversity.nd_reagent" alt="" coords="513,2045,796,2134">
+<area shape="rect" id="node12" title="phenotype.feature_phenotype" alt="" coords="509,111,800,201">
+<area shape="rect" id="node13" title="phylogeny.phylonode" alt="" coords="538,218,771,307">
+<area shape="rect" id="node14" title="project.project_feature" alt="" coords="534,325,775,414">
+<area shape="rect" id="node18" href="feature_contact.html" title="feature_contact" alt="" coords="559,431,750,521">
+<area shape="rect" id="node19" href="feature_cvterm.html" title="feature_cvterm" alt="" coords="561,2578,748,2667">
+<area shape="rect" id="node20" title="pub.pub" alt="" coords="294,2481,434,2570">
+<area shape="rect" id="node21" href="feature_dbxref.html" title="feature_dbxref" alt="" coords="563,5,747,94">
+<area shape="rect" id="node22" href="feature_pub.html" title="feature_pub" alt="" coords="571,2471,738,2561">
+<area shape="rect" id="node23" href="feature_relationship.html" title="feature_relationship" alt="" coords="543,2151,766,2241">
+<area shape="rect" id="node24" href="feature_synonym.html" title="feature_synonym" alt="" coords="553,2365,756,2454">
+<area shape="rect" id="node25" href="featureloc.html" title="featureloc" alt="" coords="505,645,805,1067">
+<area shape="rect" id="node26" href="featureloc_pub.html" title="featureloc_pub" alt="" coords="850,1602,1046,1755">
+<area shape="rect" id="node27" href="featureprop.html" title="featureprop" alt="" coords="573,2258,737,2347">
+<area shape="rect" id="node28" title="stock.stock_feature" alt="" coords="545,538,764,627">
+</map>
+
+					<a name='diagram'><img id='twodegreesDegreeImg' src='../diagrams/featureloc.2degrees.png' usemap='#twoDegreesRelationshipsDiagram' class='diagram' border='0' alt='' align='left'></a>							
+				</div>
+			  			</div>
+			</div>
+		  </div><!-- /.box-body -->
+		</div>
+	      </section>
+    
+  </div>
+  <!-- /.content-wrapper -->
+  <footer class="main-footer">
+    <div>
+      <div class="pull-right hidden-xs">
+        <a href="https://github.com/schemaspy/schemaspy" title="GitHub for SchemaSpy"><i class="fa fa-github-square fa-2x"></i></a>
+        <a href="http://stackoverflow.com/questions/tagged/schemaspy" title="StackOverflow for SchemaSpy"><i class="fa fa-stack-overflow fa-2x"></i></a>
+      </div>
+      <strong>Generated by <a href="http://schemaspy.org/" class="logo-text"><i class="fa fa-database"></i> SchemaSpy @project.version@</a></strong>
+    </div>
+    <!-- /.container -->
+  </footer>
+</div>
+<!-- ./wrapper -->
+
+<!-- jQuery 2.2.3 -->
+<script src="../bower/admin-lte/plugins/jQuery/jquery-2.2.3.min.js"></script>
+<script src="../bower/admin-lte/plugins/jQueryUI/jquery-ui.min.js"></script>
+<!-- Bootstrap 3.3.5 -->
+<script src="../bower/admin-lte/bootstrap/js/bootstrap.min.js"></script>
+<!-- DataTables -->
+<script src="../bower/datatables.net/jquery.dataTables.min.js"></script>
+<script src="../bower/datatables.net-bs/js/dataTables.bootstrap.min.js"></script>
+<script src="../bower/datatables.net-buttons/dataTables.buttons.min.js"></script>
+<script src="../bower/datatables.net-buttons-bs/js/buttons.bootstrap.min.js"></script>
+<script src="../bower/datatables.net-buttons/buttons.html5.min.js"></script>
+<script src="../bower/datatables.net-buttons/buttons.print.min.js"></script>
+<script src="../bower/datatables.net-buttons/buttons.colVis.min.js"></script>
+
+<!-- SlimScroll -->
+<script src="../bower/admin-lte/plugins/slimScroll/jquery.slimscroll.min.js"></script>
+<!-- FastClick -->
+<script src="../bower/admin-lte/plugins/fastclick/fastclick.js"></script>
+<!-- Salvattore -->
+<script src="../bower/salvattore/salvattore.min.js"></script>
+<!-- AnchorJS -->
+<script src="../bower/anchor-js/anchor.min.js"></script>
+<!-- CodeMirror -->
+<script src="../bower/codemirror/codemirror.js"></script>
+<script src="../bower/codemirror/sql.js"></script>
+<!-- AdminLTE App -->
+<script src="../bower/admin-lte/dist/js/app.min.js"></script>
+<script src="table.js"></script>
+<script src="../schemaSpy.js"></script>
+</body>
+</html>

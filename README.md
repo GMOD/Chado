@@ -83,6 +83,15 @@ are currently using PostgreSQL.
 Please read the included [chado/INSTALL.Chado.md](./chado/INSTALL.Chado.md) document for instructions on how to
 install the Chado schema.
 
+### Running the Docker Image
+
+```bash
+
+docker build -t chado .
+docker run -it -d chado
+```
+
+
 ## Chado Support
 
 Please see our website for more information on Chado and the GMOD project:
@@ -156,4 +165,3 @@ Full list of committers:
 - Tony deCatanzaro <tonydecat@users.sourceforge.net>
 - Yuri Bendana <ybendana@users.sourceforge.net>
 - zheng zha <zzgw@users.sourceforge.net>
-

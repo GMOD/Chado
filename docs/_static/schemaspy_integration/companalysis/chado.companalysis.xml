@@ -1,0 +1,225 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<database name="chado" schema="companalysis" type="PostgreSQL - 9.3.18">
+   <tables>
+      <table name="analysis" remarks="An analysis is a particular type of a&#10;    computational analysis; it may be a blast of one sequence against&#10;    another, or an all by all blast, or a different kind of analysis&#10;    altogether. It is a single unit of computation." schema="companalysis" type="TABLE">
+         <column autoUpdated="false" defaultValue="nextval('companalysis.analysis_analysis_id_seq'::regclass)" digits="0" id="0" name="analysis_id" nullable="false" remarks="" size="19" type="bigserial">
+            <child column="analysis_id" foreignKey="analysis_cvterm_analysis_id_fkey" implied="false" onDeleteCascade="true" schema="companalysis" table="analysis_cvterm"/>
+            <child column="analysis_id" foreignKey="analysis_dbxref_analysis_id_fkey" implied="false" onDeleteCascade="true" schema="companalysis" table="analysis_dbxref"/>
+            <child column="analysis_id" foreignKey="analysis_pub_analysis_id_fkey" implied="false" onDeleteCascade="true" schema="companalysis" table="analysis_pub"/>
+            <child column="object_id" foreignKey="analysis_relationship_object_id_fkey" implied="false" onDeleteCascade="true" schema="companalysis" table="analysis_relationship"/>
+            <child column="subject_id" foreignKey="analysis_relationship_subject_id_fkey" implied="false" onDeleteCascade="true" schema="companalysis" table="analysis_relationship"/>
+            <child column="analysis_id" foreignKey="analysisfeature_analysis_id_fkey" implied="false" onDeleteCascade="true" schema="companalysis" table="analysisfeature"/>
+            <child column="analysis_id" foreignKey="analysisprop_analysis_id_fkey" implied="false" onDeleteCascade="true" schema="companalysis" table="analysisprop"/>
+            <child column="analysis_id" foreignKey="quantification_analysis_id_fkey" implied="false" onDeleteCascade="true" schema="mage" table="quantification"/>
+            <child column="analysis_id" foreignKey="nd_experiment_analysis_analysis_id_fkey" implied="false" onDeleteCascade="true" schema="natural_diversity" table="nd_experiment_analysis"/>
+            <child column="analysis_id" foreignKey="phylotree_analysis_id_fkey" implied="false" onDeleteCascade="true" schema="phylogeny" table="phylotree"/>
+            <child column="analysis_id" foreignKey="project_analysis_analysis_id_fkey" implied="false" onDeleteCascade="true" schema="project" table="project_analysis"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="1" name="name" nullable="true" remarks="A way of grouping analyses. This&#10;    should be a handy short identifier that can help people find an&#10;    analysis they want. For instance &quot;tRNAscan&quot;, &quot;cDNA&quot;, &quot;FlyPep&quot;,&#10;    &quot;SwissProt&quot;, and it should not be assumed to be unique. For instance, there may be lots of separate analyses done against a cDNA database." size="255" type="varchar"/>
+         <column autoUpdated="false" digits="0" id="2" name="description" nullable="true" remarks="" size="2147483647" type="text"/>
+         <column autoUpdated="false" digits="0" id="3" name="program" nullable="false" remarks="Program name, e.g. blastx, blastp, sim4, genscan." size="255" type="varchar"/>
+         <column autoUpdated="false" digits="0" id="4" name="programversion" nullable="false" remarks="Version description, e.g. TBLASTX 2.0MP-WashU [09-Nov-2000]." size="255" type="varchar"/>
+         <column autoUpdated="false" digits="0" id="5" name="algorithm" nullable="true" remarks="Algorithm name, e.g. blast." size="255" type="varchar"/>
+         <column autoUpdated="false" digits="0" id="6" name="sourcename" nullable="true" remarks="Source name, e.g. cDNA, SwissProt." size="255" type="varchar"/>
+         <column autoUpdated="false" digits="0" id="7" name="sourceversion" nullable="true" remarks="" size="255" type="varchar"/>
+         <column autoUpdated="false" digits="0" id="8" name="sourceuri" nullable="true" remarks="This is an optional, permanent URL or URI for the source of the  analysis. The idea is that someone could recreate the analysis directly by going to this URI and fetching the source data (e.g. the blast database, or the training model)." size="2147483647" type="text"/>
+         <column autoUpdated="false" defaultValue="now()" digits="6" id="9" name="timeexecuted" nullable="false" remarks="" size="29" type="timestamp"/>
+         <primaryKey column="analysis_id" sequenceNumberInPK="1"/>
+         <index name="analysis_pkey" unique="true">
+            <column ascending="true" name="analysis_id"/>
+         </index>
+         <index name="analysis_c1" unique="true">
+            <column ascending="true" name="program"/>
+            <column ascending="true" name="programversion"/>
+            <column ascending="true" name="sourcename"/>
+         </index>
+      </table>
+      <table name="analysis_cvterm" remarks="Associate a term from a cv with an analysis." schema="companalysis" type="TABLE">
+         <column autoUpdated="false" defaultValue="nextval('companalysis.analysis_cvterm_analysis_cvterm_id_seq'::regclass)" digits="0" id="0" name="analysis_cvterm_id" nullable="false" remarks="" size="19" type="bigserial"/>
+         <column autoUpdated="false" digits="0" id="1" name="analysis_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="analysis_id" foreignKey="analysis_cvterm_analysis_id_fkey" implied="false" onDeleteCascade="true" schema="companalysis" table="analysis"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="2" name="cvterm_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="cvterm_id" foreignKey="analysis_cvterm_cvterm_id_fkey" implied="false" onDeleteCascade="true" schema="cv" table="cvterm"/>
+         </column>
+         <column autoUpdated="false" defaultValue="false" digits="0" id="3" name="is_not" nullable="false" remarks="If this is set to true, then this &#10;annotation is interpreted as a NEGATIVE annotation - i.e. the analysis does &#10;NOT have the specified term." size="1" type="bool"/>
+         <column autoUpdated="false" defaultValue="0" digits="0" id="4" name="rank" nullable="false" remarks="" size="10" type="int4"/>
+         <primaryKey column="analysis_cvterm_id" sequenceNumberInPK="1"/>
+         <index name="analysis_cvterm_pkey" unique="true">
+            <column ascending="true" name="analysis_cvterm_id"/>
+         </index>
+         <index name="analysis_cvterm_c1" unique="true">
+            <column ascending="true" name="analysis_id"/>
+            <column ascending="true" name="cvterm_id"/>
+            <column ascending="true" name="rank"/>
+         </index>
+         <index name="analysis_cvterm_idx1" unique="false">
+            <column ascending="true" name="analysis_id"/>
+         </index>
+         <index name="analysis_cvterm_idx2" unique="false">
+            <column ascending="true" name="cvterm_id"/>
+         </index>
+      </table>
+      <table name="analysis_dbxref" remarks="Links an analysis to dbxrefs." schema="companalysis" type="TABLE">
+         <column autoUpdated="false" defaultValue="nextval('companalysis.analysis_dbxref_analysis_dbxref_id_seq'::regclass)" digits="0" id="0" name="analysis_dbxref_id" nullable="false" remarks="" size="19" type="bigserial"/>
+         <column autoUpdated="false" digits="0" id="1" name="analysis_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="analysis_id" foreignKey="analysis_dbxref_analysis_id_fkey" implied="false" onDeleteCascade="true" schema="companalysis" table="analysis"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="2" name="dbxref_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="dbxref_id" foreignKey="analysis_dbxref_dbxref_id_fkey" implied="false" onDeleteCascade="true" schema="db" table="dbxref"/>
+         </column>
+         <column autoUpdated="false" defaultValue="true" digits="0" id="3" name="is_current" nullable="false" remarks="True if this dbxref &#10;is the most up to date accession in the corresponding db. Retired &#10;accessions should set this field to false" size="1" type="bool"/>
+         <primaryKey column="analysis_dbxref_id" sequenceNumberInPK="1"/>
+         <index name="analysis_dbxref_pkey" unique="true">
+            <column ascending="true" name="analysis_dbxref_id"/>
+         </index>
+         <index name="analysis_dbxref_c1" unique="true">
+            <column ascending="true" name="analysis_id"/>
+            <column ascending="true" name="dbxref_id"/>
+         </index>
+         <index name="analysis_dbxref_idx1" unique="false">
+            <column ascending="true" name="analysis_id"/>
+         </index>
+         <index name="analysis_dbxref_idx2" unique="false">
+            <column ascending="true" name="dbxref_id"/>
+         </index>
+      </table>
+      <table name="analysis_pub" remarks="Provenance. Linking table between analyses and the publications that mention them." schema="companalysis" type="TABLE">
+         <column autoUpdated="false" defaultValue="nextval('companalysis.analysis_pub_analysis_pub_id_seq'::regclass)" digits="0" id="0" name="analysis_pub_id" nullable="false" remarks="" size="19" type="bigserial"/>
+         <column autoUpdated="false" digits="0" id="1" name="analysis_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="analysis_id" foreignKey="analysis_pub_analysis_id_fkey" implied="false" onDeleteCascade="true" schema="companalysis" table="analysis"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="2" name="pub_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="pub_id" foreignKey="analysis_pub_pub_id_fkey" implied="false" onDeleteCascade="true" schema="pub" table="pub"/>
+         </column>
+         <primaryKey column="analysis_pub_id" sequenceNumberInPK="1"/>
+         <index name="analysis_pub_pkey" unique="true">
+            <column ascending="true" name="analysis_pub_id"/>
+         </index>
+         <index name="analysis_pub_c1" unique="true">
+            <column ascending="true" name="analysis_id"/>
+            <column ascending="true" name="pub_id"/>
+         </index>
+         <index name="analysis_pub_idx1" unique="false">
+            <column ascending="true" name="analysis_id"/>
+         </index>
+         <index name="analysis_pub_idx2" unique="false">
+            <column ascending="true" name="pub_id"/>
+         </index>
+      </table>
+      <table name="analysis_relationship" remarks="" schema="companalysis" type="TABLE">
+         <column autoUpdated="false" defaultValue="nextval('companalysis.analysis_relationship_analysis_relationship_id_seq'::regclass)" digits="0" id="0" name="analysis_relationship_id" nullable="false" remarks="" size="19" type="bigserial"/>
+         <column autoUpdated="false" digits="0" id="1" name="subject_id" nullable="false" remarks="analysis_relationship.subject_id i&#10;s the subject of the subj-predicate-obj sentence." size="19" type="int8">
+            <parent column="analysis_id" foreignKey="analysis_relationship_subject_id_fkey" implied="false" onDeleteCascade="true" schema="companalysis" table="analysis"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="2" name="object_id" nullable="false" remarks="analysis_relationship.object_id &#10;is the object of the subj-predicate-obj sentence." size="19" type="int8">
+            <parent column="analysis_id" foreignKey="analysis_relationship_object_id_fkey" implied="false" onDeleteCascade="true" schema="companalysis" table="analysis"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="3" name="type_id" nullable="false" remarks="analysis_relationship.type_id &#10;is relationship type between subject and object. This is a cvterm, typically &#10;from the OBO relationship ontology, although other relationship types are allowed." size="19" type="int8">
+            <parent column="cvterm_id" foreignKey="analysis_relationship_type_id_fkey" implied="false" onDeleteCascade="true" schema="cv" table="cvterm"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="4" name="value" nullable="true" remarks="analysis_relationship.value &#10;is for additional notes or comments." size="2147483647" type="text"/>
+         <column autoUpdated="false" defaultValue="0" digits="0" id="5" name="rank" nullable="false" remarks="analysis_relationship.rank is &#10;the ordering of subject analysiss with respect to the object analysis may be &#10;important where rank is used to order these; starts from zero." size="10" type="int4"/>
+         <primaryKey column="analysis_relationship_id" sequenceNumberInPK="1"/>
+         <index name="analysis_relationship_pkey" unique="true">
+            <column ascending="true" name="analysis_relationship_id"/>
+         </index>
+         <index name="analysis_relationship_c1" unique="true">
+            <column ascending="true" name="subject_id"/>
+            <column ascending="true" name="object_id"/>
+            <column ascending="true" name="type_id"/>
+            <column ascending="true" name="rank"/>
+         </index>
+         <index name="analysis_relationship_idx1" unique="false">
+            <column ascending="true" name="subject_id"/>
+         </index>
+         <index name="analysis_relationship_idx2" unique="false">
+            <column ascending="true" name="object_id"/>
+         </index>
+         <index name="analysis_relationship_idx3" unique="false">
+            <column ascending="true" name="type_id"/>
+         </index>
+      </table>
+      <table name="analysisfeature" remarks="Computational analyses generate features (e.g. Genscan generates transcripts and exons; sim4 alignments generate similarity/match features). analysisfeatures are stored using the feature table from the sequence module. The analysisfeature table is used to decorate these features, with analysis specific attributes. A feature is an analysisfeature if and only if there is a corresponding entry in the analysisfeature table. analysisfeatures will have two or more featureloc entries,&#10; with rank indicating query/subject" schema="companalysis" type="TABLE">
+         <column autoUpdated="false" defaultValue="nextval('companalysis.analysisfeature_analysisfeature_id_seq'::regclass)" digits="0" id="0" name="analysisfeature_id" nullable="false" remarks="" size="19" type="bigserial">
+            <child column="analysisfeature_id" foreignKey="analysisfeatureprop_analysisfeature_id_fkey" implied="false" onDeleteCascade="true" schema="companalysis" table="analysisfeatureprop"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="1" name="feature_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="feature_id" foreignKey="analysisfeature_feature_id_fkey" implied="false" onDeleteCascade="true" schema="sequence" table="feature"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="2" name="analysis_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="analysis_id" foreignKey="analysisfeature_analysis_id_fkey" implied="false" onDeleteCascade="true" schema="companalysis" table="analysis"/>
+         </column>
+         <column autoUpdated="false" digits="17" id="3" name="rawscore" nullable="true" remarks="This is the native score generated by the program; for example, the bitscore generated by blast, sim4 or genscan scores. One should not assume that high is necessarily better than low." size="17" type="float8"/>
+         <column autoUpdated="false" digits="17" id="4" name="normscore" nullable="true" remarks="This is the rawscore but&#10;    semi-normalized. Complete normalization to allow comparison of&#10;    features generated by different programs would be nice but too&#10;    difficult. Instead the normalization should strive to enforce the&#10;    following semantics: * normscores are floating point numbers &gt;= 0,&#10;    * high normscores are better than low one. For most programs, it would be sufficient to make the normscore the same as this rawscore, providing these semantics are satisfied." size="17" type="float8"/>
+         <column autoUpdated="false" digits="17" id="5" name="significance" nullable="true" remarks="This is some kind of expectation or probability metric, representing the probability that the analysis would appear randomly given the model. As such, any program or person querying this table can assume the following semantics:&#10;   * 0 &lt;= significance &lt;= n, where n is a positive number, theoretically unbounded but unlikely to be more than 10&#10;  * low numbers are better than high numbers." size="17" type="float8"/>
+         <column autoUpdated="false" digits="17" id="6" name="identity" nullable="true" remarks="Percent identity between the locations compared.  Note that these 4 metrics do not cover the full range of scores possible; it would be undesirable to list every score possible, as this should be kept extensible. instead, for non-standard scores, use the analysisprop table." size="17" type="float8"/>
+         <primaryKey column="analysisfeature_id" sequenceNumberInPK="1"/>
+         <index name="analysisfeature_pkey" unique="true">
+            <column ascending="true" name="analysisfeature_id"/>
+         </index>
+         <index name="analysisfeature_c1" unique="true">
+            <column ascending="true" name="feature_id"/>
+            <column ascending="true" name="analysis_id"/>
+         </index>
+         <index name="analysisfeature_idx1" unique="false">
+            <column ascending="true" name="feature_id"/>
+         </index>
+         <index name="analysisfeature_idx2" unique="false">
+            <column ascending="true" name="analysis_id"/>
+         </index>
+      </table>
+      <table name="analysisfeatureprop" remarks="" schema="companalysis" type="TABLE">
+         <column autoUpdated="false" defaultValue="nextval('companalysis.analysisfeatureprop_analysisfeatureprop_id_seq'::regclass)" digits="0" id="0" name="analysisfeatureprop_id" nullable="false" remarks="" size="19" type="bigserial"/>
+         <column autoUpdated="false" digits="0" id="1" name="analysisfeature_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="analysisfeature_id" foreignKey="analysisfeatureprop_analysisfeature_id_fkey" implied="false" onDeleteCascade="true" schema="companalysis" table="analysisfeature"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="2" name="type_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="cvterm_id" foreignKey="analysisfeatureprop_type_id_fkey" implied="false" onDeleteCascade="true" schema="cv" table="cvterm"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="3" name="value" nullable="true" remarks="" size="2147483647" type="text"/>
+         <column autoUpdated="false" digits="0" id="4" name="rank" nullable="false" remarks="" size="10" type="int4"/>
+         <primaryKey column="analysisfeatureprop_id" sequenceNumberInPK="1"/>
+         <index name="analysisfeatureprop_pkey" unique="true">
+            <column ascending="true" name="analysisfeatureprop_id"/>
+         </index>
+         <index name="analysisfeature_id_type_id_rank" unique="true">
+            <column ascending="true" name="analysisfeature_id"/>
+            <column ascending="true" name="type_id"/>
+            <column ascending="true" name="rank"/>
+         </index>
+         <index name="analysisfeatureprop_idx1" unique="false">
+            <column ascending="true" name="analysisfeature_id"/>
+         </index>
+         <index name="analysisfeatureprop_idx2" unique="false">
+            <column ascending="true" name="type_id"/>
+         </index>
+      </table>
+      <table name="analysisprop" remarks="" schema="companalysis" type="TABLE">
+         <column autoUpdated="false" defaultValue="nextval('companalysis.analysisprop_analysisprop_id_seq'::regclass)" digits="0" id="0" name="analysisprop_id" nullable="false" remarks="" size="19" type="bigserial"/>
+         <column autoUpdated="false" digits="0" id="1" name="analysis_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="analysis_id" foreignKey="analysisprop_analysis_id_fkey" implied="false" onDeleteCascade="true" schema="companalysis" table="analysis"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="2" name="type_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="cvterm_id" foreignKey="analysisprop_type_id_fkey" implied="false" onDeleteCascade="true" schema="cv" table="cvterm"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="3" name="value" nullable="true" remarks="" size="2147483647" type="text"/>
+         <column autoUpdated="false" defaultValue="0" digits="0" id="4" name="rank" nullable="false" remarks="" size="10" type="int4"/>
+         <primaryKey column="analysisprop_id" sequenceNumberInPK="1"/>
+         <index name="analysisprop_pkey" unique="true">
+            <column ascending="true" name="analysisprop_id"/>
+         </index>
+         <index name="analysisprop_c1" unique="true">
+            <column ascending="true" name="analysis_id"/>
+            <column ascending="true" name="type_id"/>
+            <column ascending="true" name="rank"/>
+         </index>
+         <index name="analysisprop_idx1" unique="false">
+            <column ascending="true" name="analysis_id"/>
+         </index>
+         <index name="analysisprop_idx2" unique="false">
+            <column ascending="true" name="type_id"/>
+         </index>
+      </table>
+   </tables>
+</database>

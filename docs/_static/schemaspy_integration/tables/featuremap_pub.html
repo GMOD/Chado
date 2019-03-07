@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>featuremap_pub -  Chado</title>
+  <!-- Tell the browser to be responsive to screen width -->
+  <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+  <link rel="icon" type="image/png" sizes="16x16" href="../favicon.ico">
+  <!-- Bootstrap 3.3.5 -->
+  <link rel="stylesheet" href="../bower/admin-lte/bootstrap/css/bootstrap.min.css">
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="../bower/font-awesome/css/font-awesome.min.css">
+  <!-- Ionicons -->
+  <link rel="stylesheet" href="../bower/ionicons/css/ionicons.min.css">
+  <!-- DataTables -->
+  <link rel="stylesheet" href="../bower/datatables.net-bs/css/dataTables.bootstrap.min.css">
+  <link rel="stylesheet" href="../bower/datatables.net-buttons-bs/css/buttons.bootstrap.min.css">
+  <!-- Code Mirror -->
+  <link rel="stylesheet" href="../bower/codemirror/codemirror.css">
+  <!-- Fonts -->
+  <link href='../fonts/indieflower/indie-flower.css' rel='stylesheet' type='text/css'>
+  <link href='../fonts/source-sans-pro/source-sans-pro.css' rel='stylesheet' type='text/css'>
+
+  <!-- Theme style -->
+  <link rel="stylesheet" href="../bower/admin-lte/dist/css/AdminLTE.min.css">
+  <!-- Salvattore -->
+  <link rel="stylesheet" href="../bower/salvattore/salvattore.css">
+  <!-- AdminLTE Skins. Choose a skin from the css/skins
+       folder instead of downloading all of them to reduce the load. -->
+  <link rel="stylesheet" href="../bower/admin-lte/dist/css/skins/_all-skins.min.css">
+  <!-- SchemaSpy -->
+  <link rel="stylesheet" href="../schemaSpy.css">
+  <!-- GMOD Chado Specific CSS -->
+  <link rel="stylesheet" href="../main.css">
+  
+  <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+  <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+  <!--[if lt IE 9]>
+  <script src="../bower/html5shiv/html5shiv.min.js"></script>
+  <script src="../bower/respond/respond.min.js"></script>
+  <![endif]-->
+</head>
+<!-- ADD THE CLASS layout-top-nav TO REMOVE THE SIDEBAR. -->
+<!-- Skins: skin-black, black-light, green-light, red-light, yellow-light, purple-light, blue-light -->
+<body class="hold-transition skin-black layout-top-nav">
+<div class="wrapper">
+  <header class="main-header">
+    <nav class="navbar navbar-static-top">
+      <div class="container">
+        <div class="navbar-header">
+          <a href="../index.html" class="navbar-brand" style="padding:0;">
+            <img src="../GMOD-cogs.png" class="gmod-logo" />
+            <span class="gmod-title">Chado</span>
+          </a>
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar-collapse">
+            <i class="fa fa-bars"></i>
+          </button>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-collapse pull-left" id="navbar-collapse">
+          <ul class="nav navbar-nav">
+            <li>
+              <a href="../index.html" title="All Chado Tables.">
+                Home</span>
+              </a>
+            </li>
+            <li>
+              <a href="../index.html" title="All Chado Tables.">
+                All Tables</span>
+              </a>
+            </li>
+            <li>
+              <a href="../constraints.html" title="All Constraints in Chado.">
+                All Constraints
+              </a>
+            </li>
+          </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+        <!-- Navbar Right Menu -->
+
+      </div>
+      <!-- /.container-fluid -->
+    </nav>
+  </header>
+  <!-- Main content -->
+  <!-- Full Width Column -->
+  <div class="content-wrapper">
+    
+    <div class="box box-solid">
+      <div class="box-body">
+        <p><span class="version-label">Schema Version:</span> 1.3</p>
+      </div>
+    </div>
+		
+          <!-- Content Header (Page header) -->
+      <section class="content-header">
+        <h1>featuremap_pub</h1></br>
+		      </section>
+      <!-- Main content -->
+      <section class="content">
+		<div class="box box-primary">
+			<div class="box-header with-border">
+			  <span class="glyphicon glyphicon-list-alt" aria-hidden="true"></span>
+              <h3 id="Columns" class="box-title">Columns</h3>
+              <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
+                </button>
+                <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
+              </div>
+            </div>	
+            <div class="box-body">
+				<table id="standard_table" class="table table-bordered table-striped dataTable" role="grid">
+				<thead align='left'>
+				<tr>
+				  <th>Column</th>
+				  <th>Type</th>
+				  <th>Size</th>
+				  <th title='Columns in tables that are referenced by this column'>Foreign Key</th>
+				  <th title='Are nulls allowed?'>Nullable</th>
+				  <th title='Default value'>Default</th>
+				  <th title='Comments' class="toggle"><span>Comments</span></th>
+				</tr>
+				</thead>
+				<tbody>
+				<tr>
+				 <td class='primaryKey' title='Primary Key'><i class='icon ion-key iconkey' style='padding-left: 5px;'></i><span id="featuremap_pub_id">featuremap_pub_id</span></td>
+				 <td>bigserial</td>
+				 <td>19</td>
+				 <td>
+				  <table border='0' cellspacing='0' cellpadding='0'>
+				  </table>					 
+				 </td>
+				 <td title=''></td>
+				 <td>nextval(&#39;chado.featuremap_pub_featuremap_pub_id_seq&#39;::regclass)</td>
+				 <td></td>
+				</tr>
+				<tr>
+				 <td class='foreignKey' title='Foreign Key'><i class='icon ion-key iconkey' style='padding-left: 5px;'></i><span id="featuremap_id">featuremap_id</span></td>
+				 <td>int8</td>
+				 <td>19</td>
+				 <td>
+				  <table border='0' cellspacing='0' cellpadding='0'>
+				   <tr>
+					<td title="featuremap_pub.featuremap_id references featuremap.featuremap_id via featuremap_pub_featuremap_id_fkey">
+						<a href='featuremap.html'>featuremap</a><span class='relatedKey'>.featuremap_id</span>
+					</td>
+					<td class="constraint detail">
+						featuremap_pub_featuremap_id_fkey <span title='Cascade on delete:&#10;Deletion of parent deletes child'>C</span>
+					</td>
+				   </tr>
+				  </table>					 
+				 </td>
+				 <td title=''></td>
+				 <td>null</td>
+				 <td></td>
+				</tr>
+				<tr>
+				 <td class='foreignKey' title='Foreign Key'><i class='icon ion-key iconkey' style='padding-left: 5px;'></i><span id="pub_id">pub_id</span></td>
+				 <td>int8</td>
+				 <td>19</td>
+				 <td>
+				  <table border='0' cellspacing='0' cellpadding='0'>
+				   <tr>
+					<td title="featuremap_pub.pub_id references pub.pub_id via featuremap_pub_pub_id_fkey">
+						<a href='pub.html'>pub</a><span class='relatedKey'>.pub_id</span>
+					</td>
+					<td class="constraint detail">
+						featuremap_pub_pub_id_fkey <span title='Cascade on delete:&#10;Deletion of parent deletes child'>C</span>
+					</td>
+				   </tr>
+				  </table>					 
+				 </td>
+				 <td title=''></td>
+				 <td>null</td>
+				 <td></td>
+				</tr>
+								</tbody>
+				</table>
+				<p title='3 columns'>Table contained <span id="recordNumber">-1</span> rows<p/>
+			</div>
+		</div>
+		<div class="box box-primary">		
+			<div class="box-header with-border">
+              <i class="fa fa-sitemap"></i>
+
+              <h3 id="Indexes" class="box-title">Indexes</h3>
+
+              <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
+                </button>
+                <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
+              </div>
+            </div>	
+			<div class="box-body">
+				<table id="indexes_table" class="table table-bordered table-striped dataTable" role="grid">
+				<thead>
+				 <tr>
+				  <th>Constraint Name</th>
+				  <th>Type</th>
+				  <th>Sort</th>
+				  <th>Column(s)</th>
+				 </tr>
+				</thead>
+				<tbody>
+				 <tr>
+				  <td class='primaryKey' title='Primary Key'><i class='icon ion-key iconkey'></i> featuremap_pub_pkey</td>
+				  <td>Primary key</td>
+				  <td><span title='Ascending'>Asc</span></td>
+				  <td>featuremap_pub_id</td>
+				 </tr>				 
+				 <tr>
+				  <td title='Indexed'>featuremap_pub_idx1</td>
+				  <td>Performance</td>
+				  <td><span title='Ascending'>Asc</span></td>
+				  <td>featuremap_id</td>
+				 </tr>				 
+				 <tr>
+				  <td title='Indexed'>featuremap_pub_idx2</td>
+				  <td>Performance</td>
+				  <td><span title='Ascending'>Asc</span></td>
+				  <td>pub_id</td>
+				 </tr>				 
+				</tbody>
+				</table>   			  
+			</div><!-- /.box-body -->
+		</div>
+				<div class="box box-primary">		
+			<div class="box-header with-border">
+              <i class="fa fa-code-fork"></i>
+
+              <h3 id="Relationships" class="box-title">Relationships</h3>
+
+              <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
+                </button>
+                <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
+              </div>
+            </div>	
+			<div class="box-body">	
+			<div class="nav-tabs-custom" style="cursor: move;">
+				<p>The following entity relationship (ER) diagram shows the relationships involving the featuremap_pub table. </p>
+            <!-- Tabs within a box -->
+			<h4>Show relationships within degrees of separation</h4>
+            <ul class="nav nav-tabs pull-left ui-sortable-handle">
+			  			              <li class="active"><a href="#oneDegreeImg-chart" data-toggle="tab" aria-expanded="true">One</a></li>			  			 
+			  			              <li class=""><a href="#twodegreesDegreeImg-chart" data-toggle="tab" aria-expanded="true">Two degrees</a></li>			  			 
+            </ul>
+            <div class="tab-content no-padding">            
+				<div class="chart tab-pane active" id="oneDegreeImg-chart" style="position: relative; overflow-x:auto;">					
+					<map id="oneDegreeRelationshipsDiagram" name="oneDegreeRelationshipsDiagram">
+<area shape="rect" id="node1" href="featuremap_pub.html" title="featuremap_pub" alt="" coords="217,55,516,214">
+<area shape="rect" id="node2" href="featuremap.html" title="featuremap" alt="" coords="5,5,173,182">
+<area shape="rect" id="node3" href="pub.html" title="pub" alt="" coords="13,199,165,377">
+</map>
+
+					<a name='diagram'><img id='oneDegreeImg' src='../diagrams/featuremap_pub.1degree.png' usemap='#oneDegreeRelationshipsDiagram' class='diagram' border='0' alt='' align='left'></a>							
+				</div>
+				<div class="chart tab-pane " id="twodegreesDegreeImg-chart" style="position: relative; overflow-x:auto;">					
+					<map id="twoDegreesRelationshipsDiagram" name="twoDegreesRelationshipsDiagram">
+<area shape="rect" id="node1" href="analysis_pub.html" title="analysis_pub" alt="" coords="454,4165,629,4254">
+<area shape="rect" id="node2" href="pub.html" title="pub" alt="" coords="188,3149,340,3326">
+<area shape="rect" id="node4" href="cvterm.html" title="cvterm" alt="" coords="5,1417,136,1506">
+<area shape="rect" id="node3" href="cell_line_cvterm.html" title="cell_line_cvterm" alt="" coords="444,927,639,1017">
+<area shape="rect" id="node5" href="cell_line_feature.html" title="cell_line_feature" alt="" coords="443,4735,639,4825">
+<area shape="rect" id="node6" href="cell_line_library.html" title="cell_line_library" alt="" coords="445,4842,637,4931">
+<area shape="rect" id="node7" href="cell_line_pub.html" title="cell_line_pub" alt="" coords="454,4949,629,5038">
+<area shape="rect" id="node8" href="cell_line_synonym.html" title="cell_line_synonym" alt="" coords="436,5055,647,5145">
+<area shape="rect" id="node9" href="cell_lineprop_pub.html" title="cell_lineprop_pub" alt="" coords="438,1674,645,1763">
+<area shape="rect" id="node10" href="expression_pub.html" title="expression_pub" alt="" coords="444,1781,639,1870">
+<area shape="rect" id="node11" href="feature_cvterm.html" title="feature_cvterm" alt="" coords="448,1034,635,1123">
+<area shape="rect" id="node12" href="feature_cvterm_pub.html" title="feature_cvterm_pub" alt="" coords="775,1655,998,1745">
+<area shape="rect" id="node13" href="feature_expression.html" title="feature_expression" alt="" coords="433,1887,649,1977">
+<area shape="rect" id="node14" href="feature_pub.html" title="feature_pub" alt="" coords="458,1994,625,2083">
+<area shape="rect" id="node15" href="feature_relationship_pub.html" title="feature_relationship_pub" alt="" coords="413,2101,670,2190">
+<area shape="rect" id="node16" href="feature_relationshipprop_pub.html" title="feature_relationshipprop_pub" alt="" coords="396,2207,687,2297">
+<area shape="rect" id="node17" href="feature_synonym.html" title="feature_synonym" alt="" coords="440,2351,643,2441">
+<area shape="rect" id="node18" href="featureloc_pub.html" title="featureloc_pub" alt="" coords="448,2458,635,2547">
+<area shape="rect" id="node19" href="featuremap.html" title="featuremap" alt="" coords="180,429,348,606">
+<area shape="rect" id="node20" href="featuremap_contact.html" title="featuremap_contact" alt="" coords="431,218,652,307">
+<area shape="rect" id="node21" href="featuremap_dbxref.html" title="featuremap_dbxref" alt="" coords="434,325,649,414">
+<area shape="rect" id="node22" href="featuremap_organism.html" title="featuremap_organism" alt="" coords="424,431,659,521">
+<area shape="rect" id="node23" href="featuremap_pub.html" title="featuremap_pub" alt="" coords="392,751,691,910">
+<area shape="rect" id="node24" href="featuremapprop.html" title="featuremapprop" alt="" coords="444,538,639,627">
+<area shape="rect" id="node25" href="featurepos.html" title="featurepos" alt="" coords="463,5,620,94">
+<area shape="rect" id="node26" href="featureprop_pub.html" title="featureprop_pub" alt="" coords="442,2565,641,2654">
+<area shape="rect" id="node27" href="featurerange.html" title="featurerange" alt="" coords="456,111,627,201">
+<area shape="rect" id="node28" href="library_cvterm.html" title="library_cvterm" alt="" coords="450,1141,633,1230">
+<area shape="rect" id="node29" href="library_expression.html" title="library_expression" alt="" coords="435,2671,647,2761">
+<area shape="rect" id="node30" href="library_pub.html" title="library_pub" alt="" coords="460,2778,623,2867">
+<area shape="rect" id="node31" href="library_relationship_pub.html" title="library_relationship_pub" alt="" coords="415,2885,668,2974">
+<area shape="rect" id="node32" href="library_synonym.html" title="library_synonym" alt="" coords="442,2991,641,3081">
+<area shape="rect" id="node33" href="libraryprop_pub.html" title="libraryprop_pub" alt="" coords="444,3098,639,3187">
+<area shape="rect" id="node34" href="nd_experiment_pub.html" title="nd_experiment_pub" alt="" coords="431,3205,652,3294">
+<area shape="rect" id="node35" href="organism_cvterm.html" title="organism_cvterm" alt="" coords="439,1247,643,1337">
+<area shape="rect" id="node36" href="organism_pub.html" title="organism_pub" alt="" coords="450,3311,633,3401">
+<area shape="rect" id="node37" href="organismprop_pub.html" title="organismprop_pub" alt="" coords="433,3418,649,3507">
+<area shape="rect" id="node38" href="phendesc.html" title="phendesc" alt="" coords="466,1354,617,1443">
+<area shape="rect" id="node39" href="phenotype_comparison.html" title="phenotype_comparison" alt="" coords="418,4591,665,4681">
+<area shape="rect" id="node40" href="phenotype_comparison_cvterm.html" title="phenotype_comparison_cvterm" alt="" coords="735,4659,1038,4749">
+<area shape="rect" id="node41" href="phenstatement.html" title="phenstatement" alt="" coords="448,1461,635,1550">
+<area shape="rect" id="node42" href="phylonode_pub.html" title="phylonode_pub" alt="" coords="446,3525,637,3614">
+<area shape="rect" id="node43" href="phylotree_pub.html" title="phylotree_pub" alt="" coords="450,3631,633,3721">
+<area shape="rect" id="node44" href="project_pub.html" title="project_pub" alt="" coords="458,3738,625,3827">
+<area shape="rect" id="node45" href="protocol.html" title="protocol" alt="" coords="471,1567,612,1657">
+<area shape="rect" id="node46" href="pub_dbxref.html" title="pub_dbxref" alt="" coords="460,3845,623,3934">
+<area shape="rect" id="node47" href="pub_relationship.html" title="pub_relationship" alt="" coords="441,5162,641,5251">
+<area shape="rect" id="node48" href="pubauthor.html" title="pubauthor" alt="" coords="464,3951,619,4041">
+<area shape="rect" id="node49" href="pubprop.html" title="pubprop" alt="" coords="470,5269,613,5358">
+<area shape="rect" id="node50" href="stock_cvterm.html" title="stock_cvterm" alt="" coords="453,5375,629,5465">
+<area shape="rect" id="node51" href="stock_featuremap.html" title="stock_featuremap" alt="" coords="438,645,645,734">
+<area shape="rect" id="node52" href="stock_pub.html" title="stock_pub" alt="" coords="464,4058,619,4147">
+<area shape="rect" id="node53" href="stock_relationship_cvterm.html" title="stock_relationship_cvterm" alt="" coords="408,5482,675,5571">
+<area shape="rect" id="node54" href="stock_relationship_pub.html" title="stock_relationship_pub" alt="" coords="418,4271,665,4361">
+<area shape="rect" id="node55" href="stockprop_pub.html" title="stockprop_pub" alt="" coords="447,4378,635,4467">
+<area shape="rect" id="node56" href="study.html" title="study" alt="" coords="481,4485,602,4574">
+</map>
+
+					<a name='diagram'><img id='twodegreesDegreeImg' src='../diagrams/featuremap_pub.2degrees.png' usemap='#twoDegreesRelationshipsDiagram' class='diagram' border='0' alt='' align='left'></a>							
+				</div>
+			  			</div>
+			</div>
+		  </div><!-- /.box-body -->
+		</div>
+	      </section>
+    
+  </div>
+  <!-- /.content-wrapper -->
+  <footer class="main-footer">
+    <div>
+      <div class="pull-right hidden-xs">
+        <a href="https://github.com/schemaspy/schemaspy" title="GitHub for SchemaSpy"><i class="fa fa-github-square fa-2x"></i></a>
+        <a href="http://stackoverflow.com/questions/tagged/schemaspy" title="StackOverflow for SchemaSpy"><i class="fa fa-stack-overflow fa-2x"></i></a>
+      </div>
+      <strong>Generated by <a href="http://schemaspy.org/" class="logo-text"><i class="fa fa-database"></i> SchemaSpy @project.version@</a></strong>
+    </div>
+    <!-- /.container -->
+  </footer>
+</div>
+<!-- ./wrapper -->
+
+<!-- jQuery 2.2.3 -->
+<script src="../bower/admin-lte/plugins/jQuery/jquery-2.2.3.min.js"></script>
+<script src="../bower/admin-lte/plugins/jQueryUI/jquery-ui.min.js"></script>
+<!-- Bootstrap 3.3.5 -->
+<script src="../bower/admin-lte/bootstrap/js/bootstrap.min.js"></script>
+<!-- DataTables -->
+<script src="../bower/datatables.net/jquery.dataTables.min.js"></script>
+<script src="../bower/datatables.net-bs/js/dataTables.bootstrap.min.js"></script>
+<script src="../bower/datatables.net-buttons/dataTables.buttons.min.js"></script>
+<script src="../bower/datatables.net-buttons-bs/js/buttons.bootstrap.min.js"></script>
+<script src="../bower/datatables.net-buttons/buttons.html5.min.js"></script>
+<script src="../bower/datatables.net-buttons/buttons.print.min.js"></script>
+<script src="../bower/datatables.net-buttons/buttons.colVis.min.js"></script>
+
+<!-- SlimScroll -->
+<script src="../bower/admin-lte/plugins/slimScroll/jquery.slimscroll.min.js"></script>
+<!-- FastClick -->
+<script src="../bower/admin-lte/plugins/fastclick/fastclick.js"></script>
+<!-- Salvattore -->
+<script src="../bower/salvattore/salvattore.min.js"></script>
+<!-- AnchorJS -->
+<script src="../bower/anchor-js/anchor.min.js"></script>
+<!-- CodeMirror -->
+<script src="../bower/codemirror/codemirror.js"></script>
+<script src="../bower/codemirror/sql.js"></script>
+<!-- AdminLTE App -->
+<script src="../bower/admin-lte/dist/js/app.min.js"></script>
+<script src="table.js"></script>
+<script src="../schemaSpy.js"></script>
+</body>
+</html>

@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>biomaterial_dbxref -  Chado</title>
+  <!-- Tell the browser to be responsive to screen width -->
+  <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+  <link rel="icon" type="image/png" sizes="16x16" href="../favicon.ico">
+  <!-- Bootstrap 3.3.5 -->
+  <link rel="stylesheet" href="../bower/admin-lte/bootstrap/css/bootstrap.min.css">
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="../bower/font-awesome/css/font-awesome.min.css">
+  <!-- Ionicons -->
+  <link rel="stylesheet" href="../bower/ionicons/css/ionicons.min.css">
+  <!-- DataTables -->
+  <link rel="stylesheet" href="../bower/datatables.net-bs/css/dataTables.bootstrap.min.css">
+  <link rel="stylesheet" href="../bower/datatables.net-buttons-bs/css/buttons.bootstrap.min.css">
+  <!-- Code Mirror -->
+  <link rel="stylesheet" href="../bower/codemirror/codemirror.css">
+  <!-- Fonts -->
+  <link href='../fonts/indieflower/indie-flower.css' rel='stylesheet' type='text/css'>
+  <link href='../fonts/source-sans-pro/source-sans-pro.css' rel='stylesheet' type='text/css'>
+
+  <!-- Theme style -->
+  <link rel="stylesheet" href="../bower/admin-lte/dist/css/AdminLTE.min.css">
+  <!-- Salvattore -->
+  <link rel="stylesheet" href="../bower/salvattore/salvattore.css">
+  <!-- AdminLTE Skins. Choose a skin from the css/skins
+       folder instead of downloading all of them to reduce the load. -->
+  <link rel="stylesheet" href="../bower/admin-lte/dist/css/skins/_all-skins.min.css">
+  <!-- SchemaSpy -->
+  <link rel="stylesheet" href="../schemaSpy.css">
+  <!-- GMOD Chado Specific CSS -->
+  <link rel="stylesheet" href="../main.css">
+  
+  <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+  <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+  <!--[if lt IE 9]>
+  <script src="../bower/html5shiv/html5shiv.min.js"></script>
+  <script src="../bower/respond/respond.min.js"></script>
+  <![endif]-->
+</head>
+<!-- ADD THE CLASS layout-top-nav TO REMOVE THE SIDEBAR. -->
+<!-- Skins: skin-black, black-light, green-light, red-light, yellow-light, purple-light, blue-light -->
+<body class="hold-transition skin-black layout-top-nav">
+<div class="wrapper">
+  <header class="main-header">
+    <nav class="navbar navbar-static-top">
+      <div class="container">
+        <div class="navbar-header">
+          <a href="../index.html" class="navbar-brand" style="padding:0;">
+            <img src="../GMOD-cogs.png" class="gmod-logo" />
+            <span class="gmod-title">Chado</span>
+          </a>
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar-collapse">
+            <i class="fa fa-bars"></i>
+          </button>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-collapse pull-left" id="navbar-collapse">
+          <ul class="nav navbar-nav">
+            <li>
+              <a href="../index.html" title="All Chado Tables.">
+                Home</span>
+              </a>
+            </li>
+            <li>
+              <a href="../index.html" title="All Chado Tables.">
+                All Tables</span>
+              </a>
+            </li>
+            <li>
+              <a href="../constraints.html" title="All Constraints in Chado.">
+                All Constraints
+              </a>
+            </li>
+          </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+        <!-- Navbar Right Menu -->
+
+      </div>
+      <!-- /.container-fluid -->
+    </nav>
+  </header>
+  <!-- Main content -->
+  <!-- Full Width Column -->
+  <div class="content-wrapper">
+    
+    <div class="box box-solid">
+      <div class="box-body">
+        <p><span class="version-label">Schema Version:</span> 1.3</p>
+      </div>
+    </div>
+		
+          <!-- Content Header (Page header) -->
+      <section class="content-header">
+        <h1>biomaterial_dbxref</h1></br>
+		      </section>
+      <!-- Main content -->
+      <section class="content">
+		<div class="box box-primary">
+			<div class="box-header with-border">
+			  <span class="glyphicon glyphicon-list-alt" aria-hidden="true"></span>
+              <h3 id="Columns" class="box-title">Columns</h3>
+              <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
+                </button>
+                <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
+              </div>
+            </div>	
+            <div class="box-body">
+				<table id="standard_table" class="table table-bordered table-striped dataTable" role="grid">
+				<thead align='left'>
+				<tr>
+				  <th>Column</th>
+				  <th>Type</th>
+				  <th>Size</th>
+				  <th title='Columns in tables that are referenced by this column'>Foreign Key</th>
+				  <th title='Are nulls allowed?'>Nullable</th>
+				  <th title='Default value'>Default</th>
+				  <th title='Comments' class="toggle"><span>Comments</span></th>
+				</tr>
+				</thead>
+				<tbody>
+				<tr>
+				 <td class='primaryKey' title='Primary Key'><i class='icon ion-key iconkey' style='padding-left: 5px;'></i><span id="biomaterial_dbxref_id">biomaterial_dbxref_id</span></td>
+				 <td>bigserial</td>
+				 <td>19</td>
+				 <td>
+				  <table border='0' cellspacing='0' cellpadding='0'>
+				  </table>					 
+				 </td>
+				 <td title=''></td>
+				 <td>nextval(&#39;chado.biomaterial_dbxref_biomaterial_dbxref_id_seq&#39;::regclass)</td>
+				 <td></td>
+				</tr>
+				<tr>
+				 <td class='foreignKey' title='Foreign Key'><i class='icon ion-key iconkey' style='padding-left: 5px;'></i><span id="biomaterial_id">biomaterial_id</span></td>
+				 <td>int8</td>
+				 <td>19</td>
+				 <td>
+				  <table border='0' cellspacing='0' cellpadding='0'>
+				   <tr>
+					<td title="biomaterial_dbxref.biomaterial_id references biomaterial.biomaterial_id via biomaterial_dbxref_biomaterial_id_fkey">
+						<a href='biomaterial.html'>biomaterial</a><span class='relatedKey'>.biomaterial_id</span>
+					</td>
+					<td class="constraint detail">
+						biomaterial_dbxref_biomaterial_id_fkey <span title='Cascade on delete:&#10;Deletion of parent deletes child'>C</span>
+					</td>
+				   </tr>
+				  </table>					 
+				 </td>
+				 <td title=''></td>
+				 <td>null</td>
+				 <td></td>
+				</tr>
+				<tr>
+				 <td class='foreignKey' title='Foreign Key'><i class='icon ion-key iconkey' style='padding-left: 5px;'></i><span id="dbxref_id">dbxref_id</span></td>
+				 <td>int8</td>
+				 <td>19</td>
+				 <td>
+				  <table border='0' cellspacing='0' cellpadding='0'>
+				   <tr>
+					<td title="biomaterial_dbxref.dbxref_id references dbxref.dbxref_id via biomaterial_dbxref_dbxref_id_fkey">
+						<a href='dbxref.html'>dbxref</a><span class='relatedKey'>.dbxref_id</span>
+					</td>
+					<td class="constraint detail">
+						biomaterial_dbxref_dbxref_id_fkey <span title='Cascade on delete:&#10;Deletion of parent deletes child'>C</span>
+					</td>
+				   </tr>
+				  </table>					 
+				 </td>
+				 <td title=''></td>
+				 <td>null</td>
+				 <td></td>
+				</tr>
+								</tbody>
+				</table>
+				<p title='3 columns'>Table contained <span id="recordNumber">-1</span> rows<p/>
+			</div>
+		</div>
+		<div class="box box-primary">		
+			<div class="box-header with-border">
+              <i class="fa fa-sitemap"></i>
+
+              <h3 id="Indexes" class="box-title">Indexes</h3>
+
+              <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
+                </button>
+                <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
+              </div>
+            </div>	
+			<div class="box-body">
+				<table id="indexes_table" class="table table-bordered table-striped dataTable" role="grid">
+				<thead>
+				 <tr>
+				  <th>Constraint Name</th>
+				  <th>Type</th>
+				  <th>Sort</th>
+				  <th>Column(s)</th>
+				 </tr>
+				</thead>
+				<tbody>
+				 <tr>
+				  <td class='primaryKey' title='Primary Key'><i class='icon ion-key iconkey'></i> biomaterial_dbxref_pkey</td>
+				  <td>Primary key</td>
+				  <td><span title='Ascending'>Asc</span></td>
+				  <td>biomaterial_dbxref_id</td>
+				 </tr>				 
+				 <tr>
+				  <td class='uniqueKey' title='Unique Key'><i class='icon ion-key iconkey'></i> biomaterial_dbxref_c1</td>
+				  <td>Must be unique</td>
+				  <td><span title='Ascending'>Asc</span>/<span title='Ascending'>Asc</span></td>
+				  <td>biomaterial_id + dbxref_id</td>
+				 </tr>				 
+				 <tr>
+				  <td title='Indexed'>biomaterial_dbxref_idx1</td>
+				  <td>Performance</td>
+				  <td><span title='Ascending'>Asc</span></td>
+				  <td>biomaterial_id</td>
+				 </tr>				 
+				 <tr>
+				  <td title='Indexed'>biomaterial_dbxref_idx2</td>
+				  <td>Performance</td>
+				  <td><span title='Ascending'>Asc</span></td>
+				  <td>dbxref_id</td>
+				 </tr>				 
+				</tbody>
+				</table>   			  
+			</div><!-- /.box-body -->
+		</div>
+				<div class="box box-primary">		
+			<div class="box-header with-border">
+              <i class="fa fa-code-fork"></i>
+
+              <h3 id="Relationships" class="box-title">Relationships</h3>
+
+              <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
+                </button>
+                <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
+              </div>
+            </div>	
+			<div class="box-body">	
+			<div class="nav-tabs-custom" style="cursor: move;">
+				<p>The following entity relationship (ER) diagram shows the relationships involving the biomaterial_dbxref table. </p>
+            <!-- Tabs within a box -->
+			<h4>Show relationships within degrees of separation</h4>
+            <ul class="nav nav-tabs pull-left ui-sortable-handle">
+			  			              <li class="active"><a href="#oneDegreeImg-chart" data-toggle="tab" aria-expanded="true">One</a></li>			  			 
+			  			              <li class=""><a href="#twodegreesDegreeImg-chart" data-toggle="tab" aria-expanded="true">Two degrees</a></li>			  			 
+            </ul>
+            <div class="tab-content no-padding">            
+				<div class="chart tab-pane active" id="oneDegreeImg-chart" style="position: relative; overflow-x:auto;">					
+					<map id="oneDegreeRelationshipsDiagram" name="oneDegreeRelationshipsDiagram">
+<area shape="rect" id="node1" href="biomaterial.html" title="biomaterial" alt="" coords="194,5,419,241">
+<area shape="rect" id="node2" href="dbxref.html" title="dbxref" alt="" coords="6,154,149,361">
+<area shape="rect" id="node3" href="biomaterial_dbxref.html" title="biomaterial_dbxref" alt="" coords="464,63,784,222">
+</map>
+
+					<a name='diagram'><img id='oneDegreeImg' src='../diagrams/biomaterial_dbxref.1degree.png' usemap='#oneDegreeRelationshipsDiagram' class='diagram' border='0' alt='' align='left'></a>							
+				</div>
+				<div class="chart tab-pane " id="twodegreesDegreeImg-chart" style="position: relative; overflow-x:auto;">					
+					<map id="twoDegreesRelationshipsDiagram" name="twoDegreesRelationshipsDiagram">
+<area shape="rect" id="node1" href="analysis_dbxref.html" title="analysis_dbxref" alt="" coords="385,5,577,94">
+<area shape="rect" id="node2" href="dbxref.html" title="dbxref" alt="" coords="151,1254,294,1461">
+<area shape="rect" id="node18" href="db.html" title="db" alt="" coords="6,1286,106,1375">
+<area shape="rect" id="node3" href="arraydesign.html" title="arraydesign" alt="" coords="927,365,1092,454">
+<area shape="rect" id="node4" href="contact.html" title="contact" alt="" coords="693,705,827,794">
+<area shape="rect" id="node5" href="cvterm.html" title="cvterm" alt="" coords="416,739,547,829">
+<area shape="rect" id="node6" href="protocol.html" title="protocol" alt="" coords="689,329,831,418">
+<area shape="rect" id="node7" href="assay.html" title="assay" alt="" coords="1265,365,1388,454">
+<area shape="rect" id="node8" href="assay_biomaterial.html" title="assay_biomaterial" alt="" coords="1544,454,1752,543">
+<area shape="rect" id="node9" href="biomaterial.html" title="biomaterial" alt="" coords="897,723,1122,959">
+<area shape="rect" id="node10" href="organism.html" title="organism" alt="" coords="686,561,834,650">
+<area shape="rect" id="node11" href="biomaterial_dbxref.html" title="biomaterial_dbxref" alt="" coords="1167,939,1487,1098">
+<area shape="rect" id="node12" href="biomaterial_relationship.html" title="biomaterial_relationship" alt="" coords="1201,726,1452,815">
+<area shape="rect" id="node13" href="biomaterial_treatment.html" title="biomaterial_treatment" alt="" coords="1531,650,1765,739">
+<area shape="rect" id="node14" href="treatment.html" title="treatment" alt="" coords="1252,546,1401,635">
+<area shape="rect" id="node15" href="biomaterialprop.html" title="biomaterialprop" alt="" coords="1230,833,1423,922">
+<area shape="rect" id="node16" href="cell_line_dbxref.html" title="cell_line_dbxref" alt="" coords="385,1458,577,1547">
+<area shape="rect" id="node17" href="cvterm_dbxref.html" title="cvterm_dbxref" alt="" coords="669,957,851,1046">
+<area shape="rect" id="node19" href="dbxrefprop.html" title="dbxrefprop" alt="" coords="680,1063,840,1153">
+<area shape="rect" id="node20" href="element.html" title="element" alt="" coords="1258,239,1395,329">
+<area shape="rect" id="node21" href="feature.html" title="feature" alt="" coords="944,221,1075,310">
+<area shape="rect" id="node22" href="feature_cvterm_dbxref.html" title="feature_cvterm_dbxref" alt="" coords="361,1565,601,1654">
+<area shape="rect" id="node23" href="feature_dbxref.html" title="feature_dbxref" alt="" coords="1235,103,1419,193">
+<area shape="rect" id="node24" href="featuremap_dbxref.html" title="featuremap_dbxref" alt="" coords="374,1671,589,1761">
+<area shape="rect" id="node25" href="library_dbxref.html" title="library_dbxref" alt="" coords="391,1778,571,1867">
+<area shape="rect" id="node26" href="nd_experiment_dbxref.html" title="nd_experiment_dbxref" alt="" coords="362,1885,601,1974">
+<area shape="rect" id="node27" href="nd_experiment_stock_dbxref.html" title="nd_experiment_stock_dbxref" alt="" coords="339,1991,624,2081">
+<area shape="rect" id="node28" href="organism_dbxref.html" title="organism_dbxref" alt="" coords="909,545,1110,634">
+<area shape="rect" id="node29" href="phylonode_dbxref.html" title="phylonode_dbxref" alt="" coords="377,2098,586,2187">
+<area shape="rect" id="node30" href="phylotree.html" title="phylotree" alt="" coords="686,1170,834,1259">
+<area shape="rect" id="node31" href="project_dbxref.html" title="project_dbxref" alt="" coords="389,2205,573,2294">
+<area shape="rect" id="node32" href="pub_dbxref.html" title="pub_dbxref" alt="" coords="400,2311,563,2401">
+<area shape="rect" id="node33" href="stock.html" title="stock" alt="" coords="949,1117,1069,1206">
+<area shape="rect" id="node34" href="stock_dbxref.html" title="stock_dbxref" alt="" coords="1240,1267,1413,1357">
+<area shape="rect" id="node35" href="study.html" title="study" alt="" coords="949,1266,1070,1355">
+</map>
+
+					<a name='diagram'><img id='twodegreesDegreeImg' src='../diagrams/biomaterial_dbxref.2degrees.png' usemap='#twoDegreesRelationshipsDiagram' class='diagram' border='0' alt='' align='left'></a>							
+				</div>
+			  			</div>
+			</div>
+		  </div><!-- /.box-body -->
+		</div>
+	      </section>
+    
+  </div>
+  <!-- /.content-wrapper -->
+  <footer class="main-footer">
+    <div>
+      <div class="pull-right hidden-xs">
+        <a href="https://github.com/schemaspy/schemaspy" title="GitHub for SchemaSpy"><i class="fa fa-github-square fa-2x"></i></a>
+        <a href="http://stackoverflow.com/questions/tagged/schemaspy" title="StackOverflow for SchemaSpy"><i class="fa fa-stack-overflow fa-2x"></i></a>
+      </div>
+      <strong>Generated by <a href="http://schemaspy.org/" class="logo-text"><i class="fa fa-database"></i> SchemaSpy @project.version@</a></strong>
+    </div>
+    <!-- /.container -->
+  </footer>
+</div>
+<!-- ./wrapper -->
+
+<!-- jQuery 2.2.3 -->
+<script src="../bower/admin-lte/plugins/jQuery/jquery-2.2.3.min.js"></script>
+<script src="../bower/admin-lte/plugins/jQueryUI/jquery-ui.min.js"></script>
+<!-- Bootstrap 3.3.5 -->
+<script src="../bower/admin-lte/bootstrap/js/bootstrap.min.js"></script>
+<!-- DataTables -->
+<script src="../bower/datatables.net/jquery.dataTables.min.js"></script>
+<script src="../bower/datatables.net-bs/js/dataTables.bootstrap.min.js"></script>
+<script src="../bower/datatables.net-buttons/dataTables.buttons.min.js"></script>
+<script src="../bower/datatables.net-buttons-bs/js/buttons.bootstrap.min.js"></script>
+<script src="../bower/datatables.net-buttons/buttons.html5.min.js"></script>
+<script src="../bower/datatables.net-buttons/buttons.print.min.js"></script>
+<script src="../bower/datatables.net-buttons/buttons.colVis.min.js"></script>
+
+<!-- SlimScroll -->
+<script src="../bower/admin-lte/plugins/slimScroll/jquery.slimscroll.min.js"></script>
+<!-- FastClick -->
+<script src="../bower/admin-lte/plugins/fastclick/fastclick.js"></script>
+<!-- Salvattore -->
+<script src="../bower/salvattore/salvattore.min.js"></script>
+<!-- AnchorJS -->
+<script src="../bower/anchor-js/anchor.min.js"></script>
+<!-- CodeMirror -->
+<script src="../bower/codemirror/codemirror.js"></script>
+<script src="../bower/codemirror/sql.js"></script>
+<!-- AdminLTE App -->
+<script src="../bower/admin-lte/dist/js/app.min.js"></script>
+<script src="table.js"></script>
+<script src="../schemaSpy.js"></script>
+</body>
+</html>

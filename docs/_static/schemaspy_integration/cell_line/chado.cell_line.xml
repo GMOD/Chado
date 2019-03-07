@@ -1,0 +1,238 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<database name="chado" schema="cell_line" type="PostgreSQL - 9.3.18">
+   <tables>
+      <table name="cell_line" remarks="" schema="cell_line" type="TABLE">
+         <column autoUpdated="false" defaultValue="nextval('cell_line.cell_line_cell_line_id_seq'::regclass)" digits="0" id="0" name="cell_line_id" nullable="false" remarks="" size="19" type="bigserial">
+            <child column="cell_line_id" foreignKey="cell_line_cvterm_cell_line_id_fkey" implied="false" onDeleteCascade="true" schema="cell_line" table="cell_line_cvterm"/>
+            <child column="cell_line_id" foreignKey="cell_line_dbxref_cell_line_id_fkey" implied="false" onDeleteCascade="true" schema="cell_line" table="cell_line_dbxref"/>
+            <child column="cell_line_id" foreignKey="cell_line_feature_cell_line_id_fkey" implied="false" onDeleteCascade="true" schema="cell_line" table="cell_line_feature"/>
+            <child column="cell_line_id" foreignKey="cell_line_library_cell_line_id_fkey" implied="false" onDeleteCascade="true" schema="cell_line" table="cell_line_library"/>
+            <child column="cell_line_id" foreignKey="cell_line_pub_cell_line_id_fkey" implied="false" onDeleteCascade="true" schema="cell_line" table="cell_line_pub"/>
+            <child column="object_id" foreignKey="cell_line_relationship_object_id_fkey" implied="false" onDeleteCascade="true" schema="cell_line" table="cell_line_relationship"/>
+            <child column="subject_id" foreignKey="cell_line_relationship_subject_id_fkey" implied="false" onDeleteCascade="true" schema="cell_line" table="cell_line_relationship"/>
+            <child column="cell_line_id" foreignKey="cell_line_synonym_cell_line_id_fkey" implied="false" onDeleteCascade="true" schema="cell_line" table="cell_line_synonym"/>
+            <child column="cell_line_id" foreignKey="cell_lineprop_cell_line_id_fkey" implied="false" onDeleteCascade="true" schema="cell_line" table="cell_lineprop"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="1" name="name" nullable="true" remarks="" size="255" type="varchar"/>
+         <column autoUpdated="false" digits="0" id="2" name="uniquename" nullable="false" remarks="" size="255" type="varchar"/>
+         <column autoUpdated="false" digits="0" id="3" name="organism_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="organism_id" foreignKey="cell_line_organism_id_fkey" implied="false" onDeleteCascade="true" schema="organism" table="organism"/>
+         </column>
+         <column autoUpdated="false" defaultValue="now()" digits="6" id="4" name="timeaccessioned" nullable="false" remarks="" size="29" type="timestamp"/>
+         <column autoUpdated="false" defaultValue="now()" digits="6" id="5" name="timelastmodified" nullable="false" remarks="" size="29" type="timestamp"/>
+         <primaryKey column="cell_line_id" sequenceNumberInPK="1"/>
+         <index name="cell_line_pkey" unique="true">
+            <column ascending="true" name="cell_line_id"/>
+         </index>
+         <index name="cell_line_c1" unique="true">
+            <column ascending="true" name="uniquename"/>
+            <column ascending="true" name="organism_id"/>
+         </index>
+      </table>
+      <table name="cell_line_cvterm" remarks="" schema="cell_line" type="TABLE">
+         <column autoUpdated="false" defaultValue="nextval('cell_line.cell_line_cvterm_cell_line_cvterm_id_seq'::regclass)" digits="0" id="0" name="cell_line_cvterm_id" nullable="false" remarks="" size="19" type="bigserial">
+            <child column="cell_line_cvterm_id" foreignKey="cell_line_cvtermprop_cell_line_cvterm_id_fkey" implied="false" onDeleteCascade="true" schema="cell_line" table="cell_line_cvtermprop"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="1" name="cell_line_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="cell_line_id" foreignKey="cell_line_cvterm_cell_line_id_fkey" implied="false" onDeleteCascade="true" schema="cell_line" table="cell_line"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="2" name="cvterm_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="cvterm_id" foreignKey="cell_line_cvterm_cvterm_id_fkey" implied="false" onDeleteCascade="true" schema="cv" table="cvterm"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="3" name="pub_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="pub_id" foreignKey="cell_line_cvterm_pub_id_fkey" implied="false" onDeleteCascade="true" schema="pub" table="pub"/>
+         </column>
+         <column autoUpdated="false" defaultValue="0" digits="0" id="4" name="rank" nullable="false" remarks="" size="10" type="int4"/>
+         <primaryKey column="cell_line_cvterm_id" sequenceNumberInPK="1"/>
+         <index name="cell_line_cvterm_pkey" unique="true">
+            <column ascending="true" name="cell_line_cvterm_id"/>
+         </index>
+         <index name="cell_line_cvterm_c1" unique="true">
+            <column ascending="true" name="cell_line_id"/>
+            <column ascending="true" name="cvterm_id"/>
+            <column ascending="true" name="pub_id"/>
+            <column ascending="true" name="rank"/>
+         </index>
+      </table>
+      <table name="cell_line_cvtermprop" remarks="" schema="cell_line" type="TABLE">
+         <column autoUpdated="false" defaultValue="nextval('cell_line.cell_line_cvtermprop_cell_line_cvtermprop_id_seq'::regclass)" digits="0" id="0" name="cell_line_cvtermprop_id" nullable="false" remarks="" size="19" type="bigserial"/>
+         <column autoUpdated="false" digits="0" id="1" name="cell_line_cvterm_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="cell_line_cvterm_id" foreignKey="cell_line_cvtermprop_cell_line_cvterm_id_fkey" implied="false" onDeleteCascade="true" schema="cell_line" table="cell_line_cvterm"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="2" name="type_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="cvterm_id" foreignKey="cell_line_cvtermprop_type_id_fkey" implied="false" onDeleteCascade="true" schema="cv" table="cvterm"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="3" name="value" nullable="true" remarks="" size="2147483647" type="text"/>
+         <column autoUpdated="false" defaultValue="0" digits="0" id="4" name="rank" nullable="false" remarks="" size="10" type="int4"/>
+         <primaryKey column="cell_line_cvtermprop_id" sequenceNumberInPK="1"/>
+         <index name="cell_line_cvtermprop_pkey" unique="true">
+            <column ascending="true" name="cell_line_cvtermprop_id"/>
+         </index>
+         <index name="cell_line_cvtermprop_c1" unique="true">
+            <column ascending="true" name="cell_line_cvterm_id"/>
+            <column ascending="true" name="type_id"/>
+            <column ascending="true" name="rank"/>
+         </index>
+      </table>
+      <table name="cell_line_dbxref" remarks="" schema="cell_line" type="TABLE">
+         <column autoUpdated="false" defaultValue="nextval('cell_line.cell_line_dbxref_cell_line_dbxref_id_seq'::regclass)" digits="0" id="0" name="cell_line_dbxref_id" nullable="false" remarks="" size="19" type="bigserial"/>
+         <column autoUpdated="false" digits="0" id="1" name="cell_line_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="cell_line_id" foreignKey="cell_line_dbxref_cell_line_id_fkey" implied="false" onDeleteCascade="true" schema="cell_line" table="cell_line"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="2" name="dbxref_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="dbxref_id" foreignKey="cell_line_dbxref_dbxref_id_fkey" implied="false" onDeleteCascade="true" schema="db" table="dbxref"/>
+         </column>
+         <column autoUpdated="false" defaultValue="true" digits="0" id="3" name="is_current" nullable="false" remarks="" size="1" type="bool"/>
+         <primaryKey column="cell_line_dbxref_id" sequenceNumberInPK="1"/>
+         <index name="cell_line_dbxref_pkey" unique="true">
+            <column ascending="true" name="cell_line_dbxref_id"/>
+         </index>
+         <index name="cell_line_dbxref_c1" unique="true">
+            <column ascending="true" name="cell_line_id"/>
+            <column ascending="true" name="dbxref_id"/>
+         </index>
+      </table>
+      <table name="cell_line_feature" remarks="" schema="cell_line" type="TABLE">
+         <column autoUpdated="false" defaultValue="nextval('cell_line.cell_line_feature_cell_line_feature_id_seq'::regclass)" digits="0" id="0" name="cell_line_feature_id" nullable="false" remarks="" size="19" type="bigserial"/>
+         <column autoUpdated="false" digits="0" id="1" name="cell_line_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="cell_line_id" foreignKey="cell_line_feature_cell_line_id_fkey" implied="false" onDeleteCascade="true" schema="cell_line" table="cell_line"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="2" name="feature_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="feature_id" foreignKey="cell_line_feature_feature_id_fkey" implied="false" onDeleteCascade="true" schema="sequence" table="feature"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="3" name="pub_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="pub_id" foreignKey="cell_line_feature_pub_id_fkey" implied="false" onDeleteCascade="true" schema="pub" table="pub"/>
+         </column>
+         <primaryKey column="cell_line_feature_id" sequenceNumberInPK="1"/>
+         <index name="cell_line_feature_pkey" unique="true">
+            <column ascending="true" name="cell_line_feature_id"/>
+         </index>
+         <index name="cell_line_feature_c1" unique="true">
+            <column ascending="true" name="cell_line_id"/>
+            <column ascending="true" name="feature_id"/>
+            <column ascending="true" name="pub_id"/>
+         </index>
+      </table>
+      <table name="cell_line_library" remarks="" schema="cell_line" type="TABLE">
+         <column autoUpdated="false" defaultValue="nextval('cell_line.cell_line_library_cell_line_library_id_seq'::regclass)" digits="0" id="0" name="cell_line_library_id" nullable="false" remarks="" size="19" type="bigserial"/>
+         <column autoUpdated="false" digits="0" id="1" name="cell_line_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="cell_line_id" foreignKey="cell_line_library_cell_line_id_fkey" implied="false" onDeleteCascade="true" schema="cell_line" table="cell_line"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="2" name="library_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="library_id" foreignKey="cell_line_library_library_id_fkey" implied="false" onDeleteCascade="true" schema="library" table="library"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="3" name="pub_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="pub_id" foreignKey="cell_line_library_pub_id_fkey" implied="false" onDeleteCascade="true" schema="pub" table="pub"/>
+         </column>
+         <primaryKey column="cell_line_library_id" sequenceNumberInPK="1"/>
+         <index name="cell_line_library_pkey" unique="true">
+            <column ascending="true" name="cell_line_library_id"/>
+         </index>
+         <index name="cell_line_library_c1" unique="true">
+            <column ascending="true" name="cell_line_id"/>
+            <column ascending="true" name="library_id"/>
+            <column ascending="true" name="pub_id"/>
+         </index>
+      </table>
+      <table name="cell_line_pub" remarks="" schema="cell_line" type="TABLE">
+         <column autoUpdated="false" defaultValue="nextval('cell_line.cell_line_pub_cell_line_pub_id_seq'::regclass)" digits="0" id="0" name="cell_line_pub_id" nullable="false" remarks="" size="19" type="bigserial"/>
+         <column autoUpdated="false" digits="0" id="1" name="cell_line_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="cell_line_id" foreignKey="cell_line_pub_cell_line_id_fkey" implied="false" onDeleteCascade="true" schema="cell_line" table="cell_line"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="2" name="pub_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="pub_id" foreignKey="cell_line_pub_pub_id_fkey" implied="false" onDeleteCascade="true" schema="pub" table="pub"/>
+         </column>
+         <primaryKey column="cell_line_pub_id" sequenceNumberInPK="1"/>
+         <index name="cell_line_pub_pkey" unique="true">
+            <column ascending="true" name="cell_line_pub_id"/>
+         </index>
+         <index name="cell_line_pub_c1" unique="true">
+            <column ascending="true" name="cell_line_id"/>
+            <column ascending="true" name="pub_id"/>
+         </index>
+      </table>
+      <table name="cell_line_relationship" remarks="" schema="cell_line" type="TABLE">
+         <column autoUpdated="false" defaultValue="nextval('cell_line.cell_line_relationship_cell_line_relationship_id_seq'::regclass)" digits="0" id="0" name="cell_line_relationship_id" nullable="false" remarks="" size="19" type="bigserial"/>
+         <column autoUpdated="false" digits="0" id="1" name="subject_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="cell_line_id" foreignKey="cell_line_relationship_subject_id_fkey" implied="false" onDeleteCascade="true" schema="cell_line" table="cell_line"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="2" name="object_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="cell_line_id" foreignKey="cell_line_relationship_object_id_fkey" implied="false" onDeleteCascade="true" schema="cell_line" table="cell_line"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="3" name="type_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="cvterm_id" foreignKey="cell_line_relationship_type_id_fkey" implied="false" onDeleteCascade="true" schema="cv" table="cvterm"/>
+         </column>
+         <primaryKey column="cell_line_relationship_id" sequenceNumberInPK="1"/>
+         <index name="cell_line_relationship_pkey" unique="true">
+            <column ascending="true" name="cell_line_relationship_id"/>
+         </index>
+         <index name="cell_line_relationship_c1" unique="true">
+            <column ascending="true" name="subject_id"/>
+            <column ascending="true" name="object_id"/>
+            <column ascending="true" name="type_id"/>
+         </index>
+      </table>
+      <table name="cell_line_synonym" remarks="" schema="cell_line" type="TABLE">
+         <column autoUpdated="false" defaultValue="nextval('cell_line.cell_line_synonym_cell_line_synonym_id_seq'::regclass)" digits="0" id="0" name="cell_line_synonym_id" nullable="false" remarks="" size="19" type="bigserial"/>
+         <column autoUpdated="false" digits="0" id="1" name="cell_line_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="cell_line_id" foreignKey="cell_line_synonym_cell_line_id_fkey" implied="false" onDeleteCascade="true" schema="cell_line" table="cell_line"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="2" name="synonym_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="synonym_id" foreignKey="cell_line_synonym_synonym_id_fkey" implied="false" onDeleteCascade="true" schema="sequence" table="synonym"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="3" name="pub_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="pub_id" foreignKey="cell_line_synonym_pub_id_fkey" implied="false" onDeleteCascade="true" schema="pub" table="pub"/>
+         </column>
+         <column autoUpdated="false" defaultValue="false" digits="0" id="4" name="is_current" nullable="false" remarks="" size="1" type="bool"/>
+         <column autoUpdated="false" defaultValue="false" digits="0" id="5" name="is_internal" nullable="false" remarks="" size="1" type="bool"/>
+         <primaryKey column="cell_line_synonym_id" sequenceNumberInPK="1"/>
+         <index name="cell_line_synonym_pkey" unique="true">
+            <column ascending="true" name="cell_line_synonym_id"/>
+         </index>
+         <index name="cell_line_synonym_c1" unique="true">
+            <column ascending="true" name="synonym_id"/>
+            <column ascending="true" name="cell_line_id"/>
+            <column ascending="true" name="pub_id"/>
+         </index>
+      </table>
+      <table name="cell_lineprop" remarks="" schema="cell_line" type="TABLE">
+         <column autoUpdated="false" defaultValue="nextval('cell_line.cell_lineprop_cell_lineprop_id_seq'::regclass)" digits="0" id="0" name="cell_lineprop_id" nullable="false" remarks="" size="19" type="bigserial">
+            <child column="cell_lineprop_id" foreignKey="cell_lineprop_pub_cell_lineprop_id_fkey" implied="false" onDeleteCascade="true" schema="cell_line" table="cell_lineprop_pub"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="1" name="cell_line_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="cell_line_id" foreignKey="cell_lineprop_cell_line_id_fkey" implied="false" onDeleteCascade="true" schema="cell_line" table="cell_line"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="2" name="type_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="cvterm_id" foreignKey="cell_lineprop_type_id_fkey" implied="false" onDeleteCascade="true" schema="cv" table="cvterm"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="3" name="value" nullable="true" remarks="" size="2147483647" type="text"/>
+         <column autoUpdated="false" defaultValue="0" digits="0" id="4" name="rank" nullable="false" remarks="" size="10" type="int4"/>
+         <primaryKey column="cell_lineprop_id" sequenceNumberInPK="1"/>
+         <index name="cell_lineprop_pkey" unique="true">
+            <column ascending="true" name="cell_lineprop_id"/>
+         </index>
+         <index name="cell_lineprop_c1" unique="true">
+            <column ascending="true" name="cell_line_id"/>
+            <column ascending="true" name="type_id"/>
+            <column ascending="true" name="rank"/>
+         </index>
+      </table>
+      <table name="cell_lineprop_pub" remarks="" schema="cell_line" type="TABLE">
+         <column autoUpdated="false" defaultValue="nextval('cell_line.cell_lineprop_pub_cell_lineprop_pub_id_seq'::regclass)" digits="0" id="0" name="cell_lineprop_pub_id" nullable="false" remarks="" size="19" type="bigserial"/>
+         <column autoUpdated="false" digits="0" id="1" name="cell_lineprop_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="cell_lineprop_id" foreignKey="cell_lineprop_pub_cell_lineprop_id_fkey" implied="false" onDeleteCascade="true" schema="cell_line" table="cell_lineprop"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="2" name="pub_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="pub_id" foreignKey="cell_lineprop_pub_pub_id_fkey" implied="false" onDeleteCascade="true" schema="pub" table="pub"/>
+         </column>
+         <primaryKey column="cell_lineprop_pub_id" sequenceNumberInPK="1"/>
+         <index name="cell_lineprop_pub_pkey" unique="true">
+            <column ascending="true" name="cell_lineprop_pub_id"/>
+         </index>
+         <index name="cell_lineprop_pub_c1" unique="true">
+            <column ascending="true" name="cell_lineprop_id"/>
+            <column ascending="true" name="pub_id"/>
+         </index>
+      </table>
+   </tables>
+</database>

@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>chado Module</title>
+  <!-- Tell the browser to be responsive to screen width -->
+  <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+  <link rel="icon" type="image/png" sizes="16x16" href="../favicon.ico">
+  <!-- Bootstrap 3.3.5 -->
+  <link rel="stylesheet" href="bower/admin-lte/bootstrap/css/bootstrap.min.css">
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="bower/font-awesome/css/font-awesome.min.css">
+  <!-- Ionicons -->
+  <link rel="stylesheet" href="bower/ionicons/css/ionicons.min.css">
+  <!-- DataTables -->
+  <link rel="stylesheet" href="bower/datatables.net-bs/css/dataTables.bootstrap.min.css">
+  <link rel="stylesheet" href="bower/datatables.net-buttons-bs/css/buttons.bootstrap.min.css">
+  <!-- Code Mirror -->
+  <link rel="stylesheet" href="bower/codemirror/codemirror.css">
+  <!-- Fonts -->
+  <link href='fonts/indieflower/indie-flower.css' rel='stylesheet' type='text/css'>
+  <link href='fonts/source-sans-pro/source-sans-pro.css' rel='stylesheet' type='text/css'>
+
+  <!-- Theme style -->
+  <link rel="stylesheet" href="bower/admin-lte/dist/css/AdminLTE.min.css">
+  <!-- Salvattore -->
+  <link rel="stylesheet" href="bower/salvattore/salvattore.css">
+  <!-- AdminLTE Skins. Choose a skin from the css/skins
+       folder instead of downloading all of them to reduce the load. -->
+  <link rel="stylesheet" href="bower/admin-lte/dist/css/skins/_all-skins.min.css">
+  <!-- SchemaSpy -->
+  <link rel="stylesheet" href="schemaSpy.css">
+  <!-- GMOD Chado Specific CSS -->
+  <link rel="stylesheet" href="../main.css">
+  
+  <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+  <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+  <!--[if lt IE 9]>
+  <script src="bower/html5shiv/html5shiv.min.js"></script>
+  <script src="bower/respond/respond.min.js"></script>
+  <![endif]-->
+</head>
+<!-- ADD THE CLASS layout-top-nav TO REMOVE THE SIDEBAR. -->
+<!-- Skins: skin-black, black-light, green-light, red-light, yellow-light, purple-light, blue-light -->
+<body class="hold-transition skin-black layout-top-nav">
+<div class="wrapper">
+  <header class="main-header">
+    <nav class="navbar navbar-static-top">
+      <div class="container">
+        <div class="navbar-header">
+          <a href="../index.html" class="navbar-brand" style="padding:0;">
+            <img src="../GMOD-cogs.png" class="gmod-logo" />
+            <span class="gmod-title">Chado</span>
+          </a>
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar-collapse">
+            <i class="fa fa-bars"></i>
+          </button>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-collapse pull-left" id="navbar-collapse">
+          <ul class="nav navbar-nav">
+            <li>
+              <a href="../index.html" title="All Chado Tables.">
+                All Tables</span>
+              </a>
+            </li>
+            <li>
+              <a href="../constraints.html" title="All Constraints in Chado.">
+                All Constraints
+              </a>
+            </li>
+            <li>
+              <a href="index.html" title="Tables in this module.">
+                Module Tables <span class="sr-only">(current)</span>
+              </a>
+            </li>            
+            <li>
+              <a href="columns.html" title="Columns in this module.">
+                Module Columns
+              </a>
+            </li>
+            <li>
+              <a href="constraints.html" title="Constraints defined by this module.">
+                Module Constraints
+              </a>
+            </li>
+            <li>
+              <a href="relationships.html" title="Diagram of table relationships">
+                Module Relationships
+              </a>
+            </li>
+          </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+        <!-- Navbar Right Menu -->
+
+      </div>
+      <!-- /.container-fluid -->
+    </nav>
+  </header>
+  <!-- Main content -->
+  <!-- Full Width Column -->
+  <div class="content-wrapper">
+    
+    <div class="box box-solid">
+      <div class="box-body">
+        <p><span class="version-label">Schema Version:</span> 1.3 
+          <span class="version-label">Module</span>: chado</p>
+      </div>
+    </div>
+		
+          <!-- Content Header (Page header) -->
+      <section class="content-header">
+        <h1>Columns</h1>
+      </section>
+      <!-- Main content -->
+      <section class="content">
+		<div class="box box-primary">
+			<div class="box-header with-border">
+			  <span class="glyphicon glyphicon-list-alt" aria-hidden="true"></span>
+              <h3 class="box-title">Columns</h3>
+            </div>	
+            <div class="box-body">
+				<table id="column_table" class="table table-bordered table-striped dataTable" role="grid">
+				<thead align='left'>
+				<tr>
+				  <th>Table</th>
+				  <th>Type</th>
+				  <th>Column</th>				  
+				  <th>Type</th>
+				  <th>Size</th>
+				  <th title='Are nulls allowed?'>Nulls</th>
+				  <th title='Default value'>Default</th>
+				  <th title='Comments' class="toggle"><span>Comments</span></th>
+				</tr>
+				</thead>
+				<tbody>
+				<tr>
+				 <td>cvtermsynonym</td>
+				 <td>Table</td>
+				 <td class='primaryKey' title='Primary Key'><i class='icon ion-key iconkey' style='padding-left: 5px;'></i>cvtermsynonym_id</td>
+				 <td>bigserial</td>
+				 <td>19</td>
+				 <td title=''></td>
+				 <td>nextval(&#39;cv.cvtermsynonym_cvtermsynonym_id_seq&#39;::regclass)</td>
+				 <td></td>
+				</tr>
+				<tr>
+				 <td>cvterm_dbxref</td>
+				 <td>Table</td>
+				 <td class='foreignKey' title='Foreign Key'><i class='icon ion-key iconkey' style='padding-left: 5px;'></i>cvterm_id</td>
+				 <td>int8</td>
+				 <td>19</td>
+				 <td title=''></td>
+				 <td>null</td>
+				 <td></td>
+				</tr>
+				<tr>
+				 <td>dbprop</td>
+				 <td>Table</td>
+				 <td class='foreignKey' title='Foreign Key'><i class='icon ion-key iconkey' style='padding-left: 5px;'></i>db_id</td>
+				 <td>int8</td>
+				 <td>19</td>
+				 <td title=''></td>
+				 <td>null</td>
+				 <td></td>
+				</tr>
+				<tr>
+				 <td>cvterm_dbxref</td>
+				 <td>Table</td>
+				 <td class='primaryKey' title='Primary Key'><i class='icon ion-key iconkey' style='padding-left: 5px;'></i>cvterm_dbxref_id</td>
+				 <td>bigserial</td>
+				 <td>19</td>
+				 <td title=''></td>
+				 <td>nextval(&#39;cv.cvterm_dbxref_cvterm_dbxref_id_seq&#39;::regclass)</td>
+				 <td></td>
+				</tr>
+				<tr>
+				 <td>cvtermprop</td>
+				 <td>Table</td>
+				 <td class='foreignKey' title='Foreign Key'><i class='icon ion-key iconkey' style='padding-left: 5px;'></i>type_id</td>
+				 <td>int8</td>
+				 <td>19</td>
+				 <td title=''></td>
+				 <td>null</td>
+				 <td><p>The name of the property or slot is a cvterm. The meaning of the property is defined in that cvterm.</p></td>
+				</tr>
+				<tr>
+				 <td>cvtermprop</td>
+				 <td>Table</td>
+				 <td class='primaryKey' title='Primary Key'><i class='icon ion-key iconkey' style='padding-left: 5px;'></i>cvtermprop_id</td>
+				 <td>bigserial</td>
+				 <td>19</td>
+				 <td title=''></td>
+				 <td>nextval(&#39;cv.cvtermprop_cvtermprop_id_seq&#39;::regclass)</td>
+				 <td></td>
+				</tr>
+				<tr>
+				 <td>cvtermpath</td>
+				 <td>Table</td>
+				 <td class='primaryKey' title='Primary Key'><i class='icon ion-key iconkey' style='padding-left: 5px;'></i>cvtermpath_id</td>
+				 <td>bigserial</td>
+				 <td>19</td>
+				 <td title=''></td>
+				 <td>nextval(&#39;cv.cvtermpath_cvtermpath_id_seq&#39;::regclass)</td>
+				 <td></td>
+				</tr>
+				<tr>
+				 <td>cvterm</td>
+				 <td>Table</td>
+				 <td>definition</td>
+				 <td>text</td>
+				 <td>2147483647</td>
+				 <td title='nullable'>√</td>
+				 <td>null</td>
+				 <td><p>A human-readable text definition.</p></td>
+				</tr>
+				<tr>
+				 <td>cvtermsynonym</td>
+				 <td>Table</td>
+				 <td class='foreignKey' title='Foreign Key'><i class='icon ion-key iconkey' style='padding-left: 5px;'></i>type_id</td>
+				 <td>int8</td>
+				 <td>19</td>
+				 <td title='nullable'>√</td>
+				 <td>null</td>
+				 <td><p>A synonym can be exact, narrower, or broader than.</p></td>
+				</tr>
+				<tr>
+				 <td>cvterm</td>
+				 <td>Table</td>
+				 <td class='indexedColumn' title='Indexed'><i class='fa fa-sitemap fa-rotate-120' style='padding-right: 5px;'></i>is_obsolete</td>
+				 <td>int4</td>
+				 <td>10</td>
+				 <td title=''></td>
+				 <td>0</td>
+				 <td><p>Boolean 0=false,1=true; see GO documentation for details of obsoletion. Note that two terms with different primary dbxrefs may exist if one is obsolete.</p></td>
+				</tr>
+				<tr>
+				 <td>cvterm_relationship</td>
+				 <td>Table</td>
+				 <td class='foreignKey' title='Foreign Key'><i class='icon ion-key iconkey' style='padding-left: 5px;'></i>type_id</td>
+				 <td>int8</td>
+				 <td>19</td>
+				 <td title=''></td>
+				 <td>null</td>
+				 <td><p>The nature of the relationship between subject and object. Note that relations are also housed in the cvterm table, typically from the OBO relationship ontology, although other relationship types are allowed.</p></td>
+				</tr>
+				<tr>
+				 <td>cvtermpath</td>
+				 <td>Table</td>
+				 <td class='foreignKey' title='Foreign Key'><i class='icon ion-key iconkey' style='padding-left: 5px;'></i>cv_id</td>
+				 <td>int8</td>
+				 <td>19</td>
+				 <td title=''></td>
+				 <td>null</td>
+				 <td><p>Closures will mostly be within one cv. If the closure of a relationship traverses a cv, then this refers to the cv of the object_id cvterm.</p></td>
+				</tr>
+				<tr>
+				 <td>cvtermpath</td>
+				 <td>Table</td>
+				 <td class='indexedColumn' title='Indexed'><i class='fa fa-sitemap fa-rotate-120' style='padding-right: 5px;'></i>pathdistance</td>
+				 <td>int4</td>
+				 <td>10</td>
+				 <td title='nullable'>√</td>
+				 <td>null</td>
+				 <td><p>The number of steps required to get from the subject cvterm to the object cvterm, counting from zero (reflexive relationship).</p></td>
+				</tr>
+				<tr>
+				 <td>cvprop</td>
+				 <td>Table</td>
+				 <td>value</td>
+				 <td>text</td>
+				 <td>2147483647</td>
+				 <td title='nullable'>√</td>
+				 <td>null</td>
+				 <td><p>The value of the property, represented as text. Numeric values are converted to their text representation.</p></td>
+				</tr>
+				<tr>
+				 <td>cv</td>
+				 <td>Table</td>
+				 <td>definition</td>
+				 <td>text</td>
+				 <td>2147483647</td>
+				 <td title='nullable'>√</td>
+				 <td>null</td>
+				 <td><p>A text description of the criteria for membership of this ontology.</p></td>
+				</tr>
+				<tr>
+				 <td>cvprop</td>
+				 <td>Table</td>
+				 <td class='foreignKey' title='Foreign Key'><i class='icon ion-key iconkey' style='padding-left: 5px;'></i>type_id</td>
+				 <td>int8</td>
+				 <td>19</td>
+				 <td title=''></td>
+				 <td>null</td>
+				 <td><p>The name of the property or slot is a cvterm. The meaning of the property is defined in that cvterm.</p></td>
+				</tr>
+				<tr>
+				 <td>cvterm_relationship</td>
+				 <td>Table</td>
+				 <td class='foreignKey' title='Foreign Key'><i class='icon ion-key iconkey' style='padding-left: 5px;'></i>subject_id</td>
+				 <td>int8</td>
+				 <td>19</td>
+				 <td title=''></td>
+				 <td>null</td>
+				 <td><p>The subject of the subj-predicate-obj sentence. The cvterm_relationship is about the subject. In a graph, this typically corresponds to the child node.</p></td>
+				</tr>
+				<tr>
+				 <td>cv</td>
+				 <td>Table</td>
+				 <td class='indexedColumn' title='Indexed'><i class='fa fa-sitemap fa-rotate-120' style='padding-right: 5px;'></i>name</td>
+				 <td>varchar</td>
+				 <td>255</td>
+				 <td title=''></td>
+				 <td>null</td>
+				 <td><p>The name of the ontology. This corresponds to the obo-format -namespace-. cv names uniquely identify the cv. In OBO file format, the cv.name is known as the namespace.</p></td>
+				</tr>
+				<tr>
+				 <td>chadoprop</td>
+				 <td>Table</td>
+				 <td class='indexedColumn' title='Indexed'><i class='fa fa-sitemap fa-rotate-120' style='padding-right: 5px;'></i>rank</td>
+				 <td>int4</td>
+				 <td>10</td>
+				 <td title=''></td>
+				 <td>0</td>
+				 <td><p>Property-Value ordering. Any cv can have multiple values for any particular property type - these are ordered in a list using rank, counting from zero. For properties that are single-valued rather than multi-valued, the default 0 value should be used.</p></td>
+				</tr>
+				<tr>
+				 <td>dbxrefprop</td>
+				 <td>Table</td>
+				 <td>value</td>
+				 <td>text</td>
+				 <td>2147483647</td>
+				 <td title=''></td>
+				 <td>&#39;&#39;::text</td>
+				 <td></td>
+				</tr>
+				<tr>
+				 <td>chadoprop</td>
+				 <td>Table</td>
+				 <td class='foreignKey' title='Foreign Key'><i class='icon ion-key iconkey' style='padding-left: 5px;'></i>type_id</td>
+				 <td>int8</td>
+				 <td>19</td>
+				 <td title=''></td>
+				 <td>null</td>
+				 <td><p>The name of the property or slot is a cvterm. The meaning of the property is defined in that cvterm.</p></td>
+				</tr>
+				<tr>
+				 <td>cvprop</td>
+				 <td>Table</td>
+				 <td class='foreignKey' title='Foreign Key'><i class='icon ion-key iconkey' style='padding-left: 5px;'></i>cv_id</td>
+				 <td>int8</td>
+				 <td>19</td>
+				 <td title=''></td>
+				 <td>null</td>
+				 <td></td>
+				</tr>
+				<tr>
+				 <td>cvtermsynonym</td>
+				 <td>Table</td>
+				 <td class='indexedColumn' title='Indexed'><i class='fa fa-sitemap fa-rotate-120' style='padding-right: 5px;'></i>synonym</td>
+				 <td>varchar</td>
+				 <td>1024</td>
+				 <td title=''></td>
+				 <td>null</td>
+				 <td></td>
+				</tr>
+				<tr>
+				 <td>dbprop</td>
+				 <td>Table</td>
+				 <td class='indexedColumn' title='Indexed'><i class='fa fa-sitemap fa-rotate-120' style='padding-right: 5px;'></i>rank</td>
+				 <td>int4</td>
+				 <td>10</td>
+				 <td title=''></td>
+				 <td>0</td>
+				 <td></td>
+				</tr>
+				<tr>
+				 <td>cvterm</td>
+				 <td>Table</td>
+				 <td>is_relationshiptype</td>
+				 <td>int4</td>
+				 <td>10</td>
+				 <td title=''></td>
+				 <td>0</td>
+				 <td><p>Boolean 0=false,1=true relations or relationship types (also known as Typedefs in OBO format, or as properties or slots) form a cv/ontology in themselves. We use this flag to indicate whether this cvterm is an actual term/class/universal or a relation. Relations may be drawn from the OBO Relations ontology, but are not exclusively drawn from there.</p></td>
+				</tr>
+				<tr>
+				 <td>cvtermpath</td>
+				 <td>Table</td>
+				 <td class='foreignKey' title='Foreign Key'><i class='icon ion-key iconkey' style='padding-left: 5px;'></i>object_id</td>
+				 <td>int8</td>
+				 <td>19</td>
+				 <td title=''></td>
+				 <td>null</td>
+				 <td></td>
+				</tr>
+				<tr>
+				 <td>cv</td>
+				 <td>Table</td>
+				 <td class='primaryKey' title='Primary Key'><i class='icon ion-key iconkey' style='padding-left: 5px;'></i>cv_id</td>
+				 <td>bigserial</td>
+				 <td>19</td>
+				 <td title=''></td>
+				 <td>nextval(&#39;cv.cv_cv_id_seq&#39;::regclass)</td>
+				 <td></td>
+				</tr>
+				<tr>
+				 <td>cvtermprop</td>
+				 <td>Table</td>
+				 <td class='indexedColumn' title='Indexed'><i class='fa fa-sitemap fa-rotate-120' style='padding-right: 5px;'></i>value</td>
+				 <td>text</td>
+				 <td>2147483647</td>
+				 <td title=''></td>
+				 <td>&#39;&#39;::text</td>
+				 <td><p>The value of the property, represented as text. Numeric values are converted to their text representation.</p></td>
+				</tr>
+				<tr>
+				 <td>chadoprop</td>
+				 <td>Table</td>
+				 <td>value</td>
+				 <td>text</td>
+				 <td>2147483647</td>
+				 <td title='nullable'>√</td>
+				 <td>null</td>
+				 <td><p>The value of the property, represented as text. Numeric values are converted to their text representation.</p></td>
+				</tr>
+				<tr>
+				 <td>dbxrefprop</td>
+				 <td>Table</td>
+				 <td class='indexedColumn' title='Indexed'><i class='fa fa-sitemap fa-rotate-120' style='padding-right: 5px;'></i>rank</td>
+				 <td>int4</td>
+				 <td>10</td>
+				 <td title=''></td>
+				 <td>0</td>
+				 <td></td>
+				</tr>
+				<tr>
+				 <td>cvtermprop</td>
+				 <td>Table</td>
+				 <td class='foreignKey' title='Foreign Key'><i class='icon ion-key iconkey' style='padding-left: 5px;'></i>cvterm_id</td>
+				 <td>int8</td>
+				 <td>19</td>
+				 <td title=''></td>
+				 <td>null</td>
+				 <td></td>
+				</tr>
+				<tr>
+				 <td>cvtermsynonym</td>
+				 <td>Table</td>
+				 <td class='foreignKey' title='Foreign Key'><i class='icon ion-key iconkey' style='padding-left: 5px;'></i>cvterm_id</td>
+				 <td>int8</td>
+				 <td>19</td>
+				 <td title=''></td>
+				 <td>null</td>
+				 <td></td>
+				</tr>
+				<tr>
+				 <td>cvterm</td>
+				 <td>Table</td>
+				 <td class='foreignKey' title='Foreign Key'><i class='icon ion-key iconkey' style='padding-left: 5px;'></i>dbxref_id</td>
+				 <td>int8</td>
+				 <td>19</td>
+				 <td title=''></td>
+				 <td>null</td>
+				 <td><p>Primary identifier dbxref - The unique global OBO identifier for this cvterm. Note that a cvterm may have multiple secondary dbxrefs - see also table: cvterm_dbxref.</p></td>
+				</tr>
+				<tr>
+				 <td>chadoprop</td>
+				 <td>Table</td>
+				 <td class='primaryKey' title='Primary Key'><i class='icon ion-key iconkey' style='padding-left: 5px;'></i>chadoprop_id</td>
+				 <td>bigserial</td>
+				 <td>19</td>
+				 <td title=''></td>
+				 <td>nextval(&#39;cv.chadoprop_chadoprop_id_seq&#39;::regclass)</td>
+				 <td></td>
+				</tr>
+				<tr>
+				 <td>cvprop</td>
+				 <td>Table</td>
+				 <td class='primaryKey' title='Primary Key'><i class='icon ion-key iconkey' style='padding-left: 5px;'></i>cvprop_id</td>
+				 <td>bigserial</td>
+				 <td>19</td>
+				 <td title=''></td>
+				 <td>nextval(&#39;cv.cvprop_cvprop_id_seq&#39;::regclass)</td>
+				 <td></td>
+				</tr>
+				<tr>
+				 <td>cvterm_dbxref</td>
+				 <td>Table</td>
+				 <td class='foreignKey' title='Foreign Key'><i class='icon ion-key iconkey' style='padding-left: 5px;'></i>dbxref_id</td>
+				 <td>int8</td>
+				 <td>19</td>
+				 <td title=''></td>
+				 <td>null</td>
+				 <td></td>
+				</tr>
+				<tr>
+				 <td>cvterm_relationship</td>
+				 <td>Table</td>
+				 <td class='foreignKey' title='Foreign Key'><i class='icon ion-key iconkey' style='padding-left: 5px;'></i>object_id</td>
+				 <td>int8</td>
+				 <td>19</td>
+				 <td title=''></td>
+				 <td>null</td>
+				 <td><p>The object of the subj-predicate-obj sentence. The cvterm_relationship refers to the object. In a graph, this typically corresponds to the parent node.</p></td>
+				</tr>
+				<tr>
+				 <td>cvterm</td>
+				 <td>Table</td>
+				 <td class='foreignKey' title='Foreign Key'><i class='icon ion-key iconkey' style='padding-left: 5px;'></i>cv_id</td>
+				 <td>int8</td>
+				 <td>19</td>
+				 <td title=''></td>
+				 <td>null</td>
+				 <td><p>The cv or ontology or namespace to which this cvterm belongs.</p></td>
+				</tr>
+				<tr>
+				 <td>cvterm_relationship</td>
+				 <td>Table</td>
+				 <td class='primaryKey' title='Primary Key'><i class='icon ion-key iconkey' style='padding-left: 5px;'></i>cvterm_relationship_id</td>
+				 <td>bigserial</td>
+				 <td>19</td>
+				 <td title=''></td>
+				 <td>nextval(&#39;cv.cvterm_relationship_cvterm_relationship_id_seq&#39;::regclass)</td>
+				 <td></td>
+				</tr>
+				<tr>
+				 <td>dbprop</td>
+				 <td>Table</td>
+				 <td class='primaryKey' title='Primary Key'><i class='icon ion-key iconkey' style='padding-left: 5px;'></i>dbprop_id</td>
+				 <td>bigserial</td>
+				 <td>19</td>
+				 <td title=''></td>
+				 <td>nextval(&#39;cv.dbprop_dbprop_id_seq&#39;::regclass)</td>
+				 <td></td>
+				</tr>
+				<tr>
+				 <td>cvprop</td>
+				 <td>Table</td>
+				 <td class='indexedColumn' title='Indexed'><i class='fa fa-sitemap fa-rotate-120' style='padding-right: 5px;'></i>rank</td>
+				 <td>int4</td>
+				 <td>10</td>
+				 <td title=''></td>
+				 <td>0</td>
+				 <td><p>Property-Value ordering. Any cv can have multiple values for any particular property type - these are ordered in a list using rank, counting from zero. For properties that are single-valued rather than multi-valued, the default 0 value should be used.</p></td>
+				</tr>
+				<tr>
+				 <td>cvtermpath</td>
+				 <td>Table</td>
+				 <td class='foreignKey' title='Foreign Key'><i class='icon ion-key iconkey' style='padding-left: 5px;'></i>type_id</td>
+				 <td>int8</td>
+				 <td>19</td>
+				 <td title='nullable'>√</td>
+				 <td>null</td>
+				 <td><p>The relationship type that this is a closure over. If null, then this is a closure over ALL relationship types. If non-null, then this references a relationship cvterm - note that the closure will apply to both this relationship AND the OBO_REL:is_a (subclass) relationship.</p></td>
+				</tr>
+				<tr>
+				 <td>dbxrefprop</td>
+				 <td>Table</td>
+				 <td class='foreignKey' title='Foreign Key'><i class='icon ion-key iconkey' style='padding-left: 5px;'></i>dbxref_id</td>
+				 <td>int8</td>
+				 <td>19</td>
+				 <td title=''></td>
+				 <td>null</td>
+				 <td></td>
+				</tr>
+				<tr>
+				 <td>dbprop</td>
+				 <td>Table</td>
+				 <td class='foreignKey' title='Foreign Key'><i class='icon ion-key iconkey' style='padding-left: 5px;'></i>type_id</td>
+				 <td>int8</td>
+				 <td>19</td>
+				 <td title=''></td>
+				 <td>null</td>
+				 <td></td>
+				</tr>
+				<tr>
+				 <td>cvtermpath</td>
+				 <td>Table</td>
+				 <td class='foreignKey' title='Foreign Key'><i class='icon ion-key iconkey' style='padding-left: 5px;'></i>subject_id</td>
+				 <td>int8</td>
+				 <td>19</td>
+				 <td title=''></td>
+				 <td>null</td>
+				 <td></td>
+				</tr>
+				<tr>
+				 <td>cvterm</td>
+				 <td>Table</td>
+				 <td class='indexedColumn' title='Indexed'><i class='fa fa-sitemap fa-rotate-120' style='padding-right: 5px;'></i>name</td>
+				 <td>varchar</td>
+				 <td>1024</td>
+				 <td title=''></td>
+				 <td>null</td>
+				 <td><p>A concise human-readable name or label for the cvterm. Uniquely identifies a cvterm within a cv.</p></td>
+				</tr>
+				<tr>
+				 <td>cvterm_dbxref</td>
+				 <td>Table</td>
+				 <td>is_for_definition</td>
+				 <td>int4</td>
+				 <td>10</td>
+				 <td title=''></td>
+				 <td>0</td>
+				 <td><p>A cvterm.definition should be supported by one or more references. If this column is true, the dbxref is not for a term in an external database - it is a dbxref for provenance information for the definition.</p></td>
+				</tr>
+				<tr>
+				 <td>dbxrefprop</td>
+				 <td>Table</td>
+				 <td class='primaryKey' title='Primary Key'><i class='icon ion-key iconkey' style='padding-left: 5px;'></i>dbxrefprop_id</td>
+				 <td>bigserial</td>
+				 <td>19</td>
+				 <td title=''></td>
+				 <td>nextval(&#39;cv.dbxrefprop_dbxrefprop_id_seq&#39;::regclass)</td>
+				 <td></td>
+				</tr>
+				<tr>
+				 <td>dbprop</td>
+				 <td>Table</td>
+				 <td>value</td>
+				 <td>text</td>
+				 <td>2147483647</td>
+				 <td title='nullable'>√</td>
+				 <td>null</td>
+				 <td></td>
+				</tr>
+				<tr>
+				 <td>cvtermprop</td>
+				 <td>Table</td>
+				 <td class='indexedColumn' title='Indexed'><i class='fa fa-sitemap fa-rotate-120' style='padding-right: 5px;'></i>rank</td>
+				 <td>int4</td>
+				 <td>10</td>
+				 <td title=''></td>
+				 <td>0</td>
+				 <td><p>Property-Value ordering. Any cvterm can have multiple values for any particular property type - these are ordered in a list using rank, counting from zero. For properties that are single-valued rather than multi-valued, the default 0 value should be used.</p></td>
+				</tr>
+				<tr>
+				 <td>dbxrefprop</td>
+				 <td>Table</td>
+				 <td class='foreignKey' title='Foreign Key'><i class='icon ion-key iconkey' style='padding-left: 5px;'></i>type_id</td>
+				 <td>int8</td>
+				 <td>19</td>
+				 <td title=''></td>
+				 <td>null</td>
+				 <td></td>
+				</tr>
+				<tr>
+				 <td>cvterm</td>
+				 <td>Table</td>
+				 <td class='primaryKey' title='Primary Key'><i class='icon ion-key iconkey' style='padding-left: 5px;'></i>cvterm_id</td>
+				 <td>bigserial</td>
+				 <td>19</td>
+				 <td title=''></td>
+				 <td>nextval(&#39;cv.cvterm_cvterm_id_seq&#39;::regclass)</td>
+				 <td></td>
+				</tr>
+								</tbody>
+				</table>				
+			</div>
+		</div>	
+      </section>
+	  <script>
+          var config = {
+	          pagination: 
+          }
+	  </script>    
+  </div>
+  <!-- /.content-wrapper -->
+  <footer class="main-footer">
+    <div>
+      <div class="pull-right hidden-xs">
+        <a href="https://github.com/schemaspy/schemaspy" title="GitHub for SchemaSpy"><i class="fa fa-github-square fa-2x"></i></a>
+        <a href="http://stackoverflow.com/questions/tagged/schemaspy" title="StackOverflow for SchemaSpy"><i class="fa fa-stack-overflow fa-2x"></i></a>
+      </div>
+      <strong>Generated by <a href="http://schemaspy.org/" class="logo-text"><i class="fa fa-database"></i> SchemaSpy @project.version@</a></strong>
+    </div>
+    <!-- /.container -->
+  </footer>
+</div>
+<!-- ./wrapper -->
+
+<!-- jQuery 2.2.3 -->
+<script src="bower/admin-lte/plugins/jQuery/jquery-2.2.3.min.js"></script>
+<script src="bower/admin-lte/plugins/jQueryUI/jquery-ui.min.js"></script>
+<!-- Bootstrap 3.3.5 -->
+<script src="bower/admin-lte/bootstrap/js/bootstrap.min.js"></script>
+<!-- DataTables -->
+<script src="bower/datatables.net/jquery.dataTables.min.js"></script>
+<script src="bower/datatables.net-bs/js/dataTables.bootstrap.min.js"></script>
+<script src="bower/datatables.net-buttons/dataTables.buttons.min.js"></script>
+<script src="bower/datatables.net-buttons-bs/js/buttons.bootstrap.min.js"></script>
+<script src="bower/datatables.net-buttons/buttons.html5.min.js"></script>
+<script src="bower/datatables.net-buttons/buttons.print.min.js"></script>
+<script src="bower/datatables.net-buttons/buttons.colVis.min.js"></script>
+
+<!-- SlimScroll -->
+<script src="bower/admin-lte/plugins/slimScroll/jquery.slimscroll.min.js"></script>
+<!-- FastClick -->
+<script src="bower/admin-lte/plugins/fastclick/fastclick.js"></script>
+<!-- Salvattore -->
+<script src="bower/salvattore/salvattore.min.js"></script>
+<!-- AnchorJS -->
+<script src="bower/anchor-js/anchor.min.js"></script>
+<!-- CodeMirror -->
+<script src="bower/codemirror/codemirror.js"></script>
+<script src="bower/codemirror/sql.js"></script>
+<!-- AdminLTE App -->
+<script src="bower/admin-lte/dist/js/app.min.js"></script>
+<script src="column.js"></script>
+<script src="schemaSpy.js"></script>
+</body>
+</html>

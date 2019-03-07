@@ -1,0 +1,9 @@
+phylotree
+phylonode
+phylonode_dbxref
+phylonode_organism
+phylonode_pub
+phylonodeprop
+phylotree_pub
+phylotreeprop
+phylonode_relationship

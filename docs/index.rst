@@ -18,6 +18,8 @@ Chado is a relational database schema that underlies many GMOD installations. It
   best_practices
 
 
+`API <_static/schemaspy_integration/index.html>`_
+
 Mailing List
 ============
 

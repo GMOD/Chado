@@ -1,0 +1,539 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<database name="chado" schema="stock" type="PostgreSQL - 9.3.18">
+   <tables>
+      <table name="stock" remarks="Any stock can be globally identified by the&#10;combination of organism, uniquename and stock type. A stock is the physical entities, either living or preserved, held by collections. Stocks belong to a collection; they have IDs, type, organism, description and may have a genotype." schema="stock" type="TABLE">
+         <column autoUpdated="false" defaultValue="nextval('stock.stock_stock_id_seq'::regclass)" digits="0" id="0" name="stock_id" nullable="false" remarks="" size="19" type="bigserial">
+            <child column="stock_id" foreignKey="nd_experiment_stock_stock_id_fkey" implied="false" onDeleteCascade="true" schema="natural_diversity" table="nd_experiment_stock"/>
+            <child column="stock_id" foreignKey="project_stock_stock_id_fkey" implied="false" onDeleteCascade="true" schema="project" table="project_stock"/>
+            <child column="stock_id" foreignKey="stock_cvterm_stock_id_fkey" implied="false" onDeleteCascade="true" schema="stock" table="stock_cvterm"/>
+            <child column="stock_id" foreignKey="stock_dbxref_stock_id_fkey" implied="false" onDeleteCascade="true" schema="stock" table="stock_dbxref"/>
+            <child column="stock_id" foreignKey="stock_feature_stock_id_fkey" implied="false" onDeleteCascade="true" schema="stock" table="stock_feature"/>
+            <child column="stock_id" foreignKey="stock_featuremap_stock_id_fkey" implied="false" onDeleteCascade="true" schema="stock" table="stock_featuremap"/>
+            <child column="stock_id" foreignKey="stock_genotype_stock_id_fkey" implied="false" onDeleteCascade="true" schema="stock" table="stock_genotype"/>
+            <child column="stock_id" foreignKey="stock_library_stock_id_fkey" implied="false" onDeleteCascade="true" schema="stock" table="stock_library"/>
+            <child column="stock_id" foreignKey="stock_pub_stock_id_fkey" implied="false" onDeleteCascade="true" schema="stock" table="stock_pub"/>
+            <child column="object_id" foreignKey="stock_relationship_object_id_fkey" implied="false" onDeleteCascade="true" schema="stock" table="stock_relationship"/>
+            <child column="subject_id" foreignKey="stock_relationship_subject_id_fkey" implied="false" onDeleteCascade="true" schema="stock" table="stock_relationship"/>
+            <child column="stock_id" foreignKey="stockcollection_stock_stock_id_fkey" implied="false" onDeleteCascade="true" schema="stock" table="stockcollection_stock"/>
+            <child column="stock_id" foreignKey="stockprop_stock_id_fkey" implied="false" onDeleteCascade="true" schema="stock" table="stockprop"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="1" name="dbxref_id" nullable="true" remarks="The dbxref_id is an optional primary stable identifier for this stock. Secondary indentifiers and external dbxrefs go in table: stock_dbxref." size="19" type="int8">
+            <parent column="dbxref_id" foreignKey="stock_dbxref_id_fkey" implied="false" onDeleteCascade="false" schema="db" table="dbxref"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="2" name="organism_id" nullable="true" remarks="The organism_id is the organism to which the stock belongs. This column should only be left blank if the organism cannot be determined." size="19" type="int8">
+            <parent column="organism_id" foreignKey="stock_organism_id_fkey" implied="false" onDeleteCascade="true" schema="organism" table="organism"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="3" name="name" nullable="true" remarks="The name is a human-readable local name for a stock." size="255" type="varchar"/>
+         <column autoUpdated="false" digits="0" id="4" name="uniquename" nullable="false" remarks="" size="2147483647" type="text"/>
+         <column autoUpdated="false" digits="0" id="5" name="description" nullable="true" remarks="The description is the genetic description provided in the stock list." size="2147483647" type="text"/>
+         <column autoUpdated="false" digits="0" id="6" name="type_id" nullable="false" remarks="The type_id foreign key links to a controlled vocabulary of stock types. The would include living stock, genomic DNA, preserved specimen. Secondary cvterms for stocks would go in stock_cvterm." size="19" type="int8">
+            <parent column="cvterm_id" foreignKey="stock_type_id_fkey" implied="false" onDeleteCascade="true" schema="cv" table="cvterm"/>
+         </column>
+         <column autoUpdated="false" defaultValue="false" digits="0" id="7" name="is_obsolete" nullable="false" remarks="" size="1" type="bool"/>
+         <primaryKey column="stock_id" sequenceNumberInPK="1"/>
+         <index name="stock_pkey" unique="true">
+            <column ascending="true" name="stock_id"/>
+         </index>
+         <index name="stock_c1" unique="true">
+            <column ascending="true" name="organism_id"/>
+            <column ascending="true" name="uniquename"/>
+            <column ascending="true" name="type_id"/>
+         </index>
+         <index name="stock_idx1" unique="false">
+            <column ascending="true" name="dbxref_id"/>
+         </index>
+         <index name="stock_idx2" unique="false">
+            <column ascending="true" name="organism_id"/>
+         </index>
+         <index name="stock_idx3" unique="false">
+            <column ascending="true" name="type_id"/>
+         </index>
+         <index name="stock_idx4" unique="false">
+            <column ascending="true" name="uniquename"/>
+         </index>
+         <index name="stock_name_ind1" unique="false">
+            <column ascending="true" name="name"/>
+         </index>
+      </table>
+      <table name="stock_cvterm" remarks="stock_cvterm links a stock to cvterms. This is for secondary cvterms; primary cvterms should use stock.type_id." schema="stock" type="TABLE">
+         <column autoUpdated="false" defaultValue="nextval('stock.stock_cvterm_stock_cvterm_id_seq'::regclass)" digits="0" id="0" name="stock_cvterm_id" nullable="false" remarks="" size="19" type="bigserial">
+            <child column="stock_cvterm_id" foreignKey="stock_cvtermprop_stock_cvterm_id_fkey" implied="false" onDeleteCascade="true" schema="stock" table="stock_cvtermprop"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="1" name="stock_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="stock_id" foreignKey="stock_cvterm_stock_id_fkey" implied="false" onDeleteCascade="true" schema="stock" table="stock"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="2" name="cvterm_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="cvterm_id" foreignKey="stock_cvterm_cvterm_id_fkey" implied="false" onDeleteCascade="true" schema="cv" table="cvterm"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="3" name="pub_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="pub_id" foreignKey="stock_cvterm_pub_id_fkey" implied="false" onDeleteCascade="true" schema="pub" table="pub"/>
+         </column>
+         <column autoUpdated="false" defaultValue="false" digits="0" id="4" name="is_not" nullable="false" remarks="" size="1" type="bool"/>
+         <column autoUpdated="false" defaultValue="0" digits="0" id="5" name="rank" nullable="false" remarks="" size="10" type="int4"/>
+         <primaryKey column="stock_cvterm_id" sequenceNumberInPK="1"/>
+         <index name="stock_cvterm_pkey" unique="true">
+            <column ascending="true" name="stock_cvterm_id"/>
+         </index>
+         <index name="stock_cvterm_c1" unique="true">
+            <column ascending="true" name="stock_id"/>
+            <column ascending="true" name="cvterm_id"/>
+            <column ascending="true" name="pub_id"/>
+            <column ascending="true" name="rank"/>
+         </index>
+         <index name="stock_cvterm_idx1" unique="false">
+            <column ascending="true" name="stock_id"/>
+         </index>
+         <index name="stock_cvterm_idx2" unique="false">
+            <column ascending="true" name="cvterm_id"/>
+         </index>
+         <index name="stock_cvterm_idx3" unique="false">
+            <column ascending="true" name="pub_id"/>
+         </index>
+      </table>
+      <table name="stock_cvtermprop" remarks="Extensible properties for&#10;stock to cvterm associations. Examples: GO evidence codes;&#10;qualifiers; metadata such as the date on which the entry was curated&#10;and the source of the association. See the stockprop table for&#10;meanings of type_id, value and rank." schema="stock" type="TABLE">
+         <column autoUpdated="false" defaultValue="nextval('stock.stock_cvtermprop_stock_cvtermprop_id_seq'::regclass)" digits="0" id="0" name="stock_cvtermprop_id" nullable="false" remarks="" size="19" type="bigserial"/>
+         <column autoUpdated="false" digits="0" id="1" name="stock_cvterm_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="stock_cvterm_id" foreignKey="stock_cvtermprop_stock_cvterm_id_fkey" implied="false" onDeleteCascade="true" schema="stock" table="stock_cvterm"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="2" name="type_id" nullable="false" remarks="The name of the&#10;property/slot is a cvterm. The meaning of the property is defined in&#10;that cvterm. cvterms may come from the OBO evidence code cv." size="19" type="int8">
+            <parent column="cvterm_id" foreignKey="stock_cvtermprop_type_id_fkey" implied="false" onDeleteCascade="true" schema="cv" table="cvterm"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="3" name="value" nullable="true" remarks="The value of the&#10;property, represented as text. Numeric values are converted to their&#10;text representation. This is less efficient than using native database&#10;types, but is easier to query." size="2147483647" type="text"/>
+         <column autoUpdated="false" defaultValue="0" digits="0" id="4" name="rank" nullable="false" remarks="Property-Value&#10;ordering. Any stock_cvterm can have multiple values for any particular&#10;property type - these are ordered in a list using rank, counting from&#10;zero. For properties that are single-valued rather than multi-valued,&#10;the default 0 value should be used." size="10" type="int4"/>
+         <primaryKey column="stock_cvtermprop_id" sequenceNumberInPK="1"/>
+         <index name="stock_cvtermprop_pkey" unique="true">
+            <column ascending="true" name="stock_cvtermprop_id"/>
+         </index>
+         <index name="stock_cvtermprop_c1" unique="true">
+            <column ascending="true" name="stock_cvterm_id"/>
+            <column ascending="true" name="type_id"/>
+            <column ascending="true" name="rank"/>
+         </index>
+         <index name="stock_cvtermprop_idx1" unique="false">
+            <column ascending="true" name="stock_cvterm_id"/>
+         </index>
+         <index name="stock_cvtermprop_idx2" unique="false">
+            <column ascending="true" name="type_id"/>
+         </index>
+      </table>
+      <table name="stock_dbxref" remarks="stock_dbxref links a stock to dbxrefs. This is for secondary identifiers; primary identifiers should use stock.dbxref_id." schema="stock" type="TABLE">
+         <column autoUpdated="false" defaultValue="nextval('stock.stock_dbxref_stock_dbxref_id_seq'::regclass)" digits="0" id="0" name="stock_dbxref_id" nullable="false" remarks="" size="19" type="bigserial">
+            <child column="stock_dbxref_id" foreignKey="stock_dbxrefprop_stock_dbxref_id_fkey" implied="false" onDeleteCascade="true" schema="stock" table="stock_dbxrefprop"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="1" name="stock_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="stock_id" foreignKey="stock_dbxref_stock_id_fkey" implied="false" onDeleteCascade="true" schema="stock" table="stock"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="2" name="dbxref_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="dbxref_id" foreignKey="stock_dbxref_dbxref_id_fkey" implied="false" onDeleteCascade="true" schema="db" table="dbxref"/>
+         </column>
+         <column autoUpdated="false" defaultValue="true" digits="0" id="3" name="is_current" nullable="false" remarks="The is_current boolean indicates whether the linked dbxref is the current -official- dbxref for the linked stock." size="1" type="bool"/>
+         <primaryKey column="stock_dbxref_id" sequenceNumberInPK="1"/>
+         <index name="stock_dbxref_pkey" unique="true">
+            <column ascending="true" name="stock_dbxref_id"/>
+         </index>
+         <index name="stock_dbxref_c1" unique="true">
+            <column ascending="true" name="stock_id"/>
+            <column ascending="true" name="dbxref_id"/>
+         </index>
+         <index name="stock_dbxref_idx1" unique="false">
+            <column ascending="true" name="stock_id"/>
+         </index>
+         <index name="stock_dbxref_idx2" unique="false">
+            <column ascending="true" name="dbxref_id"/>
+         </index>
+      </table>
+      <table name="stock_dbxrefprop" remarks="A stock_dbxref can have any number of&#10;slot-value property tags attached to it. This is useful for storing properties related to dbxref annotations of stocks, such as evidence codes, and references, and metadata, such as create/modify dates. This is an alternative to&#10;hardcoding a list of columns in the relational schema, and is&#10;completely extensible. There is a unique constraint, stock_dbxrefprop_c1, for&#10;the combination of stock_dbxref_id, rank, and type_id. Multivalued property-value pairs must be differentiated by rank." schema="stock" type="TABLE">
+         <column autoUpdated="false" defaultValue="nextval('stock.stock_dbxrefprop_stock_dbxrefprop_id_seq'::regclass)" digits="0" id="0" name="stock_dbxrefprop_id" nullable="false" remarks="" size="19" type="bigserial"/>
+         <column autoUpdated="false" digits="0" id="1" name="stock_dbxref_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="stock_dbxref_id" foreignKey="stock_dbxrefprop_stock_dbxref_id_fkey" implied="false" onDeleteCascade="true" schema="stock" table="stock_dbxref"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="2" name="type_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="cvterm_id" foreignKey="stock_dbxrefprop_type_id_fkey" implied="false" onDeleteCascade="true" schema="cv" table="cvterm"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="3" name="value" nullable="true" remarks="" size="2147483647" type="text"/>
+         <column autoUpdated="false" defaultValue="0" digits="0" id="4" name="rank" nullable="false" remarks="" size="10" type="int4"/>
+         <primaryKey column="stock_dbxrefprop_id" sequenceNumberInPK="1"/>
+         <index name="stock_dbxrefprop_pkey" unique="true">
+            <column ascending="true" name="stock_dbxrefprop_id"/>
+         </index>
+         <index name="stock_dbxrefprop_c1" unique="true">
+            <column ascending="true" name="stock_dbxref_id"/>
+            <column ascending="true" name="type_id"/>
+            <column ascending="true" name="rank"/>
+         </index>
+         <index name="stock_dbxrefprop_idx1" unique="false">
+            <column ascending="true" name="stock_dbxref_id"/>
+         </index>
+         <index name="stock_dbxrefprop_idx2" unique="false">
+            <column ascending="true" name="type_id"/>
+         </index>
+      </table>
+      <table name="stock_feature" remarks="Links a stock to a feature." schema="stock" type="TABLE">
+         <column autoUpdated="false" defaultValue="nextval('stock.stock_feature_stock_feature_id_seq'::regclass)" digits="0" id="0" name="stock_feature_id" nullable="false" remarks="" size="19" type="bigserial"/>
+         <column autoUpdated="false" digits="0" id="1" name="feature_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="feature_id" foreignKey="stock_feature_feature_id_fkey" implied="false" onDeleteCascade="true" schema="sequence" table="feature"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="2" name="stock_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="stock_id" foreignKey="stock_feature_stock_id_fkey" implied="false" onDeleteCascade="true" schema="stock" table="stock"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="3" name="type_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="cvterm_id" foreignKey="stock_feature_type_id_fkey" implied="false" onDeleteCascade="true" schema="cv" table="cvterm"/>
+         </column>
+         <column autoUpdated="false" defaultValue="0" digits="0" id="4" name="rank" nullable="false" remarks="" size="10" type="int4"/>
+         <primaryKey column="stock_feature_id" sequenceNumberInPK="1"/>
+         <index name="stock_feature_pkey" unique="true">
+            <column ascending="true" name="stock_feature_id"/>
+         </index>
+         <index name="stock_feature_c1" unique="true">
+            <column ascending="true" name="feature_id"/>
+            <column ascending="true" name="stock_id"/>
+            <column ascending="true" name="type_id"/>
+            <column ascending="true" name="rank"/>
+         </index>
+         <index name="stock_feature_idx1" unique="false">
+            <column ascending="true" name="stock_feature_id"/>
+         </index>
+         <index name="stock_feature_idx2" unique="false">
+            <column ascending="true" name="feature_id"/>
+         </index>
+         <index name="stock_feature_idx3" unique="false">
+            <column ascending="true" name="stock_id"/>
+         </index>
+         <index name="stock_feature_idx4" unique="false">
+            <column ascending="true" name="type_id"/>
+         </index>
+      </table>
+      <table name="stock_featuremap" remarks="Links a featuremap to a stock." schema="stock" type="TABLE">
+         <column autoUpdated="false" defaultValue="nextval('stock.stock_featuremap_stock_featuremap_id_seq'::regclass)" digits="0" id="0" name="stock_featuremap_id" nullable="false" remarks="" size="19" type="bigserial"/>
+         <column autoUpdated="false" digits="0" id="1" name="featuremap_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="featuremap_id" foreignKey="stock_featuremap_featuremap_id_fkey" implied="false" onDeleteCascade="true" schema="map" table="featuremap"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="2" name="stock_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="stock_id" foreignKey="stock_featuremap_stock_id_fkey" implied="false" onDeleteCascade="true" schema="stock" table="stock"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="3" name="type_id" nullable="true" remarks="" size="19" type="int8">
+            <parent column="cvterm_id" foreignKey="stock_featuremap_type_id_fkey" implied="false" onDeleteCascade="true" schema="cv" table="cvterm"/>
+         </column>
+         <primaryKey column="stock_featuremap_id" sequenceNumberInPK="1"/>
+         <index name="stock_featuremap_pkey" unique="true">
+            <column ascending="true" name="stock_featuremap_id"/>
+         </index>
+         <index name="stock_featuremap_c1" unique="true">
+            <column ascending="true" name="featuremap_id"/>
+            <column ascending="true" name="stock_id"/>
+            <column ascending="true" name="type_id"/>
+         </index>
+         <index name="stock_featuremap_idx1" unique="false">
+            <column ascending="true" name="featuremap_id"/>
+         </index>
+         <index name="stock_featuremap_idx2" unique="false">
+            <column ascending="true" name="stock_id"/>
+         </index>
+         <index name="stock_featuremap_idx3" unique="false">
+            <column ascending="true" name="type_id"/>
+         </index>
+      </table>
+      <table name="stock_genotype" remarks="Simple table linking a stock to&#10;a genotype. Features with genotypes can be linked to stocks thru feature_genotype -&gt; genotype -&gt; stock_genotype -&gt; stock." schema="stock" type="TABLE">
+         <column autoUpdated="false" defaultValue="nextval('stock.stock_genotype_stock_genotype_id_seq'::regclass)" digits="0" id="0" name="stock_genotype_id" nullable="false" remarks="" size="19" type="bigserial"/>
+         <column autoUpdated="false" digits="0" id="1" name="stock_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="stock_id" foreignKey="stock_genotype_stock_id_fkey" implied="false" onDeleteCascade="true" schema="stock" table="stock"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="2" name="genotype_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="genotype_id" foreignKey="stock_genotype_genotype_id_fkey" implied="false" onDeleteCascade="true" schema="genetic" table="genotype"/>
+         </column>
+         <primaryKey column="stock_genotype_id" sequenceNumberInPK="1"/>
+         <index name="stock_genotype_pkey" unique="true">
+            <column ascending="true" name="stock_genotype_id"/>
+         </index>
+         <index name="stock_genotype_c1" unique="true">
+            <column ascending="true" name="stock_id"/>
+            <column ascending="true" name="genotype_id"/>
+         </index>
+         <index name="stock_genotype_idx1" unique="false">
+            <column ascending="true" name="stock_id"/>
+         </index>
+         <index name="stock_genotype_idx2" unique="false">
+            <column ascending="true" name="genotype_id"/>
+         </index>
+      </table>
+      <table name="stock_library" remarks="Links a stock with a library." schema="stock" type="TABLE">
+         <column autoUpdated="false" defaultValue="nextval('stock.stock_library_stock_library_id_seq'::regclass)" digits="0" id="0" name="stock_library_id" nullable="false" remarks="" size="19" type="bigserial"/>
+         <column autoUpdated="false" digits="0" id="1" name="library_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="library_id" foreignKey="stock_library_library_id_fkey" implied="false" onDeleteCascade="true" schema="library" table="library"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="2" name="stock_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="stock_id" foreignKey="stock_library_stock_id_fkey" implied="false" onDeleteCascade="true" schema="stock" table="stock"/>
+         </column>
+         <primaryKey column="stock_library_id" sequenceNumberInPK="1"/>
+         <index name="stock_library_pkey" unique="true">
+            <column ascending="true" name="stock_library_id"/>
+         </index>
+         <index name="stock_library_c1" unique="true">
+            <column ascending="true" name="library_id"/>
+            <column ascending="true" name="stock_id"/>
+         </index>
+         <index name="stock_library_idx1" unique="false">
+            <column ascending="true" name="library_id"/>
+         </index>
+         <index name="stock_library_idx2" unique="false">
+            <column ascending="true" name="stock_id"/>
+         </index>
+      </table>
+      <table name="stock_pub" remarks="Provenance. Linking table between stocks and, for example, a stocklist computer file." schema="stock" type="TABLE">
+         <column autoUpdated="false" defaultValue="nextval('stock.stock_pub_stock_pub_id_seq'::regclass)" digits="0" id="0" name="stock_pub_id" nullable="false" remarks="" size="19" type="bigserial"/>
+         <column autoUpdated="false" digits="0" id="1" name="stock_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="stock_id" foreignKey="stock_pub_stock_id_fkey" implied="false" onDeleteCascade="true" schema="stock" table="stock"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="2" name="pub_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="pub_id" foreignKey="stock_pub_pub_id_fkey" implied="false" onDeleteCascade="true" schema="pub" table="pub"/>
+         </column>
+         <primaryKey column="stock_pub_id" sequenceNumberInPK="1"/>
+         <index name="stock_pub_pkey" unique="true">
+            <column ascending="true" name="stock_pub_id"/>
+         </index>
+         <index name="stock_pub_c1" unique="true">
+            <column ascending="true" name="stock_id"/>
+            <column ascending="true" name="pub_id"/>
+         </index>
+         <index name="stock_pub_idx1" unique="false">
+            <column ascending="true" name="stock_id"/>
+         </index>
+         <index name="stock_pub_idx2" unique="false">
+            <column ascending="true" name="pub_id"/>
+         </index>
+      </table>
+      <table name="stock_relationship" remarks="" schema="stock" type="TABLE">
+         <column autoUpdated="false" defaultValue="nextval('stock.stock_relationship_stock_relationship_id_seq'::regclass)" digits="0" id="0" name="stock_relationship_id" nullable="false" remarks="" size="19" type="bigserial">
+            <child column="stock_relationship_id" foreignKey="stock_relationship_cvterm_stock_relationship_id_fkey" implied="false" onDeleteCascade="true" schema="stock" table="stock_relationship_cvterm"/>
+            <child column="stock_relationship_id" foreignKey="stock_relationship_pub_stock_relationship_id_fkey" implied="false" onDeleteCascade="true" schema="stock" table="stock_relationship_pub"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="1" name="subject_id" nullable="false" remarks="stock_relationship.subject_id is the subject of the subj-predicate-obj sentence. This is typically the substock." size="19" type="int8">
+            <parent column="stock_id" foreignKey="stock_relationship_subject_id_fkey" implied="false" onDeleteCascade="true" schema="stock" table="stock"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="2" name="object_id" nullable="false" remarks="stock_relationship.object_id is the object of the subj-predicate-obj sentence. This is typically the container stock." size="19" type="int8">
+            <parent column="stock_id" foreignKey="stock_relationship_object_id_fkey" implied="false" onDeleteCascade="true" schema="stock" table="stock"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="3" name="type_id" nullable="false" remarks="stock_relationship.type_id is relationship type between subject and object. This is a cvterm, typically from the OBO relationship ontology, although other relationship types are allowed." size="19" type="int8">
+            <parent column="cvterm_id" foreignKey="stock_relationship_type_id_fkey" implied="false" onDeleteCascade="true" schema="cv" table="cvterm"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="4" name="value" nullable="true" remarks="stock_relationship.value is for additional notes or comments." size="2147483647" type="text"/>
+         <column autoUpdated="false" defaultValue="0" digits="0" id="5" name="rank" nullable="false" remarks="stock_relationship.rank is the ordering of subject stocks with respect to the object stock may be important where rank is used to order these; starts from zero." size="10" type="int4"/>
+         <primaryKey column="stock_relationship_id" sequenceNumberInPK="1"/>
+         <index name="stock_relationship_pkey" unique="true">
+            <column ascending="true" name="stock_relationship_id"/>
+         </index>
+         <index name="stock_relationship_c1" unique="true">
+            <column ascending="true" name="subject_id"/>
+            <column ascending="true" name="object_id"/>
+            <column ascending="true" name="type_id"/>
+            <column ascending="true" name="rank"/>
+         </index>
+         <index name="stock_relationship_idx1" unique="false">
+            <column ascending="true" name="subject_id"/>
+         </index>
+         <index name="stock_relationship_idx2" unique="false">
+            <column ascending="true" name="object_id"/>
+         </index>
+         <index name="stock_relationship_idx3" unique="false">
+            <column ascending="true" name="type_id"/>
+         </index>
+      </table>
+      <table name="stock_relationship_cvterm" remarks="For germplasm maintenance and pedigree data, stock_relationship. type_id will record cvterms such as &quot;is a female parent of&quot;, &quot;a parent for mutation&quot;, &quot;is a group_id of&quot;, &quot;is a source_id of&quot;, etc The cvterms for higher categories such as &quot;generative&quot;, &quot;derivative&quot; or &quot;maintenance&quot; can be stored in table stock_relationship_cvterm" schema="stock" type="TABLE">
+         <column autoUpdated="false" defaultValue="nextval('stock.stock_relationship_cvterm_stock_relationship_cvterm_id_seq'::regclass)" digits="0" id="0" name="stock_relationship_cvterm_id" nullable="false" remarks="" size="19" type="bigserial"/>
+         <column autoUpdated="false" digits="0" id="1" name="stock_relationship_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="stock_relationship_id" foreignKey="stock_relationship_cvterm_stock_relationship_id_fkey" implied="false" onDeleteCascade="true" schema="stock" table="stock_relationship"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="2" name="cvterm_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="cvterm_id" foreignKey="stock_relationship_cvterm_cvterm_id_fkey" implied="false" onDeleteCascade="false" schema="cv" table="cvterm"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="3" name="pub_id" nullable="true" remarks="" size="19" type="int8">
+            <parent column="pub_id" foreignKey="stock_relationship_cvterm_pub_id_fkey" implied="false" onDeleteCascade="false" schema="pub" table="pub"/>
+         </column>
+         <primaryKey column="stock_relationship_cvterm_id" sequenceNumberInPK="1"/>
+         <index name="stock_relationship_cvterm_pkey" unique="true">
+            <column ascending="true" name="stock_relationship_cvterm_id"/>
+         </index>
+      </table>
+      <table name="stock_relationship_pub" remarks="Provenance. Attach optional evidence to a stock_relationship in the form of a publication." schema="stock" type="TABLE">
+         <column autoUpdated="false" defaultValue="nextval('stock.stock_relationship_pub_stock_relationship_pub_id_seq'::regclass)" digits="0" id="0" name="stock_relationship_pub_id" nullable="false" remarks="" size="19" type="bigserial"/>
+         <column autoUpdated="false" digits="0" id="1" name="stock_relationship_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="stock_relationship_id" foreignKey="stock_relationship_pub_stock_relationship_id_fkey" implied="false" onDeleteCascade="true" schema="stock" table="stock_relationship"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="2" name="pub_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="pub_id" foreignKey="stock_relationship_pub_pub_id_fkey" implied="false" onDeleteCascade="true" schema="pub" table="pub"/>
+         </column>
+         <primaryKey column="stock_relationship_pub_id" sequenceNumberInPK="1"/>
+         <index name="stock_relationship_pub_pkey" unique="true">
+            <column ascending="true" name="stock_relationship_pub_id"/>
+         </index>
+         <index name="stock_relationship_pub_c1" unique="true">
+            <column ascending="true" name="stock_relationship_id"/>
+            <column ascending="true" name="pub_id"/>
+         </index>
+         <index name="stock_relationship_pub_idx1" unique="false">
+            <column ascending="true" name="stock_relationship_id"/>
+         </index>
+         <index name="stock_relationship_pub_idx2" unique="false">
+            <column ascending="true" name="pub_id"/>
+         </index>
+      </table>
+      <table name="stockcollection" remarks="The lab or stock center distributing the stocks in their collection." schema="stock" type="TABLE">
+         <column autoUpdated="false" defaultValue="nextval('stock.stockcollection_stockcollection_id_seq'::regclass)" digits="0" id="0" name="stockcollection_id" nullable="false" remarks="" size="19" type="bigserial">
+            <child column="stockcollection_id" foreignKey="stockcollection_db_stockcollection_id_fkey" implied="false" onDeleteCascade="true" schema="stock" table="stockcollection_db"/>
+            <child column="stockcollection_id" foreignKey="stockcollection_stock_stockcollection_id_fkey" implied="false" onDeleteCascade="true" schema="stock" table="stockcollection_stock"/>
+            <child column="stockcollection_id" foreignKey="stockcollectionprop_stockcollection_id_fkey" implied="false" onDeleteCascade="true" schema="stock" table="stockcollectionprop"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="1" name="type_id" nullable="false" remarks="type_id is the collection type cv." size="19" type="int8">
+            <parent column="cvterm_id" foreignKey="stockcollection_type_id_fkey" implied="false" onDeleteCascade="true" schema="cv" table="cvterm"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="2" name="contact_id" nullable="true" remarks="contact_id links to the contact information for the collection." size="19" type="int8">
+            <parent column="contact_id" foreignKey="stockcollection_contact_id_fkey" implied="false" onDeleteCascade="false" schema="contact" table="contact"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="3" name="name" nullable="true" remarks="name is the collection." size="255" type="varchar"/>
+         <column autoUpdated="false" digits="0" id="4" name="uniquename" nullable="false" remarks="uniqename is the value of the collection cv." size="2147483647" type="text"/>
+         <primaryKey column="stockcollection_id" sequenceNumberInPK="1"/>
+         <index name="stockcollection_pkey" unique="true">
+            <column ascending="true" name="stockcollection_id"/>
+         </index>
+         <index name="stockcollection_c1" unique="true">
+            <column ascending="true" name="uniquename"/>
+            <column ascending="true" name="type_id"/>
+         </index>
+         <index name="stockcollection_idx1" unique="false">
+            <column ascending="true" name="contact_id"/>
+         </index>
+         <index name="stockcollection_idx2" unique="false">
+            <column ascending="true" name="type_id"/>
+         </index>
+         <index name="stockcollection_idx3" unique="false">
+            <column ascending="true" name="uniquename"/>
+         </index>
+         <index name="stockcollection_name_ind1" unique="false">
+            <column ascending="true" name="name"/>
+         </index>
+      </table>
+      <table name="stockcollection_db" remarks="Stock collections may be respresented &#10;by an external online database. This table associates a stock collection with &#10;a database where its member stocks can be found. Individual stock that are part &#10;of this collction should have entries in the stock_dbxref table with the same &#10;db_id record" schema="stock" type="TABLE">
+         <column autoUpdated="false" defaultValue="nextval('stock.stockcollection_db_stockcollection_db_id_seq'::regclass)" digits="0" id="0" name="stockcollection_db_id" nullable="false" remarks="" size="19" type="bigserial"/>
+         <column autoUpdated="false" digits="0" id="1" name="stockcollection_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="stockcollection_id" foreignKey="stockcollection_db_stockcollection_id_fkey" implied="false" onDeleteCascade="true" schema="stock" table="stockcollection"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="2" name="db_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="db_id" foreignKey="stockcollection_db_db_id_fkey" implied="false" onDeleteCascade="true" schema="db" table="db"/>
+         </column>
+         <primaryKey column="stockcollection_db_id" sequenceNumberInPK="1"/>
+         <index name="stockcollection_db_pkey" unique="true">
+            <column ascending="true" name="stockcollection_db_id"/>
+         </index>
+         <index name="stockcollection_db_c1" unique="true">
+            <column ascending="true" name="stockcollection_id"/>
+            <column ascending="true" name="db_id"/>
+         </index>
+         <index name="stockcollection_db_idx1" unique="false">
+            <column ascending="true" name="stockcollection_id"/>
+         </index>
+         <index name="stockcollection_db_idx2" unique="false">
+            <column ascending="true" name="db_id"/>
+         </index>
+      </table>
+      <table name="stockcollection_stock" remarks="stockcollection_stock links&#10;a stock collection to the stocks which are contained in the collection." schema="stock" type="TABLE">
+         <column autoUpdated="false" defaultValue="nextval('stock.stockcollection_stock_stockcollection_stock_id_seq'::regclass)" digits="0" id="0" name="stockcollection_stock_id" nullable="false" remarks="" size="19" type="bigserial"/>
+         <column autoUpdated="false" digits="0" id="1" name="stockcollection_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="stockcollection_id" foreignKey="stockcollection_stock_stockcollection_id_fkey" implied="false" onDeleteCascade="true" schema="stock" table="stockcollection"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="2" name="stock_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="stock_id" foreignKey="stockcollection_stock_stock_id_fkey" implied="false" onDeleteCascade="true" schema="stock" table="stock"/>
+         </column>
+         <primaryKey column="stockcollection_stock_id" sequenceNumberInPK="1"/>
+         <index name="stockcollection_stock_pkey" unique="true">
+            <column ascending="true" name="stockcollection_stock_id"/>
+         </index>
+         <index name="stockcollection_stock_c1" unique="true">
+            <column ascending="true" name="stockcollection_id"/>
+            <column ascending="true" name="stock_id"/>
+         </index>
+         <index name="stockcollection_stock_idx1" unique="false">
+            <column ascending="true" name="stockcollection_id"/>
+         </index>
+         <index name="stockcollection_stock_idx2" unique="false">
+            <column ascending="true" name="stock_id"/>
+         </index>
+      </table>
+      <table name="stockcollectionprop" remarks="The table stockcollectionprop&#10;contains the value of the stock collection such as website/email URLs;&#10;the value of the stock collection order URLs." schema="stock" type="TABLE">
+         <column autoUpdated="false" defaultValue="nextval('stock.stockcollectionprop_stockcollectionprop_id_seq'::regclass)" digits="0" id="0" name="stockcollectionprop_id" nullable="false" remarks="" size="19" type="bigserial"/>
+         <column autoUpdated="false" digits="0" id="1" name="stockcollection_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="stockcollection_id" foreignKey="stockcollectionprop_stockcollection_id_fkey" implied="false" onDeleteCascade="true" schema="stock" table="stockcollection"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="2" name="type_id" nullable="false" remarks="The cv for the type_id is &quot;stockcollection property type&quot;." size="19" type="int8">
+            <parent column="cvterm_id" foreignKey="stockcollectionprop_type_id_fkey" implied="false" onDeleteCascade="false" schema="cv" table="cvterm"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="3" name="value" nullable="true" remarks="" size="2147483647" type="text"/>
+         <column autoUpdated="false" defaultValue="0" digits="0" id="4" name="rank" nullable="false" remarks="" size="10" type="int4"/>
+         <primaryKey column="stockcollectionprop_id" sequenceNumberInPK="1"/>
+         <index name="stockcollectionprop_pkey" unique="true">
+            <column ascending="true" name="stockcollectionprop_id"/>
+         </index>
+         <index name="stockcollectionprop_c1" unique="true">
+            <column ascending="true" name="stockcollection_id"/>
+            <column ascending="true" name="type_id"/>
+            <column ascending="true" name="rank"/>
+         </index>
+         <index name="stockcollectionprop_idx1" unique="false">
+            <column ascending="true" name="stockcollection_id"/>
+         </index>
+         <index name="stockcollectionprop_idx2" unique="false">
+            <column ascending="true" name="type_id"/>
+         </index>
+      </table>
+      <table name="stockprop" remarks="A stock can have any number of&#10;slot-value property tags attached to it. This is an alternative to&#10;hardcoding a list of columns in the relational schema, and is&#10;completely extensible. There is a unique constraint, stockprop_c1, for&#10;the combination of stock_id, rank, and type_id. Multivalued property-value pairs must be differentiated by rank." schema="stock" type="TABLE">
+         <column autoUpdated="false" defaultValue="nextval('stock.stockprop_stockprop_id_seq'::regclass)" digits="0" id="0" name="stockprop_id" nullable="false" remarks="" size="19" type="bigserial">
+            <child column="stockprop_id" foreignKey="stockprop_pub_stockprop_id_fkey" implied="false" onDeleteCascade="true" schema="stock" table="stockprop_pub"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="1" name="stock_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="stock_id" foreignKey="stockprop_stock_id_fkey" implied="false" onDeleteCascade="true" schema="stock" table="stock"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="2" name="type_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="cvterm_id" foreignKey="stockprop_type_id_fkey" implied="false" onDeleteCascade="true" schema="cv" table="cvterm"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="3" name="value" nullable="true" remarks="" size="2147483647" type="text"/>
+         <column autoUpdated="false" defaultValue="0" digits="0" id="4" name="rank" nullable="false" remarks="" size="10" type="int4"/>
+         <primaryKey column="stockprop_id" sequenceNumberInPK="1"/>
+         <index name="stockprop_pkey" unique="true">
+            <column ascending="true" name="stockprop_id"/>
+         </index>
+         <index name="stockprop_c1" unique="true">
+            <column ascending="true" name="stock_id"/>
+            <column ascending="true" name="type_id"/>
+            <column ascending="true" name="rank"/>
+         </index>
+         <index name="stockprop_idx1" unique="false">
+            <column ascending="true" name="stock_id"/>
+         </index>
+         <index name="stockprop_idx2" unique="false">
+            <column ascending="true" name="type_id"/>
+         </index>
+      </table>
+      <table name="stockprop_pub" remarks="Provenance. Any stockprop assignment can optionally be supported by a publication." schema="stock" type="TABLE">
+         <column autoUpdated="false" defaultValue="nextval('stock.stockprop_pub_stockprop_pub_id_seq'::regclass)" digits="0" id="0" name="stockprop_pub_id" nullable="false" remarks="" size="19" type="bigserial"/>
+         <column autoUpdated="false" digits="0" id="1" name="stockprop_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="stockprop_id" foreignKey="stockprop_pub_stockprop_id_fkey" implied="false" onDeleteCascade="true" schema="stock" table="stockprop"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="2" name="pub_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="pub_id" foreignKey="stockprop_pub_pub_id_fkey" implied="false" onDeleteCascade="true" schema="pub" table="pub"/>
+         </column>
+         <primaryKey column="stockprop_pub_id" sequenceNumberInPK="1"/>
+         <index name="stockprop_pub_pkey" unique="true">
+            <column ascending="true" name="stockprop_pub_id"/>
+         </index>
+         <index name="stockprop_pub_c1" unique="true">
+            <column ascending="true" name="stockprop_id"/>
+            <column ascending="true" name="pub_id"/>
+         </index>
+         <index name="stockprop_pub_idx1" unique="false">
+            <column ascending="true" name="stockprop_id"/>
+         </index>
+         <index name="stockprop_pub_idx2" unique="false">
+            <column ascending="true" name="pub_id"/>
+         </index>
+      </table>
+   </tables>
+</database>

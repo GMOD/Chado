@@ -1,0 +1,506 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<database name="chado" schema="natural_diversity" type="PostgreSQL - 9.3.18">
+   <tables>
+      <table name="nd_experiment" remarks="This is the core table for the natural diversity module, &#10;representing each individual assay that is undertaken (this is usually *not* an &#10;entire experiment). Each nd_experiment should give rise to a single genotype or &#10;phenotype and be described via 1 (or more) protocols. Collections of assays that &#10;relate to each other should be linked to the same record in the project table." schema="natural_diversity" type="TABLE">
+         <column autoUpdated="false" defaultValue="nextval('natural_diversity.nd_experiment_nd_experiment_id_seq'::regclass)" digits="0" id="0" name="nd_experiment_id" nullable="false" remarks="" size="19" type="bigserial">
+            <child column="nd_experiment_id" foreignKey="nd_experiment_analysis_nd_experiment_id_fkey" implied="false" onDeleteCascade="true" schema="natural_diversity" table="nd_experiment_analysis"/>
+            <child column="nd_experiment_id" foreignKey="nd_experiment_contact_nd_experiment_id_fkey" implied="false" onDeleteCascade="true" schema="natural_diversity" table="nd_experiment_contact"/>
+            <child column="nd_experiment_id" foreignKey="nd_experiment_dbxref_nd_experiment_id_fkey" implied="false" onDeleteCascade="true" schema="natural_diversity" table="nd_experiment_dbxref"/>
+            <child column="nd_experiment_id" foreignKey="nd_experiment_genotype_nd_experiment_id_fkey" implied="false" onDeleteCascade="true" schema="natural_diversity" table="nd_experiment_genotype"/>
+            <child column="nd_experiment_id" foreignKey="nd_experiment_phenotype_nd_experiment_id_fkey" implied="false" onDeleteCascade="true" schema="natural_diversity" table="nd_experiment_phenotype"/>
+            <child column="nd_experiment_id" foreignKey="nd_experiment_project_nd_experiment_id_fkey" implied="false" onDeleteCascade="true" schema="natural_diversity" table="nd_experiment_project"/>
+            <child column="nd_experiment_id" foreignKey="nd_experiment_protocol_nd_experiment_id_fkey" implied="false" onDeleteCascade="true" schema="natural_diversity" table="nd_experiment_protocol"/>
+            <child column="nd_experiment_id" foreignKey="nd_experiment_pub_nd_experiment_id_fkey" implied="false" onDeleteCascade="true" schema="natural_diversity" table="nd_experiment_pub"/>
+            <child column="nd_experiment_id" foreignKey="nd_experiment_stock_nd_experiment_id_fkey" implied="false" onDeleteCascade="true" schema="natural_diversity" table="nd_experiment_stock"/>
+            <child column="nd_experiment_id" foreignKey="nd_experimentprop_nd_experiment_id_fkey" implied="false" onDeleteCascade="true" schema="natural_diversity" table="nd_experimentprop"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="1" name="nd_geolocation_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="nd_geolocation_id" foreignKey="nd_experiment_nd_geolocation_id_fkey" implied="false" onDeleteCascade="true" schema="natural_diversity" table="nd_geolocation"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="2" name="type_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="cvterm_id" foreignKey="nd_experiment_type_id_fkey" implied="false" onDeleteCascade="true" schema="cv" table="cvterm"/>
+         </column>
+         <primaryKey column="nd_experiment_id" sequenceNumberInPK="1"/>
+         <index name="nd_experiment_pkey" unique="true">
+            <column ascending="true" name="nd_experiment_id"/>
+         </index>
+         <index name="nd_experiment_idx1" unique="false">
+            <column ascending="true" name="nd_geolocation_id"/>
+         </index>
+         <index name="nd_experiment_idx2" unique="false">
+            <column ascending="true" name="type_id"/>
+         </index>
+      </table>
+      <table name="nd_experiment_analysis" remarks="An analysis that is used in an experiment" schema="natural_diversity" type="TABLE">
+         <column autoUpdated="false" defaultValue="nextval('natural_diversity.nd_experiment_analysis_nd_experiment_analysis_id_seq'::regclass)" digits="0" id="0" name="nd_experiment_analysis_id" nullable="false" remarks="" size="19" type="bigserial"/>
+         <column autoUpdated="false" digits="0" id="1" name="nd_experiment_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="nd_experiment_id" foreignKey="nd_experiment_analysis_nd_experiment_id_fkey" implied="false" onDeleteCascade="true" schema="natural_diversity" table="nd_experiment"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="2" name="analysis_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="analysis_id" foreignKey="nd_experiment_analysis_analysis_id_fkey" implied="false" onDeleteCascade="true" schema="companalysis" table="analysis"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="3" name="type_id" nullable="true" remarks="" size="19" type="int8">
+            <parent column="cvterm_id" foreignKey="nd_experiment_analysis_type_id_fkey" implied="false" onDeleteCascade="true" schema="cv" table="cvterm"/>
+         </column>
+         <primaryKey column="nd_experiment_analysis_id" sequenceNumberInPK="1"/>
+         <index name="nd_experiment_analysis_pkey" unique="true">
+            <column ascending="true" name="nd_experiment_analysis_id"/>
+         </index>
+         <index name="nd_experiment_analysis_idx1" unique="false">
+            <column ascending="true" name="nd_experiment_id"/>
+         </index>
+         <index name="nd_experiment_analysis_idx2" unique="false">
+            <column ascending="true" name="analysis_id"/>
+         </index>
+         <index name="nd_experiment_analysis_idx3" unique="false">
+            <column ascending="true" name="type_id"/>
+         </index>
+      </table>
+      <table name="nd_experiment_contact" remarks="" schema="natural_diversity" type="TABLE">
+         <column autoUpdated="false" defaultValue="nextval('natural_diversity.nd_experiment_contact_nd_experiment_contact_id_seq'::regclass)" digits="0" id="0" name="nd_experiment_contact_id" nullable="false" remarks="" size="19" type="bigserial"/>
+         <column autoUpdated="false" digits="0" id="1" name="nd_experiment_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="nd_experiment_id" foreignKey="nd_experiment_contact_nd_experiment_id_fkey" implied="false" onDeleteCascade="true" schema="natural_diversity" table="nd_experiment"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="2" name="contact_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="contact_id" foreignKey="nd_experiment_contact_contact_id_fkey" implied="false" onDeleteCascade="true" schema="contact" table="contact"/>
+         </column>
+         <primaryKey column="nd_experiment_contact_id" sequenceNumberInPK="1"/>
+         <index name="nd_experiment_contact_pkey" unique="true">
+            <column ascending="true" name="nd_experiment_contact_id"/>
+         </index>
+         <index name="nd_experiment_contact_idx1" unique="false">
+            <column ascending="true" name="nd_experiment_id"/>
+         </index>
+         <index name="nd_experiment_contact_idx2" unique="false">
+            <column ascending="true" name="contact_id"/>
+         </index>
+      </table>
+      <table name="nd_experiment_dbxref" remarks="Cross-reference experiment to accessions, images, etc" schema="natural_diversity" type="TABLE">
+         <column autoUpdated="false" defaultValue="nextval('natural_diversity.nd_experiment_dbxref_nd_experiment_dbxref_id_seq'::regclass)" digits="0" id="0" name="nd_experiment_dbxref_id" nullable="false" remarks="" size="19" type="bigserial"/>
+         <column autoUpdated="false" digits="0" id="1" name="nd_experiment_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="nd_experiment_id" foreignKey="nd_experiment_dbxref_nd_experiment_id_fkey" implied="false" onDeleteCascade="true" schema="natural_diversity" table="nd_experiment"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="2" name="dbxref_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="dbxref_id" foreignKey="nd_experiment_dbxref_dbxref_id_fkey" implied="false" onDeleteCascade="true" schema="db" table="dbxref"/>
+         </column>
+         <primaryKey column="nd_experiment_dbxref_id" sequenceNumberInPK="1"/>
+         <index name="nd_experiment_dbxref_pkey" unique="true">
+            <column ascending="true" name="nd_experiment_dbxref_id"/>
+         </index>
+         <index name="nd_experiment_dbxref_idx1" unique="false">
+            <column ascending="true" name="nd_experiment_id"/>
+         </index>
+         <index name="nd_experiment_dbxref_idx2" unique="false">
+            <column ascending="true" name="dbxref_id"/>
+         </index>
+      </table>
+      <table name="nd_experiment_genotype" remarks="Linking table: experiments to the genotypes they produce. There is a one-to-one relationship between an experiment and a genotype since each genotype record should point to one experiment. Add a new experiment_id for each genotype record." schema="natural_diversity" type="TABLE">
+         <column autoUpdated="false" defaultValue="nextval('natural_diversity.nd_experiment_genotype_nd_experiment_genotype_id_seq'::regclass)" digits="0" id="0" name="nd_experiment_genotype_id" nullable="false" remarks="" size="19" type="bigserial"/>
+         <column autoUpdated="false" digits="0" id="1" name="nd_experiment_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="nd_experiment_id" foreignKey="nd_experiment_genotype_nd_experiment_id_fkey" implied="false" onDeleteCascade="true" schema="natural_diversity" table="nd_experiment"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="2" name="genotype_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="genotype_id" foreignKey="nd_experiment_genotype_genotype_id_fkey" implied="false" onDeleteCascade="true" schema="genetic" table="genotype"/>
+         </column>
+         <primaryKey column="nd_experiment_genotype_id" sequenceNumberInPK="1"/>
+         <index name="nd_experiment_genotype_pkey" unique="true">
+            <column ascending="true" name="nd_experiment_genotype_id"/>
+         </index>
+         <index name="nd_experiment_genotype_c1" unique="true">
+            <column ascending="true" name="nd_experiment_id"/>
+            <column ascending="true" name="genotype_id"/>
+         </index>
+         <index name="nd_experiment_genotype_idx1" unique="false">
+            <column ascending="true" name="nd_experiment_id"/>
+         </index>
+         <index name="nd_experiment_genotype_idx2" unique="false">
+            <column ascending="true" name="genotype_id"/>
+         </index>
+      </table>
+      <table name="nd_experiment_phenotype" remarks="Linking table: experiments to the phenotypes they produce. There is a one-to-one relationship between an experiment and a phenotype since each phenotype record should point to one experiment. Add a new experiment_id for each phenotype record." schema="natural_diversity" type="TABLE">
+         <column autoUpdated="false" defaultValue="nextval('natural_diversity.nd_experiment_phenotype_nd_experiment_phenotype_id_seq'::regclass)" digits="0" id="0" name="nd_experiment_phenotype_id" nullable="false" remarks="" size="19" type="bigserial"/>
+         <column autoUpdated="false" digits="0" id="1" name="nd_experiment_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="nd_experiment_id" foreignKey="nd_experiment_phenotype_nd_experiment_id_fkey" implied="false" onDeleteCascade="true" schema="natural_diversity" table="nd_experiment"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="2" name="phenotype_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="phenotype_id" foreignKey="nd_experiment_phenotype_phenotype_id_fkey" implied="false" onDeleteCascade="true" schema="phenotype" table="phenotype"/>
+         </column>
+         <primaryKey column="nd_experiment_phenotype_id" sequenceNumberInPK="1"/>
+         <index name="nd_experiment_phenotype_pkey" unique="true">
+            <column ascending="true" name="nd_experiment_phenotype_id"/>
+         </index>
+         <index name="nd_experiment_phenotype_c1" unique="true">
+            <column ascending="true" name="nd_experiment_id"/>
+            <column ascending="true" name="phenotype_id"/>
+         </index>
+         <index name="nd_experiment_phenotype_idx1" unique="false">
+            <column ascending="true" name="nd_experiment_id"/>
+         </index>
+         <index name="nd_experiment_phenotype_idx2" unique="false">
+            <column ascending="true" name="phenotype_id"/>
+         </index>
+      </table>
+      <table name="nd_experiment_project" remarks="Used to group together related nd_experiment records. All nd_experiments &#10;should be linked to at least one project." schema="natural_diversity" type="TABLE">
+         <column autoUpdated="false" defaultValue="nextval('natural_diversity.nd_experiment_project_nd_experiment_project_id_seq'::regclass)" digits="0" id="0" name="nd_experiment_project_id" nullable="false" remarks="" size="19" type="bigserial"/>
+         <column autoUpdated="false" digits="0" id="1" name="project_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="project_id" foreignKey="nd_experiment_project_project_id_fkey" implied="false" onDeleteCascade="true" schema="project" table="project"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="2" name="nd_experiment_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="nd_experiment_id" foreignKey="nd_experiment_project_nd_experiment_id_fkey" implied="false" onDeleteCascade="true" schema="natural_diversity" table="nd_experiment"/>
+         </column>
+         <primaryKey column="nd_experiment_project_id" sequenceNumberInPK="1"/>
+         <index name="nd_experiment_project_pkey" unique="true">
+            <column ascending="true" name="nd_experiment_project_id"/>
+         </index>
+         <index name="nd_experiment_project_c1" unique="true">
+            <column ascending="true" name="project_id"/>
+            <column ascending="true" name="nd_experiment_id"/>
+         </index>
+         <index name="nd_experiment_project_idx1" unique="false">
+            <column ascending="true" name="project_id"/>
+         </index>
+         <index name="nd_experiment_project_idx2" unique="false">
+            <column ascending="true" name="nd_experiment_id"/>
+         </index>
+      </table>
+      <table name="nd_experiment_protocol" remarks="Linking table: experiments to the protocols they involve." schema="natural_diversity" type="TABLE">
+         <column autoUpdated="false" defaultValue="nextval('natural_diversity.nd_experiment_protocol_nd_experiment_protocol_id_seq'::regclass)" digits="0" id="0" name="nd_experiment_protocol_id" nullable="false" remarks="" size="19" type="bigserial"/>
+         <column autoUpdated="false" digits="0" id="1" name="nd_experiment_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="nd_experiment_id" foreignKey="nd_experiment_protocol_nd_experiment_id_fkey" implied="false" onDeleteCascade="true" schema="natural_diversity" table="nd_experiment"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="2" name="nd_protocol_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="nd_protocol_id" foreignKey="nd_experiment_protocol_nd_protocol_id_fkey" implied="false" onDeleteCascade="true" schema="natural_diversity" table="nd_protocol"/>
+         </column>
+         <primaryKey column="nd_experiment_protocol_id" sequenceNumberInPK="1"/>
+         <index name="nd_experiment_protocol_pkey" unique="true">
+            <column ascending="true" name="nd_experiment_protocol_id"/>
+         </index>
+         <index name="nd_experiment_protocol_idx1" unique="false">
+            <column ascending="true" name="nd_experiment_id"/>
+         </index>
+         <index name="nd_experiment_protocol_idx2" unique="false">
+            <column ascending="true" name="nd_protocol_id"/>
+         </index>
+      </table>
+      <table name="nd_experiment_pub" remarks="Linking nd_experiment(s) to publication(s)" schema="natural_diversity" type="TABLE">
+         <column autoUpdated="false" defaultValue="nextval('natural_diversity.nd_experiment_pub_nd_experiment_pub_id_seq'::regclass)" digits="0" id="0" name="nd_experiment_pub_id" nullable="false" remarks="" size="19" type="bigserial"/>
+         <column autoUpdated="false" digits="0" id="1" name="nd_experiment_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="nd_experiment_id" foreignKey="nd_experiment_pub_nd_experiment_id_fkey" implied="false" onDeleteCascade="true" schema="natural_diversity" table="nd_experiment"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="2" name="pub_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="pub_id" foreignKey="nd_experiment_pub_pub_id_fkey" implied="false" onDeleteCascade="true" schema="pub" table="pub"/>
+         </column>
+         <primaryKey column="nd_experiment_pub_id" sequenceNumberInPK="1"/>
+         <index name="nd_experiment_pub_pkey" unique="true">
+            <column ascending="true" name="nd_experiment_pub_id"/>
+         </index>
+         <index name="nd_experiment_pub_c1" unique="true">
+            <column ascending="true" name="nd_experiment_id"/>
+            <column ascending="true" name="pub_id"/>
+         </index>
+         <index name="nd_experiment_pub_idx1" unique="false">
+            <column ascending="true" name="nd_experiment_id"/>
+         </index>
+         <index name="nd_experiment_pub_idx2" unique="false">
+            <column ascending="true" name="pub_id"/>
+         </index>
+      </table>
+      <table name="nd_experiment_stock" remarks="Part of a stock or a clone of a stock that is used in an experiment" schema="natural_diversity" type="TABLE">
+         <column autoUpdated="false" defaultValue="nextval('natural_diversity.nd_experiment_stock_nd_experiment_stock_id_seq'::regclass)" digits="0" id="0" name="nd_experiment_stock_id" nullable="false" remarks="" size="19" type="bigserial">
+            <child column="nd_experiment_stock_id" foreignKey="nd_experiment_stock_dbxref_nd_experiment_stock_id_fkey" implied="false" onDeleteCascade="true" schema="natural_diversity" table="nd_experiment_stock_dbxref"/>
+            <child column="nd_experiment_stock_id" foreignKey="nd_experiment_stockprop_nd_experiment_stock_id_fkey" implied="false" onDeleteCascade="true" schema="natural_diversity" table="nd_experiment_stockprop"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="1" name="nd_experiment_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="nd_experiment_id" foreignKey="nd_experiment_stock_nd_experiment_id_fkey" implied="false" onDeleteCascade="true" schema="natural_diversity" table="nd_experiment"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="2" name="stock_id" nullable="false" remarks="stock used in the extraction or the corresponding stock for the clone" size="19" type="int8">
+            <parent column="stock_id" foreignKey="nd_experiment_stock_stock_id_fkey" implied="false" onDeleteCascade="true" schema="stock" table="stock"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="3" name="type_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="cvterm_id" foreignKey="nd_experiment_stock_type_id_fkey" implied="false" onDeleteCascade="true" schema="cv" table="cvterm"/>
+         </column>
+         <primaryKey column="nd_experiment_stock_id" sequenceNumberInPK="1"/>
+         <index name="nd_experiment_stock_pkey" unique="true">
+            <column ascending="true" name="nd_experiment_stock_id"/>
+         </index>
+         <index name="nd_experiment_stock_idx1" unique="false">
+            <column ascending="true" name="nd_experiment_id"/>
+         </index>
+         <index name="nd_experiment_stock_idx2" unique="false">
+            <column ascending="true" name="stock_id"/>
+         </index>
+         <index name="nd_experiment_stock_idx3" unique="false">
+            <column ascending="true" name="type_id"/>
+         </index>
+      </table>
+      <table name="nd_experiment_stock_dbxref" remarks="Cross-reference experiment_stock to accessions, images, etc" schema="natural_diversity" type="TABLE">
+         <column autoUpdated="false" defaultValue="nextval('natural_diversity.nd_experiment_stock_dbxref_nd_experiment_stock_dbxref_id_seq'::regclass)" digits="0" id="0" name="nd_experiment_stock_dbxref_id" nullable="false" remarks="" size="19" type="bigserial"/>
+         <column autoUpdated="false" digits="0" id="1" name="nd_experiment_stock_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="nd_experiment_stock_id" foreignKey="nd_experiment_stock_dbxref_nd_experiment_stock_id_fkey" implied="false" onDeleteCascade="true" schema="natural_diversity" table="nd_experiment_stock"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="2" name="dbxref_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="dbxref_id" foreignKey="nd_experiment_stock_dbxref_dbxref_id_fkey" implied="false" onDeleteCascade="true" schema="db" table="dbxref"/>
+         </column>
+         <primaryKey column="nd_experiment_stock_dbxref_id" sequenceNumberInPK="1"/>
+         <index name="nd_experiment_stock_dbxref_pkey" unique="true">
+            <column ascending="true" name="nd_experiment_stock_dbxref_id"/>
+         </index>
+         <index name="nd_experiment_stock_dbxref_idx1" unique="false">
+            <column ascending="true" name="nd_experiment_stock_id"/>
+         </index>
+         <index name="nd_experiment_stock_dbxref_idx2" unique="false">
+            <column ascending="true" name="dbxref_id"/>
+         </index>
+      </table>
+      <table name="nd_experiment_stockprop" remarks="Property/value associations for experiment_stocks. This table can store the properties such as treatment" schema="natural_diversity" type="TABLE">
+         <column autoUpdated="false" defaultValue="nextval('natural_diversity.nd_experiment_stockprop_nd_experiment_stockprop_id_seq'::regclass)" digits="0" id="0" name="nd_experiment_stockprop_id" nullable="false" remarks="" size="19" type="bigserial"/>
+         <column autoUpdated="false" digits="0" id="1" name="nd_experiment_stock_id" nullable="false" remarks="The experiment_stock to which the property applies." size="19" type="int8">
+            <parent column="nd_experiment_stock_id" foreignKey="nd_experiment_stockprop_nd_experiment_stock_id_fkey" implied="false" onDeleteCascade="true" schema="natural_diversity" table="nd_experiment_stock"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="2" name="type_id" nullable="false" remarks="The name of the property as a reference to a controlled vocabulary term." size="19" type="int8">
+            <parent column="cvterm_id" foreignKey="nd_experiment_stockprop_type_id_fkey" implied="false" onDeleteCascade="true" schema="cv" table="cvterm"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="3" name="value" nullable="true" remarks="The value of the property." size="2147483647" type="text"/>
+         <column autoUpdated="false" defaultValue="0" digits="0" id="4" name="rank" nullable="false" remarks="The rank of the property value, if the property has an array of values." size="10" type="int4"/>
+         <primaryKey column="nd_experiment_stockprop_id" sequenceNumberInPK="1"/>
+         <index name="nd_experiment_stockprop_pkey" unique="true">
+            <column ascending="true" name="nd_experiment_stockprop_id"/>
+         </index>
+         <index name="nd_experiment_stockprop_c1" unique="true">
+            <column ascending="true" name="nd_experiment_stock_id"/>
+            <column ascending="true" name="type_id"/>
+            <column ascending="true" name="rank"/>
+         </index>
+         <index name="nd_experiment_stockprop_idx1" unique="false">
+            <column ascending="true" name="nd_experiment_stock_id"/>
+         </index>
+         <index name="nd_experiment_stockprop_idx2" unique="false">
+            <column ascending="true" name="type_id"/>
+         </index>
+      </table>
+      <table name="nd_experimentprop" remarks="An nd_experiment can have any number of&#10;slot-value property tags attached to it. This is an alternative to&#10;hardcoding a list of columns in the relational schema, and is&#10;completely extensible. There is a unique constraint, stockprop_c1, for&#10;the combination of stock_id, rank, and type_id. Multivalued property-value pairs must be differentiated by rank." schema="natural_diversity" type="TABLE">
+         <column autoUpdated="false" defaultValue="nextval('natural_diversity.nd_experimentprop_nd_experimentprop_id_seq'::regclass)" digits="0" id="0" name="nd_experimentprop_id" nullable="false" remarks="" size="19" type="bigserial"/>
+         <column autoUpdated="false" digits="0" id="1" name="nd_experiment_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="nd_experiment_id" foreignKey="nd_experimentprop_nd_experiment_id_fkey" implied="false" onDeleteCascade="true" schema="natural_diversity" table="nd_experiment"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="2" name="type_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="cvterm_id" foreignKey="nd_experimentprop_type_id_fkey" implied="false" onDeleteCascade="true" schema="cv" table="cvterm"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="3" name="value" nullable="true" remarks="" size="2147483647" type="text"/>
+         <column autoUpdated="false" defaultValue="0" digits="0" id="4" name="rank" nullable="false" remarks="" size="10" type="int4"/>
+         <primaryKey column="nd_experimentprop_id" sequenceNumberInPK="1"/>
+         <index name="nd_experimentprop_pkey" unique="true">
+            <column ascending="true" name="nd_experimentprop_id"/>
+         </index>
+         <index name="nd_experimentprop_c1" unique="true">
+            <column ascending="true" name="nd_experiment_id"/>
+            <column ascending="true" name="type_id"/>
+            <column ascending="true" name="rank"/>
+         </index>
+         <index name="nd_experimentprop_idx1" unique="false">
+            <column ascending="true" name="nd_experiment_id"/>
+         </index>
+         <index name="nd_experimentprop_idx2" unique="false">
+            <column ascending="true" name="type_id"/>
+         </index>
+      </table>
+      <table name="nd_geolocation" remarks="The geo-referencable location of the stock. NOTE: This entity is subject to change as a more general and possibly more OpenGIS-compliant geolocation module may be introduced into Chado." schema="natural_diversity" type="TABLE">
+         <column autoUpdated="false" defaultValue="nextval('natural_diversity.nd_geolocation_nd_geolocation_id_seq'::regclass)" digits="0" id="0" name="nd_geolocation_id" nullable="false" remarks="" size="19" type="bigserial">
+            <child column="nd_geolocation_id" foreignKey="nd_experiment_nd_geolocation_id_fkey" implied="false" onDeleteCascade="true" schema="natural_diversity" table="nd_experiment"/>
+            <child column="nd_geolocation_id" foreignKey="nd_geolocationprop_nd_geolocation_id_fkey" implied="false" onDeleteCascade="true" schema="natural_diversity" table="nd_geolocationprop"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="1" name="description" nullable="true" remarks="A textual representation of the location, if this is the original georeference. Optional if the original georeference is available in lat/long coordinates." size="2147483647" type="text"/>
+         <column autoUpdated="false" digits="8" id="2" name="latitude" nullable="true" remarks="The decimal latitude coordinate of the georeference, using positive and negative sign to indicate N and S, respectively." size="8" type="float4"/>
+         <column autoUpdated="false" digits="8" id="3" name="longitude" nullable="true" remarks="The decimal longitude coordinate of the georeference, using positive and negative sign to indicate E and W, respectively." size="8" type="float4"/>
+         <column autoUpdated="false" digits="0" id="4" name="geodetic_datum" nullable="true" remarks="The geodetic system on which the geo-reference coordinates are based. For geo-references measured between 1984 and 2010, this will typically be WGS84." size="32" type="varchar"/>
+         <column autoUpdated="false" digits="8" id="5" name="altitude" nullable="true" remarks="The altitude (elevation) of the location in meters. If the altitude is only known as a range, this is the average, and altitude_dev will hold half of the width of the range." size="8" type="float4"/>
+         <primaryKey column="nd_geolocation_id" sequenceNumberInPK="1"/>
+         <index name="nd_geolocation_pkey" unique="true">
+            <column ascending="true" name="nd_geolocation_id"/>
+         </index>
+         <index name="nd_geolocation_idx1" unique="false">
+            <column ascending="true" name="latitude"/>
+         </index>
+         <index name="nd_geolocation_idx2" unique="false">
+            <column ascending="true" name="longitude"/>
+         </index>
+         <index name="nd_geolocation_idx3" unique="false">
+            <column ascending="true" name="altitude"/>
+         </index>
+      </table>
+      <table name="nd_geolocationprop" remarks="Property/value associations for geolocations. This table can store the properties such as location and environment" schema="natural_diversity" type="TABLE">
+         <column autoUpdated="false" defaultValue="nextval('natural_diversity.nd_geolocationprop_nd_geolocationprop_id_seq'::regclass)" digits="0" id="0" name="nd_geolocationprop_id" nullable="false" remarks="" size="19" type="bigserial"/>
+         <column autoUpdated="false" digits="0" id="1" name="nd_geolocation_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="nd_geolocation_id" foreignKey="nd_geolocationprop_nd_geolocation_id_fkey" implied="false" onDeleteCascade="true" schema="natural_diversity" table="nd_geolocation"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="2" name="type_id" nullable="false" remarks="The name of the property as a reference to a controlled vocabulary term." size="19" type="int8">
+            <parent column="cvterm_id" foreignKey="nd_geolocationprop_type_id_fkey" implied="false" onDeleteCascade="true" schema="cv" table="cvterm"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="3" name="value" nullable="true" remarks="The value of the property." size="2147483647" type="text"/>
+         <column autoUpdated="false" defaultValue="0" digits="0" id="4" name="rank" nullable="false" remarks="The rank of the property value, if the property has an array of values." size="10" type="int4"/>
+         <primaryKey column="nd_geolocationprop_id" sequenceNumberInPK="1"/>
+         <index name="nd_geolocationprop_pkey" unique="true">
+            <column ascending="true" name="nd_geolocationprop_id"/>
+         </index>
+         <index name="nd_geolocationprop_c1" unique="true">
+            <column ascending="true" name="nd_geolocation_id"/>
+            <column ascending="true" name="type_id"/>
+            <column ascending="true" name="rank"/>
+         </index>
+         <index name="nd_geolocationprop_idx1" unique="false">
+            <column ascending="true" name="nd_geolocation_id"/>
+         </index>
+         <index name="nd_geolocationprop_idx2" unique="false">
+            <column ascending="true" name="type_id"/>
+         </index>
+      </table>
+      <table name="nd_protocol" remarks="A protocol can be anything that is done as part of the experiment." schema="natural_diversity" type="TABLE">
+         <column autoUpdated="false" defaultValue="nextval('natural_diversity.nd_protocol_nd_protocol_id_seq'::regclass)" digits="0" id="0" name="nd_protocol_id" nullable="false" remarks="" size="19" type="bigserial">
+            <child column="nd_protocol_id" foreignKey="nd_experiment_protocol_nd_protocol_id_fkey" implied="false" onDeleteCascade="true" schema="natural_diversity" table="nd_experiment_protocol"/>
+            <child column="nd_protocol_id" foreignKey="nd_protocol_reagent_nd_protocol_id_fkey" implied="false" onDeleteCascade="true" schema="natural_diversity" table="nd_protocol_reagent"/>
+            <child column="nd_protocol_id" foreignKey="nd_protocolprop_nd_protocol_id_fkey" implied="false" onDeleteCascade="true" schema="natural_diversity" table="nd_protocolprop"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="1" name="name" nullable="false" remarks="The protocol name." size="255" type="varchar"/>
+         <column autoUpdated="false" digits="0" id="2" name="type_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="cvterm_id" foreignKey="nd_protocol_type_id_fkey" implied="false" onDeleteCascade="true" schema="cv" table="cvterm"/>
+         </column>
+         <primaryKey column="nd_protocol_id" sequenceNumberInPK="1"/>
+         <index name="nd_protocol_pkey" unique="true">
+            <column ascending="true" name="nd_protocol_id"/>
+         </index>
+         <index name="nd_protocol_idx1" unique="false">
+            <column ascending="true" name="type_id"/>
+         </index>
+         <index name="nd_protocol_name_key" unique="true">
+            <column ascending="true" name="name"/>
+         </index>
+      </table>
+      <table name="nd_protocol_reagent" remarks="" schema="natural_diversity" type="TABLE">
+         <column autoUpdated="false" defaultValue="nextval('natural_diversity.nd_protocol_reagent_nd_protocol_reagent_id_seq'::regclass)" digits="0" id="0" name="nd_protocol_reagent_id" nullable="false" remarks="" size="19" type="bigserial"/>
+         <column autoUpdated="false" digits="0" id="1" name="nd_protocol_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="nd_protocol_id" foreignKey="nd_protocol_reagent_nd_protocol_id_fkey" implied="false" onDeleteCascade="true" schema="natural_diversity" table="nd_protocol"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="2" name="reagent_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="nd_reagent_id" foreignKey="nd_protocol_reagent_reagent_id_fkey" implied="false" onDeleteCascade="true" schema="natural_diversity" table="nd_reagent"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="3" name="type_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="cvterm_id" foreignKey="nd_protocol_reagent_type_id_fkey" implied="false" onDeleteCascade="true" schema="cv" table="cvterm"/>
+         </column>
+         <primaryKey column="nd_protocol_reagent_id" sequenceNumberInPK="1"/>
+         <index name="nd_protocol_reagent_pkey" unique="true">
+            <column ascending="true" name="nd_protocol_reagent_id"/>
+         </index>
+         <index name="nd_protocol_reagent_idx1" unique="false">
+            <column ascending="true" name="nd_protocol_id"/>
+         </index>
+         <index name="nd_protocol_reagent_idx2" unique="false">
+            <column ascending="true" name="reagent_id"/>
+         </index>
+         <index name="nd_protocol_reagent_idx3" unique="false">
+            <column ascending="true" name="type_id"/>
+         </index>
+      </table>
+      <table name="nd_protocolprop" remarks="Property/value associations for protocol." schema="natural_diversity" type="TABLE">
+         <column autoUpdated="false" defaultValue="nextval('natural_diversity.nd_protocolprop_nd_protocolprop_id_seq'::regclass)" digits="0" id="0" name="nd_protocolprop_id" nullable="false" remarks="" size="19" type="bigserial"/>
+         <column autoUpdated="false" digits="0" id="1" name="nd_protocol_id" nullable="false" remarks="The protocol to which the property applies." size="19" type="int8">
+            <parent column="nd_protocol_id" foreignKey="nd_protocolprop_nd_protocol_id_fkey" implied="false" onDeleteCascade="true" schema="natural_diversity" table="nd_protocol"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="2" name="type_id" nullable="false" remarks="The name of the property as a reference to a controlled vocabulary term." size="19" type="int8">
+            <parent column="cvterm_id" foreignKey="nd_protocolprop_type_id_fkey" implied="false" onDeleteCascade="true" schema="cv" table="cvterm"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="3" name="value" nullable="true" remarks="The value of the property." size="2147483647" type="text"/>
+         <column autoUpdated="false" defaultValue="0" digits="0" id="4" name="rank" nullable="false" remarks="The rank of the property value, if the property has an array of values." size="10" type="int4"/>
+         <primaryKey column="nd_protocolprop_id" sequenceNumberInPK="1"/>
+         <index name="nd_protocolprop_pkey" unique="true">
+            <column ascending="true" name="nd_protocolprop_id"/>
+         </index>
+         <index name="nd_protocolprop_c1" unique="true">
+            <column ascending="true" name="nd_protocol_id"/>
+            <column ascending="true" name="type_id"/>
+            <column ascending="true" name="rank"/>
+         </index>
+         <index name="nd_protocolprop_idx1" unique="false">
+            <column ascending="true" name="nd_protocol_id"/>
+         </index>
+         <index name="nd_protocolprop_idx2" unique="false">
+            <column ascending="true" name="type_id"/>
+         </index>
+      </table>
+      <table name="nd_reagent" remarks="A reagent such as a primer, an enzyme, an adapter oligo, a linker oligo. Reagents are used in genotyping experiments, or in any other kind of experiment." schema="natural_diversity" type="TABLE">
+         <column autoUpdated="false" defaultValue="nextval('natural_diversity.nd_reagent_nd_reagent_id_seq'::regclass)" digits="0" id="0" name="nd_reagent_id" nullable="false" remarks="" size="19" type="bigserial">
+            <child column="reagent_id" foreignKey="nd_protocol_reagent_reagent_id_fkey" implied="false" onDeleteCascade="true" schema="natural_diversity" table="nd_protocol_reagent"/>
+            <child column="object_reagent_id" foreignKey="nd_reagent_relationship_object_reagent_id_fkey" implied="false" onDeleteCascade="true" schema="natural_diversity" table="nd_reagent_relationship"/>
+            <child column="subject_reagent_id" foreignKey="nd_reagent_relationship_subject_reagent_id_fkey" implied="false" onDeleteCascade="true" schema="natural_diversity" table="nd_reagent_relationship"/>
+            <child column="nd_reagent_id" foreignKey="nd_reagentprop_nd_reagent_id_fkey" implied="false" onDeleteCascade="true" schema="natural_diversity" table="nd_reagentprop"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="1" name="name" nullable="false" remarks="The name of the reagent. The name should be unique for a given type." size="80" type="varchar"/>
+         <column autoUpdated="false" digits="0" id="2" name="type_id" nullable="false" remarks="The type of the reagent, for example linker oligomer, or forward primer." size="19" type="int8">
+            <parent column="cvterm_id" foreignKey="nd_reagent_type_id_fkey" implied="false" onDeleteCascade="true" schema="cv" table="cvterm"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="3" name="feature_id" nullable="true" remarks="If the reagent is a primer, the feature that it corresponds to. More generally, the corresponding feature for any reagent that has a sequence that maps to another sequence." size="19" type="int8">
+            <parent column="feature_id" foreignKey="nd_reagent_feature_id_fkey" implied="false" onDeleteCascade="true" schema="sequence" table="feature"/>
+         </column>
+         <primaryKey column="nd_reagent_id" sequenceNumberInPK="1"/>
+         <index name="nd_reagent_pkey" unique="true">
+            <column ascending="true" name="nd_reagent_id"/>
+         </index>
+         <index name="nd_reagent_idx1" unique="false">
+            <column ascending="true" name="type_id"/>
+         </index>
+         <index name="nd_reagent_idx2" unique="false">
+            <column ascending="true" name="feature_id"/>
+         </index>
+      </table>
+      <table name="nd_reagent_relationship" remarks="Relationships between reagents. Some reagents form a group. i.e., they are used all together or not at all. Examples are adapter/linker/enzyme experiment reagents." schema="natural_diversity" type="TABLE">
+         <column autoUpdated="false" defaultValue="nextval('natural_diversity.nd_reagent_relationship_nd_reagent_relationship_id_seq'::regclass)" digits="0" id="0" name="nd_reagent_relationship_id" nullable="false" remarks="" size="19" type="bigserial"/>
+         <column autoUpdated="false" digits="0" id="1" name="subject_reagent_id" nullable="false" remarks="The subject reagent in the relationship. In parent/child terminology, the subject is the child. For example, in &quot;linkerA 3prime-overhang-linker enzymeA&quot; linkerA is the subject, 3prime-overhand-linker is the type, and enzymeA is the object." size="19" type="int8">
+            <parent column="nd_reagent_id" foreignKey="nd_reagent_relationship_subject_reagent_id_fkey" implied="false" onDeleteCascade="true" schema="natural_diversity" table="nd_reagent"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="2" name="object_reagent_id" nullable="false" remarks="The object reagent in the relationship. In parent/child terminology, the object is the parent. For example, in &quot;linkerA 3prime-overhang-linker enzymeA&quot; linkerA is the subject, 3prime-overhand-linker is the type, and enzymeA is the object." size="19" type="int8">
+            <parent column="nd_reagent_id" foreignKey="nd_reagent_relationship_object_reagent_id_fkey" implied="false" onDeleteCascade="true" schema="natural_diversity" table="nd_reagent"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="3" name="type_id" nullable="false" remarks="The type (or predicate) of the relationship. For example, in &quot;linkerA 3prime-overhang-linker enzymeA&quot; linkerA is the subject, 3prime-overhand-linker is the type, and enzymeA is the object." size="19" type="int8">
+            <parent column="cvterm_id" foreignKey="nd_reagent_relationship_type_id_fkey" implied="false" onDeleteCascade="true" schema="cv" table="cvterm"/>
+         </column>
+         <primaryKey column="nd_reagent_relationship_id" sequenceNumberInPK="1"/>
+         <index name="nd_reagent_relationship_pkey" unique="true">
+            <column ascending="true" name="nd_reagent_relationship_id"/>
+         </index>
+         <index name="nd_reagent_relationship_idx1" unique="false">
+            <column ascending="true" name="subject_reagent_id"/>
+         </index>
+         <index name="nd_reagent_relationship_idx2" unique="false">
+            <column ascending="true" name="object_reagent_id"/>
+         </index>
+         <index name="nd_reagent_relationship_idx3" unique="false">
+            <column ascending="true" name="type_id"/>
+         </index>
+      </table>
+      <table name="nd_reagentprop" remarks="" schema="natural_diversity" type="TABLE">
+         <column autoUpdated="false" defaultValue="nextval('natural_diversity.nd_reagentprop_nd_reagentprop_id_seq'::regclass)" digits="0" id="0" name="nd_reagentprop_id" nullable="false" remarks="" size="19" type="bigserial"/>
+         <column autoUpdated="false" digits="0" id="1" name="nd_reagent_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="nd_reagent_id" foreignKey="nd_reagentprop_nd_reagent_id_fkey" implied="false" onDeleteCascade="true" schema="natural_diversity" table="nd_reagent"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="2" name="type_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="cvterm_id" foreignKey="nd_reagentprop_type_id_fkey" implied="false" onDeleteCascade="true" schema="cv" table="cvterm"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="3" name="value" nullable="true" remarks="" size="2147483647" type="text"/>
+         <column autoUpdated="false" defaultValue="0" digits="0" id="4" name="rank" nullable="false" remarks="" size="10" type="int4"/>
+         <primaryKey column="nd_reagentprop_id" sequenceNumberInPK="1"/>
+         <index name="nd_reagentprop_pkey" unique="true">
+            <column ascending="true" name="nd_reagentprop_id"/>
+         </index>
+         <index name="nd_reagentprop_c1" unique="true">
+            <column ascending="true" name="nd_reagent_id"/>
+            <column ascending="true" name="type_id"/>
+            <column ascending="true" name="rank"/>
+         </index>
+         <index name="nd_reagentprop_idx1" unique="false">
+            <column ascending="true" name="nd_reagent_id"/>
+         </index>
+         <index name="nd_reagentprop_idx2" unique="false">
+            <column ascending="true" name="type_id"/>
+         </index>
+      </table>
+   </tables>
+</database>

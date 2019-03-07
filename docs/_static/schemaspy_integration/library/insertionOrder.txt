@@ -1,0 +1,14 @@
+library
+library_feature
+libraryprop
+library_expression
+library_relationship
+library_contact
+library_dbxref
+library_expressionprop
+library_featureprop
+library_pub
+library_relationship_pub
+libraryprop_pub
+library_cvterm
+library_synonym

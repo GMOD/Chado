@@ -1,0 +1,90 @@
+/* Brand the header */
+.navbar-brand .gmod-title {
+    font-size: 30px;
+    font-weight: bolder;
+    color: black;
+    position: relative;
+    top: 5px;
+    padding-right: 20px;
+}
+.navbar-brand img.gmod-logo {
+    height: 50px;
+    display: inline;
+}
+
+/* Change the colors to the right blue ;-p */
+/** Background */
+.layout-top-nav .content-wrapper, .layout-top-nav .right-side, .layout-top-nav .main-footer {
+    background-color: #F4F3FB;
+}
+/** Table Striping */
+.table-striped>tbody>tr:nth-of-type(odd) {
+    background-color: #F9F8FB;
+}
+/** Grey Buttons */
+.btn-default {
+    background-color: #F9F8FB;
+}
+/** Main Accent */
+.box.box-primary {
+    border-top-color: #0D3FBC;
+}
+.box.box-solid{
+    background-color: #0D3FBC;
+}
+.box.box-solid .box-body {
+  color: white;
+  font-weight: bold;
+  font-size: 20px;
+}
+.box.box-solid .box-body .version-label {
+    font-weight: normal;
+    font-size: 0.9em;
+    margin-left: 105px;
+}
+.box.box-solid .box-body p {
+    margin: 0;
+}
+.bg-light-blue, .label-primary, .modal-primary .modal-body {
+    background-color: #0D3FBC !important;
+}
+.pagination>.active>a, .pagination>.active>a:focus, .pagination>.active>a:hover, .pagination>.active>span, .pagination>.active>span:focus, .pagination>.active>span:hover {
+    background-color: #0D3FBC;
+    border-color: #0D3FBC;
+}
+a {
+    color: #0D3FBC;
+}
+
+/* Main Page Specific Styling */
+.navbar-header .version {
+    color: #0D3FBC;
+    font-size: 25px;
+    font-weight: bold;
+    margin: 10px 50px;
+    position: relative;
+    top: 5px;
+}
+.navbar-header.second-info {
+    height: 50px;
+    border-right: 1px solid #eee;
+}
+#module-list .name {
+    width: 200px;
+}
+
+/* Warnings */
+.messages.warning {
+    background-color: #FEFCED;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    margin-left: 0px;
+    margin-right: 0px;
+    border: 1px solid #D9CB08;
+    min-height: 65px;
+    clear: both;
+    padding: 0px;
+    color: #66500D;
+    padding: 15px;
+    font-style: italic;
+}

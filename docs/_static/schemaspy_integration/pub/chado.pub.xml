@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<database name="chado" schema="pub" type="PostgreSQL - 9.3.18">
+   <tables>
+      <table name="pub" remarks="A documented provenance artefact - publications,&#10;documents, personal communication." schema="pub" type="TABLE">
+         <column autoUpdated="false" defaultValue="nextval('pub.pub_pub_id_seq'::regclass)" digits="0" id="0" name="pub_id" nullable="false" remarks="" size="19" type="bigserial">
+            <child column="pub_id" foreignKey="cell_line_cvterm_pub_id_fkey" implied="false" onDeleteCascade="true" schema="cell_line" table="cell_line_cvterm"/>
+            <child column="pub_id" foreignKey="cell_line_feature_pub_id_fkey" implied="false" onDeleteCascade="true" schema="cell_line" table="cell_line_feature"/>
+            <child column="pub_id" foreignKey="cell_line_library_pub_id_fkey" implied="false" onDeleteCascade="true" schema="cell_line" table="cell_line_library"/>
+            <child column="pub_id" foreignKey="cell_line_pub_pub_id_fkey" implied="false" onDeleteCascade="true" schema="cell_line" table="cell_line_pub"/>
+            <child column="pub_id" foreignKey="cell_line_synonym_pub_id_fkey" implied="false" onDeleteCascade="true" schema="cell_line" table="cell_line_synonym"/>
+            <child column="pub_id" foreignKey="cell_lineprop_pub_pub_id_fkey" implied="false" onDeleteCascade="true" schema="cell_line" table="cell_lineprop_pub"/>
+            <child column="pub_id" foreignKey="analysis_pub_pub_id_fkey" implied="false" onDeleteCascade="true" schema="companalysis" table="analysis_pub"/>
+            <child column="pub_id" foreignKey="expression_pub_pub_id_fkey" implied="false" onDeleteCascade="true" schema="expression" table="expression_pub"/>
+            <child column="pub_id" foreignKey="feature_expression_pub_id_fkey" implied="false" onDeleteCascade="true" schema="expression" table="feature_expression"/>
+            <child column="pub_id" foreignKey="phendesc_pub_id_fkey" implied="false" onDeleteCascade="true" schema="genetic" table="phendesc"/>
+            <child column="pub_id" foreignKey="phenotype_comparison_pub_id_fkey" implied="false" onDeleteCascade="true" schema="genetic" table="phenotype_comparison"/>
+            <child column="pub_id" foreignKey="phenotype_comparison_cvterm_pub_id_fkey" implied="false" onDeleteCascade="true" schema="genetic" table="phenotype_comparison_cvterm"/>
+            <child column="pub_id" foreignKey="phenstatement_pub_id_fkey" implied="false" onDeleteCascade="true" schema="genetic" table="phenstatement"/>
+            <child column="pub_id" foreignKey="library_cvterm_pub_id_fkey" implied="false" onDeleteCascade="false" schema="library" table="library_cvterm"/>
+            <child column="pub_id" foreignKey="library_expression_pub_id_fkey" implied="false" onDeleteCascade="false" schema="library" table="library_expression"/>
+            <child column="pub_id" foreignKey="library_pub_pub_id_fkey" implied="false" onDeleteCascade="true" schema="library" table="library_pub"/>
+            <child column="pub_id" foreignKey="library_relationship_pub_pub_id_fkey" implied="false" onDeleteCascade="false" schema="library" table="library_relationship_pub"/>
+            <child column="pub_id" foreignKey="library_synonym_pub_id_fkey" implied="false" onDeleteCascade="true" schema="library" table="library_synonym"/>
+            <child column="pub_id" foreignKey="libraryprop_pub_pub_id_fkey" implied="false" onDeleteCascade="true" schema="library" table="libraryprop_pub"/>
+            <child column="pub_id" foreignKey="protocol_pub_id_fkey" implied="false" onDeleteCascade="false" schema="mage" table="protocol"/>
+            <child column="pub_id" foreignKey="study_pub_id_fkey" implied="false" onDeleteCascade="false" schema="mage" table="study"/>
+            <child column="pub_id" foreignKey="featuremap_pub_pub_id_fkey" implied="false" onDeleteCascade="true" schema="map" table="featuremap_pub"/>
+            <child column="pub_id" foreignKey="nd_experiment_pub_pub_id_fkey" implied="false" onDeleteCascade="true" schema="natural_diversity" table="nd_experiment_pub"/>
+            <child column="pub_id" foreignKey="organism_cvterm_pub_id_fkey" implied="false" onDeleteCascade="true" schema="organism" table="organism_cvterm"/>
+            <child column="pub_id" foreignKey="organism_pub_pub_id_fkey" implied="false" onDeleteCascade="true" schema="organism" table="organism_pub"/>
+            <child column="pub_id" foreignKey="organismprop_pub_pub_id_fkey" implied="false" onDeleteCascade="true" schema="organism" table="organismprop_pub"/>
+            <child column="pub_id" foreignKey="phylonode_pub_pub_id_fkey" implied="false" onDeleteCascade="true" schema="phylogeny" table="phylonode_pub"/>
+            <child column="pub_id" foreignKey="phylotree_pub_pub_id_fkey" implied="false" onDeleteCascade="true" schema="phylogeny" table="phylotree_pub"/>
+            <child column="pub_id" foreignKey="project_pub_pub_id_fkey" implied="false" onDeleteCascade="true" schema="project" table="project_pub"/>
+            <child column="pub_id" foreignKey="pub_dbxref_pub_id_fkey" implied="false" onDeleteCascade="true" schema="pub" table="pub_dbxref"/>
+            <child column="object_id" foreignKey="pub_relationship_object_id_fkey" implied="false" onDeleteCascade="true" schema="pub" table="pub_relationship"/>
+            <child column="subject_id" foreignKey="pub_relationship_subject_id_fkey" implied="false" onDeleteCascade="true" schema="pub" table="pub_relationship"/>
+            <child column="pub_id" foreignKey="pubauthor_pub_id_fkey" implied="false" onDeleteCascade="true" schema="pub" table="pubauthor"/>
+            <child column="pub_id" foreignKey="pubprop_pub_id_fkey" implied="false" onDeleteCascade="true" schema="pub" table="pubprop"/>
+            <child column="pub_id" foreignKey="feature_cvterm_pub_id_fkey" implied="false" onDeleteCascade="true" schema="sequence" table="feature_cvterm"/>
+            <child column="pub_id" foreignKey="feature_cvterm_pub_pub_id_fkey" implied="false" onDeleteCascade="true" schema="sequence" table="feature_cvterm_pub"/>
+            <child column="pub_id" foreignKey="feature_pub_pub_id_fkey" implied="false" onDeleteCascade="true" schema="sequence" table="feature_pub"/>
+            <child column="pub_id" foreignKey="feature_relationship_pub_pub_id_fkey" implied="false" onDeleteCascade="true" schema="sequence" table="feature_relationship_pub"/>
+            <child column="pub_id" foreignKey="feature_relationshipprop_pub_pub_id_fkey" implied="false" onDeleteCascade="true" schema="sequence" table="feature_relationshipprop_pub"/>
+            <child column="pub_id" foreignKey="feature_synonym_pub_id_fkey" implied="false" onDeleteCascade="true" schema="sequence" table="feature_synonym"/>
+            <child column="pub_id" foreignKey="featureloc_pub_pub_id_fkey" implied="false" onDeleteCascade="true" schema="sequence" table="featureloc_pub"/>
+            <child column="pub_id" foreignKey="featureprop_pub_pub_id_fkey" implied="false" onDeleteCascade="true" schema="sequence" table="featureprop_pub"/>
+            <child column="pub_id" foreignKey="stock_cvterm_pub_id_fkey" implied="false" onDeleteCascade="true" schema="stock" table="stock_cvterm"/>
+            <child column="pub_id" foreignKey="stock_pub_pub_id_fkey" implied="false" onDeleteCascade="true" schema="stock" table="stock_pub"/>
+            <child column="pub_id" foreignKey="stock_relationship_cvterm_pub_id_fkey" implied="false" onDeleteCascade="false" schema="stock" table="stock_relationship_cvterm"/>
+            <child column="pub_id" foreignKey="stock_relationship_pub_pub_id_fkey" implied="false" onDeleteCascade="true" schema="stock" table="stock_relationship_pub"/>
+            <child column="pub_id" foreignKey="stockprop_pub_pub_id_fkey" implied="false" onDeleteCascade="true" schema="stock" table="stockprop_pub"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="1" name="title" nullable="true" remarks="Descriptive general heading." size="2147483647" type="text"/>
+         <column autoUpdated="false" digits="0" id="2" name="volumetitle" nullable="true" remarks="Title of part if one of a series." size="2147483647" type="text"/>
+         <column autoUpdated="false" digits="0" id="3" name="volume" nullable="true" remarks="" size="255" type="varchar"/>
+         <column autoUpdated="false" digits="0" id="4" name="series_name" nullable="true" remarks="Full name of (journal) series." size="255" type="varchar"/>
+         <column autoUpdated="false" digits="0" id="5" name="issue" nullable="true" remarks="" size="255" type="varchar"/>
+         <column autoUpdated="false" digits="0" id="6" name="pyear" nullable="true" remarks="" size="255" type="varchar"/>
+         <column autoUpdated="false" digits="0" id="7" name="pages" nullable="true" remarks="Page number range[s], e.g. 457--459, viii + 664pp, lv--lvii." size="255" type="varchar"/>
+         <column autoUpdated="false" digits="0" id="8" name="miniref" nullable="true" remarks="" size="255" type="varchar"/>
+         <column autoUpdated="false" digits="0" id="9" name="uniquename" nullable="false" remarks="" size="2147483647" type="text"/>
+         <column autoUpdated="false" digits="0" id="10" name="type_id" nullable="false" remarks="The type of the publication (book, journal, poem, graffiti, etc). Uses pub cv." size="19" type="int8">
+            <parent column="cvterm_id" foreignKey="pub_type_id_fkey" implied="false" onDeleteCascade="true" schema="cv" table="cvterm"/>
+         </column>
+         <column autoUpdated="false" defaultValue="false" digits="0" id="11" name="is_obsolete" nullable="true" remarks="" size="1" type="bool"/>
+         <column autoUpdated="false" digits="0" id="12" name="publisher" nullable="true" remarks="" size="255" type="varchar"/>
+         <column autoUpdated="false" digits="0" id="13" name="pubplace" nullable="true" remarks="" size="255" type="varchar"/>
+         <primaryKey column="pub_id" sequenceNumberInPK="1"/>
+         <index name="pub_pkey" unique="true">
+            <column ascending="true" name="pub_id"/>
+         </index>
+         <index name="pub_c1" unique="true">
+            <column ascending="true" name="uniquename"/>
+         </index>
+         <index name="pub_idx1" unique="false">
+            <column ascending="true" name="type_id"/>
+         </index>
+      </table>
+      <table name="pub_dbxref" remarks="Handle links to repositories,&#10;e.g. Pubmed, Biosis, zoorec, OCLC, Medline, ISSN, coden..." schema="pub" type="TABLE">
+         <column autoUpdated="false" defaultValue="nextval('pub.pub_dbxref_pub_dbxref_id_seq'::regclass)" digits="0" id="0" name="pub_dbxref_id" nullable="false" remarks="" size="19" type="bigserial"/>
+         <column autoUpdated="false" digits="0" id="1" name="pub_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="pub_id" foreignKey="pub_dbxref_pub_id_fkey" implied="false" onDeleteCascade="true" schema="pub" table="pub"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="2" name="dbxref_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="dbxref_id" foreignKey="pub_dbxref_dbxref_id_fkey" implied="false" onDeleteCascade="true" schema="db" table="dbxref"/>
+         </column>
+         <column autoUpdated="false" defaultValue="true" digits="0" id="3" name="is_current" nullable="false" remarks="" size="1" type="bool"/>
+         <primaryKey column="pub_dbxref_id" sequenceNumberInPK="1"/>
+         <index name="pub_dbxref_pkey" unique="true">
+            <column ascending="true" name="pub_dbxref_id"/>
+         </index>
+         <index name="pub_dbxref_c1" unique="true">
+            <column ascending="true" name="pub_id"/>
+            <column ascending="true" name="dbxref_id"/>
+         </index>
+         <index name="pub_dbxref_idx1" unique="false">
+            <column ascending="true" name="pub_id"/>
+         </index>
+         <index name="pub_dbxref_idx2" unique="false">
+            <column ascending="true" name="dbxref_id"/>
+         </index>
+      </table>
+      <table name="pub_relationship" remarks="Handle relationships between&#10;publications, e.g. when one publication makes others obsolete, when one&#10;publication contains errata with respect to other publication(s), or&#10;when one publication also appears in another pub." schema="pub" type="TABLE">
+         <column autoUpdated="false" defaultValue="nextval('pub.pub_relationship_pub_relationship_id_seq'::regclass)" digits="0" id="0" name="pub_relationship_id" nullable="false" remarks="" size="19" type="bigserial"/>
+         <column autoUpdated="false" digits="0" id="1" name="subject_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="pub_id" foreignKey="pub_relationship_subject_id_fkey" implied="false" onDeleteCascade="true" schema="pub" table="pub"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="2" name="object_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="pub_id" foreignKey="pub_relationship_object_id_fkey" implied="false" onDeleteCascade="true" schema="pub" table="pub"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="3" name="type_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="cvterm_id" foreignKey="pub_relationship_type_id_fkey" implied="false" onDeleteCascade="true" schema="cv" table="cvterm"/>
+         </column>
+         <primaryKey column="pub_relationship_id" sequenceNumberInPK="1"/>
+         <index name="pub_relationship_pkey" unique="true">
+            <column ascending="true" name="pub_relationship_id"/>
+         </index>
+         <index name="pub_relationship_c1" unique="true">
+            <column ascending="true" name="subject_id"/>
+            <column ascending="true" name="object_id"/>
+            <column ascending="true" name="type_id"/>
+         </index>
+         <index name="pub_relationship_idx1" unique="false">
+            <column ascending="true" name="subject_id"/>
+         </index>
+         <index name="pub_relationship_idx2" unique="false">
+            <column ascending="true" name="object_id"/>
+         </index>
+         <index name="pub_relationship_idx3" unique="false">
+            <column ascending="true" name="type_id"/>
+         </index>
+      </table>
+      <table name="pubauthor" remarks="An author for a publication. Note the denormalisation (hence lack of _ in table name) - this is deliberate as it is in general too hard to assign IDs to authors." schema="pub" type="TABLE">
+         <column autoUpdated="false" defaultValue="nextval('pub.pubauthor_pubauthor_id_seq'::regclass)" digits="0" id="0" name="pubauthor_id" nullable="false" remarks="" size="19" type="bigserial">
+            <child column="pubauthor_id" foreignKey="pubauthor_contact_pubauthor_id_fkey" implied="false" onDeleteCascade="true" schema="pub" table="pubauthor_contact"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="1" name="pub_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="pub_id" foreignKey="pubauthor_pub_id_fkey" implied="false" onDeleteCascade="true" schema="pub" table="pub"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="2" name="rank" nullable="false" remarks="Order of author in author list for this pub - order is important." size="10" type="int4"/>
+         <column autoUpdated="false" defaultValue="false" digits="0" id="3" name="editor" nullable="true" remarks="Indicates whether the author is an editor for linked publication. Note: this is a boolean field but does not follow the normal chado convention for naming booleans." size="1" type="bool"/>
+         <column autoUpdated="false" digits="0" id="4" name="surname" nullable="false" remarks="" size="100" type="varchar"/>
+         <column autoUpdated="false" digits="0" id="5" name="givennames" nullable="true" remarks="First name, initials" size="100" type="varchar"/>
+         <column autoUpdated="false" digits="0" id="6" name="suffix" nullable="true" remarks="Jr., Sr., etc" size="100" type="varchar"/>
+         <primaryKey column="pubauthor_id" sequenceNumberInPK="1"/>
+         <index name="pubauthor_pkey" unique="true">
+            <column ascending="true" name="pubauthor_id"/>
+         </index>
+         <index name="pubauthor_c1" unique="true">
+            <column ascending="true" name="pub_id"/>
+            <column ascending="true" name="rank"/>
+         </index>
+         <index name="pubauthor_contact_idx1" unique="false">
+            <column ascending="true" name="pubauthor_id"/>
+         </index>
+         <index name="pubauthor_idx2" unique="false">
+            <column ascending="true" name="pub_id"/>
+         </index>
+      </table>
+      <table name="pubauthor_contact" remarks="An author on a publication may have a corresponding entry in the contact table and this table can link the two." schema="pub" type="TABLE">
+         <column autoUpdated="false" defaultValue="nextval('pub.pubauthor_contact_pubauthor_contact_id_seq'::regclass)" digits="0" id="0" name="pubauthor_contact_id" nullable="false" remarks="" size="19" type="bigserial"/>
+         <column autoUpdated="false" digits="0" id="1" name="contact_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="contact_id" foreignKey="pubauthor_contact_contact_id_fkey" implied="false" onDeleteCascade="true" schema="contact" table="contact"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="2" name="pubauthor_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="pubauthor_id" foreignKey="pubauthor_contact_pubauthor_id_fkey" implied="false" onDeleteCascade="true" schema="pub" table="pubauthor"/>
+         </column>
+         <primaryKey column="pubauthor_contact_id" sequenceNumberInPK="1"/>
+         <index name="pubauthor_contact_pkey" unique="true">
+            <column ascending="true" name="pubauthor_contact_id"/>
+         </index>
+         <index name="pubauthor_contact_c1" unique="true">
+            <column ascending="true" name="contact_id"/>
+            <column ascending="true" name="pubauthor_id"/>
+         </index>
+      </table>
+      <table name="pubprop" remarks="Property-value pairs for a pub. Follows standard chado pattern." schema="pub" type="TABLE">
+         <column autoUpdated="false" defaultValue="nextval('pub.pubprop_pubprop_id_seq'::regclass)" digits="0" id="0" name="pubprop_id" nullable="false" remarks="" size="19" type="bigserial"/>
+         <column autoUpdated="false" digits="0" id="1" name="pub_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="pub_id" foreignKey="pubprop_pub_id_fkey" implied="false" onDeleteCascade="true" schema="pub" table="pub"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="2" name="type_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="cvterm_id" foreignKey="pubprop_type_id_fkey" implied="false" onDeleteCascade="true" schema="cv" table="cvterm"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="3" name="value" nullable="false" remarks="" size="2147483647" type="text"/>
+         <column autoUpdated="false" digits="0" id="4" name="rank" nullable="true" remarks="" size="10" type="int4"/>
+         <primaryKey column="pubprop_id" sequenceNumberInPK="1"/>
+         <index name="pubprop_pkey" unique="true">
+            <column ascending="true" name="pubprop_id"/>
+         </index>
+         <index name="pubprop_c1" unique="true">
+            <column ascending="true" name="pub_id"/>
+            <column ascending="true" name="type_id"/>
+            <column ascending="true" name="rank"/>
+         </index>
+         <index name="pubprop_idx1" unique="false">
+            <column ascending="true" name="pub_id"/>
+         </index>
+         <index name="pubprop_idx2" unique="false">
+            <column ascending="true" name="type_id"/>
+         </index>
+      </table>
+   </tables>
+</database>

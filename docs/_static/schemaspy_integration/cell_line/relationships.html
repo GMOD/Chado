@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>chado Module</title>
+  <!-- Tell the browser to be responsive to screen width -->
+  <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+  <link rel="icon" type="image/png" sizes="16x16" href="../favicon.ico">
+  <!-- Bootstrap 3.3.5 -->
+  <link rel="stylesheet" href="bower/admin-lte/bootstrap/css/bootstrap.min.css">
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="bower/font-awesome/css/font-awesome.min.css">
+  <!-- Ionicons -->
+  <link rel="stylesheet" href="bower/ionicons/css/ionicons.min.css">
+  <!-- DataTables -->
+  <link rel="stylesheet" href="bower/datatables.net-bs/css/dataTables.bootstrap.min.css">
+  <link rel="stylesheet" href="bower/datatables.net-buttons-bs/css/buttons.bootstrap.min.css">
+  <!-- Code Mirror -->
+  <link rel="stylesheet" href="bower/codemirror/codemirror.css">
+  <!-- Fonts -->
+  <link href='fonts/indieflower/indie-flower.css' rel='stylesheet' type='text/css'>
+  <link href='fonts/source-sans-pro/source-sans-pro.css' rel='stylesheet' type='text/css'>
+
+  <!-- Theme style -->
+  <link rel="stylesheet" href="bower/admin-lte/dist/css/AdminLTE.min.css">
+  <!-- Salvattore -->
+  <link rel="stylesheet" href="bower/salvattore/salvattore.css">
+  <!-- AdminLTE Skins. Choose a skin from the css/skins
+       folder instead of downloading all of them to reduce the load. -->
+  <link rel="stylesheet" href="bower/admin-lte/dist/css/skins/_all-skins.min.css">
+  <!-- SchemaSpy -->
+  <link rel="stylesheet" href="schemaSpy.css">
+  <!-- GMOD Chado Specific CSS -->
+  <link rel="stylesheet" href="../main.css">
+  
+  <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+  <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+  <!--[if lt IE 9]>
+  <script src="bower/html5shiv/html5shiv.min.js"></script>
+  <script src="bower/respond/respond.min.js"></script>
+  <![endif]-->
+</head>
+<!-- ADD THE CLASS layout-top-nav TO REMOVE THE SIDEBAR. -->
+<!-- Skins: skin-black, black-light, green-light, red-light, yellow-light, purple-light, blue-light -->
+<body class="hold-transition skin-black layout-top-nav">
+<div class="wrapper">
+  <header class="main-header">
+    <nav class="navbar navbar-static-top">
+      <div class="container">
+        <div class="navbar-header">
+          <a href="../index.html" class="navbar-brand" style="padding:0;">
+            <img src="../GMOD-cogs.png" class="gmod-logo" />
+            <span class="gmod-title">Chado</span>
+          </a>
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar-collapse">
+            <i class="fa fa-bars"></i>
+          </button>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-collapse pull-left" id="navbar-collapse">
+          <ul class="nav navbar-nav">
+            <li>
+              <a href="../index.html" title="All Chado Tables.">
+                All Tables</span>
+              </a>
+            </li>
+            <li>
+              <a href="../constraints.html" title="All Constraints in Chado.">
+                All Constraints
+              </a>
+            </li>
+            <li>
+              <a href="index.html" title="Tables in this module.">
+                Module Tables <span class="sr-only">(current)</span>
+              </a>
+            </li>            
+            <li>
+              <a href="columns.html" title="Columns in this module.">
+                Module Columns
+              </a>
+            </li>
+            <li>
+              <a href="constraints.html" title="Constraints defined by this module.">
+                Module Constraints
+              </a>
+            </li>
+            <li>
+              <a href="relationships.html" title="Diagram of table relationships">
+                Module Relationships
+              </a>
+            </li>
+          </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+        <!-- Navbar Right Menu -->
+
+      </div>
+      <!-- /.container-fluid -->
+    </nav>
+  </header>
+  <!-- Main content -->
+  <!-- Full Width Column -->
+  <div class="content-wrapper">
+    
+    <div class="box box-solid">
+      <div class="box-body">
+        <p><span class="version-label">Schema Version:</span> 1.3 
+          <span class="version-label">Module</span>: chado</p>
+      </div>
+    </div>
+		
+          <!-- Content Header (Page header) -->
+      <section class="content-header">
+        <h1>All Relationships</h1>
+      </section>
+      <!-- Main content -->
+      <section class="content">
+				<div class="box box-primary">		
+			<div class="box-header with-border">
+              <i class="fa fa-code-fork"></i>
+              <h3 class="box-title">Diagrams</h3>
+            </div>	
+			<div class="box-body">	
+			<div class="nav-tabs-custom" style="cursor: move;">
+				<p>The following entity relationship (ER) diagram shows the relationships involving the current module. </p>
+				<p class="messages warning">These relationships often cross chado module boundries, in which case <strong>the table name will be prefixed with the module</strong> it is in. When querying these tables do not include the module name, as all chado tables are contained within the same schema.</p>
+            <!-- Tabs within a box -->
+			<h5>By default only columns that are primary keys, foreign keys or indexes are shown.</h5>
+            <ul class="nav nav-tabs pull-left ui-sortable-handle">
+			  			              <li class="active"><a href="#compactDegreeImg-chart" data-toggle="tab" aria-expanded="true">Compact</a></li>			  			 
+			  			              <li class=""><a href="#largeDegreeImg-chart" data-toggle="tab" aria-expanded="true">Large</a></li>			  			 
+            </ul>
+            <div class="tab-content no-padding">            
+				<div class="chart tab-pane active" id="compactDegreeImg-chart" style="position: relative; overflow-x:auto;">
+																					<map id="compactRelationshipsDiagram" name="compactRelationshipsDiagram">
+<area shape="rect" id="node1" href="tables/cell_line.html" title="cell_line" alt="" coords="282,628,473,806">
+<area shape="rect" id="node15" title="organism.organism" alt="" coords="5,694,224,783">
+<area shape="rect" id="node2" href="tables/cell_line_cvterm.html" title="cell_line_cvterm" alt="" coords="552,484,757,696">
+<area shape="rect" id="node12" title="cv.cvterm" alt="" coords="302,252,453,342">
+<area shape="rect" id="node16" title="pub.pub" alt="" coords="307,1374,447,1463">
+<area shape="rect" id="node3" href="tables/cell_line_cvtermprop.html" title="cell_line_cvtermprop" alt="" coords="823,190,1067,396">
+<area shape="rect" id="node4" href="tables/cell_line_dbxref.html" title="cell_line_dbxref" alt="" coords="553,714,756,891">
+<area shape="rect" id="node13" title="db.dbxref" alt="" coords="303,823,452,912">
+<area shape="rect" id="node5" href="tables/cell_line_feature.html" title="cell_line_feature" alt="" coords="551,908,759,1091">
+<area shape="rect" id="node17" title="sequence.feature" alt="" coords="276,974,479,1063">
+<area shape="rect" id="node6" href="tables/cell_line_library.html" title="cell_line_library" alt="" coords="553,1279,756,1462">
+<area shape="rect" id="node14" title="library.library" alt="" coords="289,1267,465,1356">
+<area shape="rect" id="node7" href="tables/cell_line_pub.html" title="cell_line_pub" alt="" coords="565,1108,745,1262">
+<area shape="rect" id="node8" href="tables/cell_line_relationship.html" title="cell_line_relationship" alt="" coords="531,284,779,467">
+<area shape="rect" id="node9" href="tables/cell_line_synonym.html" title="cell_line_synonym" alt="" coords="543,1516,766,1723">
+<area shape="rect" id="node18" title="sequence.synonym" alt="" coords="269,1582,486,1671">
+<area shape="rect" id="node10" href="tables/cell_lineprop.html" title="cell_lineprop" alt="" coords="565,60,744,267">
+<area shape="rect" id="node11" href="tables/cell_lineprop_pub.html" title="cell_lineprop_pub" alt="" coords="836,763,1055,916">
+</map>
+
+					<a name='diagram'><img id='compactDegreeImg' src='diagrams/summary/relationships.real.compact.png' usemap='#compactRelationshipsDiagram' class='diagram' border='0' alt='' align='left'></a>							
+				</div>
+				<div class="chart tab-pane " id="largeDegreeImg-chart" style="position: relative; overflow-x:auto;">
+																					<map id="largeRelationshipsDiagram" name="largeRelationshipsDiagram">
+<area shape="rect" id="node1" href="tables/cell_line.html" title="cell_line" alt="" coords="282,409,473,650">
+<area shape="rect" id="node15" title="organism.organism" alt="" coords="5,497,224,797">
+<area shape="rect" id="node2" href="tables/cell_line_cvterm.html" title="cell_line_cvterm" alt="" coords="552,491,757,703">
+<area shape="rect" id="node12" title="cv.cvterm" alt="" coords="274,121,481,391">
+<area shape="rect" id="node16" title="pub.pub" alt="" coords="301,1678,453,2154">
+<area shape="rect" id="node3" href="tables/cell_line_cvtermprop.html" title="cell_line_cvtermprop" alt="" coords="823,194,1067,406">
+<area shape="rect" id="node4" href="tables/cell_line_dbxref.html" title="cell_line_dbxref" alt="" coords="553,721,756,903">
+<area shape="rect" id="node13" title="db.dbxref" alt="" coords="303,667,452,879">
+<area shape="rect" id="node5" href="tables/cell_line_feature.html" title="cell_line_feature" alt="" coords="551,921,759,1103">
+<area shape="rect" id="node17" title="sequence.feature" alt="" coords="276,897,479,1343">
+<area shape="rect" id="node6" href="tables/cell_line_library.html" title="cell_line_library" alt="" coords="553,1302,756,1485">
+<area shape="rect" id="node14" title="library.library" alt="" coords="282,1361,473,1661">
+<area shape="rect" id="node7" href="tables/cell_line_pub.html" title="cell_line_pub" alt="" coords="565,1126,745,1279">
+<area shape="rect" id="node8" href="tables/cell_line_relationship.html" title="cell_line_relationship" alt="" coords="531,291,779,474">
+<area shape="rect" id="node9" href="tables/cell_line_synonym.html" title="cell_line_synonym" alt="" coords="543,1590,766,1831">
+<area shape="rect" id="node18" title="sequence.synonym" alt="" coords="269,2171,486,2354">
+<area shape="rect" id="node10" href="tables/cell_lineprop.html" title="cell_lineprop" alt="" coords="565,62,744,274">
+<area shape="rect" id="node11" href="tables/cell_lineprop_pub.html" title="cell_lineprop_pub" alt="" coords="836,791,1055,945">
+</map>
+
+					<a name='diagram'><img id='largeDegreeImg' src='diagrams/summary/relationships.real.large.png' usemap='#largeRelationshipsDiagram' class='diagram' border='0' alt='' align='left'></a>							
+				</div>
+			  			</div>
+			</div>
+		  </div><!-- /.box-body -->
+		</div>
+		      </section>    
+  </div>
+  <!-- /.content-wrapper -->
+  <footer class="main-footer">
+    <div>
+      <div class="pull-right hidden-xs">
+        <a href="https://github.com/schemaspy/schemaspy" title="GitHub for SchemaSpy"><i class="fa fa-github-square fa-2x"></i></a>
+        <a href="http://stackoverflow.com/questions/tagged/schemaspy" title="StackOverflow for SchemaSpy"><i class="fa fa-stack-overflow fa-2x"></i></a>
+      </div>
+      <strong>Generated by <a href="http://schemaspy.org/" class="logo-text"><i class="fa fa-database"></i> SchemaSpy @project.version@</a></strong>
+    </div>
+    <!-- /.container -->
+  </footer>
+</div>
+<!-- ./wrapper -->
+
+<!-- jQuery 2.2.3 -->
+<script src="bower/admin-lte/plugins/jQuery/jquery-2.2.3.min.js"></script>
+<script src="bower/admin-lte/plugins/jQueryUI/jquery-ui.min.js"></script>
+<!-- Bootstrap 3.3.5 -->
+<script src="bower/admin-lte/bootstrap/js/bootstrap.min.js"></script>
+<!-- DataTables -->
+<script src="bower/datatables.net/jquery.dataTables.min.js"></script>
+<script src="bower/datatables.net-bs/js/dataTables.bootstrap.min.js"></script>
+<script src="bower/datatables.net-buttons/dataTables.buttons.min.js"></script>
+<script src="bower/datatables.net-buttons-bs/js/buttons.bootstrap.min.js"></script>
+<script src="bower/datatables.net-buttons/buttons.html5.min.js"></script>
+<script src="bower/datatables.net-buttons/buttons.print.min.js"></script>
+<script src="bower/datatables.net-buttons/buttons.colVis.min.js"></script>
+
+<!-- SlimScroll -->
+<script src="bower/admin-lte/plugins/slimScroll/jquery.slimscroll.min.js"></script>
+<!-- FastClick -->
+<script src="bower/admin-lte/plugins/fastclick/fastclick.js"></script>
+<!-- Salvattore -->
+<script src="bower/salvattore/salvattore.min.js"></script>
+<!-- AnchorJS -->
+<script src="bower/anchor-js/anchor.min.js"></script>
+<!-- CodeMirror -->
+<script src="bower/codemirror/codemirror.js"></script>
+<script src="bower/codemirror/sql.js"></script>
+<!-- AdminLTE App -->
+<script src="bower/admin-lte/dist/js/app.min.js"></script>
+<script src="relationships.js"></script>
+<script src="schemaSpy.js"></script>
+</body>
+</html>

@@ -1,0 +1,227 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<database name="chado" schema="expression" type="PostgreSQL - 9.3.18">
+   <tables>
+      <table name="eimage" remarks="" schema="expression" type="TABLE">
+         <column autoUpdated="false" defaultValue="nextval('expression.eimage_eimage_id_seq'::regclass)" digits="0" id="0" name="eimage_id" nullable="false" remarks="" size="19" type="bigserial">
+            <child column="eimage_id" foreignKey="expression_image_eimage_id_fkey" implied="false" onDeleteCascade="true" schema="expression" table="expression_image"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="1" name="eimage_data" nullable="true" remarks="We expect images in eimage_data (e.g. JPEGs) to be uuencoded." size="2147483647" type="text"/>
+         <column autoUpdated="false" digits="0" id="2" name="eimage_type" nullable="false" remarks="Describes the type of data in eimage_data." size="255" type="varchar"/>
+         <column autoUpdated="false" digits="0" id="3" name="image_uri" nullable="true" remarks="" size="255" type="varchar"/>
+         <primaryKey column="eimage_id" sequenceNumberInPK="1"/>
+         <index name="eimage_pkey" unique="true">
+            <column ascending="true" name="eimage_id"/>
+         </index>
+      </table>
+      <table name="expression" remarks="The expression table is essentially a bridge table." schema="expression" type="TABLE">
+         <column autoUpdated="false" defaultValue="nextval('expression.expression_expression_id_seq'::regclass)" digits="0" id="0" name="expression_id" nullable="false" remarks="" size="19" type="bigserial">
+            <child column="expression_id" foreignKey="expression_cvterm_expression_id_fkey" implied="false" onDeleteCascade="true" schema="expression" table="expression_cvterm"/>
+            <child column="expression_id" foreignKey="expression_image_expression_id_fkey" implied="false" onDeleteCascade="true" schema="expression" table="expression_image"/>
+            <child column="expression_id" foreignKey="expression_pub_expression_id_fkey" implied="false" onDeleteCascade="true" schema="expression" table="expression_pub"/>
+            <child column="expression_id" foreignKey="expressionprop_expression_id_fkey" implied="false" onDeleteCascade="true" schema="expression" table="expressionprop"/>
+            <child column="expression_id" foreignKey="feature_expression_expression_id_fkey" implied="false" onDeleteCascade="true" schema="expression" table="feature_expression"/>
+            <child column="expression_id" foreignKey="library_expression_expression_id_fkey" implied="false" onDeleteCascade="true" schema="library" table="library_expression"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="1" name="uniquename" nullable="false" remarks="" size="2147483647" type="text"/>
+         <column autoUpdated="false" digits="0" id="2" name="md5checksum" nullable="true" remarks="" size="32" type="bpchar"/>
+         <column autoUpdated="false" digits="0" id="3" name="description" nullable="true" remarks="" size="2147483647" type="text"/>
+         <primaryKey column="expression_id" sequenceNumberInPK="1"/>
+         <index name="expression_pkey" unique="true">
+            <column ascending="true" name="expression_id"/>
+         </index>
+         <index name="expression_c1" unique="true">
+            <column ascending="true" name="uniquename"/>
+         </index>
+      </table>
+      <table name="expression_cvterm" remarks="" schema="expression" type="TABLE">
+         <column autoUpdated="false" defaultValue="nextval('expression.expression_cvterm_expression_cvterm_id_seq'::regclass)" digits="0" id="0" name="expression_cvterm_id" nullable="false" remarks="" size="19" type="bigserial">
+            <child column="expression_cvterm_id" foreignKey="expression_cvtermprop_expression_cvterm_id_fkey" implied="false" onDeleteCascade="true" schema="expression" table="expression_cvtermprop"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="1" name="expression_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="expression_id" foreignKey="expression_cvterm_expression_id_fkey" implied="false" onDeleteCascade="true" schema="expression" table="expression"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="2" name="cvterm_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="cvterm_id" foreignKey="expression_cvterm_cvterm_id_fkey" implied="false" onDeleteCascade="true" schema="cv" table="cvterm"/>
+         </column>
+         <column autoUpdated="false" defaultValue="0" digits="0" id="3" name="rank" nullable="false" remarks="" size="10" type="int4"/>
+         <column autoUpdated="false" digits="0" id="4" name="cvterm_type_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="cvterm_id" foreignKey="expression_cvterm_cvterm_type_id_fkey" implied="false" onDeleteCascade="true" schema="cv" table="cvterm"/>
+         </column>
+         <primaryKey column="expression_cvterm_id" sequenceNumberInPK="1"/>
+         <index name="expression_cvterm_pkey" unique="true">
+            <column ascending="true" name="expression_cvterm_id"/>
+         </index>
+         <index name="expression_cvterm_c1" unique="true">
+            <column ascending="true" name="expression_id"/>
+            <column ascending="true" name="cvterm_id"/>
+            <column ascending="true" name="rank"/>
+            <column ascending="true" name="cvterm_type_id"/>
+         </index>
+         <index name="expression_cvterm_idx1" unique="false">
+            <column ascending="true" name="expression_id"/>
+         </index>
+         <index name="expression_cvterm_idx2" unique="false">
+            <column ascending="true" name="cvterm_id"/>
+         </index>
+         <index name="expression_cvterm_idx3" unique="false">
+            <column ascending="true" name="cvterm_type_id"/>
+         </index>
+      </table>
+      <table name="expression_cvtermprop" remarks="Extensible properties for&#10;expression to cvterm associations. Examples: qualifiers." schema="expression" type="TABLE">
+         <column autoUpdated="false" defaultValue="nextval('expression.expression_cvtermprop_expression_cvtermprop_id_seq'::regclass)" digits="0" id="0" name="expression_cvtermprop_id" nullable="false" remarks="" size="19" type="bigserial"/>
+         <column autoUpdated="false" digits="0" id="1" name="expression_cvterm_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="expression_cvterm_id" foreignKey="expression_cvtermprop_expression_cvterm_id_fkey" implied="false" onDeleteCascade="true" schema="expression" table="expression_cvterm"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="2" name="type_id" nullable="false" remarks="The name of the&#10;property/slot is a cvterm. The meaning of the property is defined in&#10;that cvterm. For example, cvterms may come from the FlyBase miscellaneous cv." size="19" type="int8">
+            <parent column="cvterm_id" foreignKey="expression_cvtermprop_type_id_fkey" implied="false" onDeleteCascade="true" schema="cv" table="cvterm"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="3" name="value" nullable="true" remarks="The value of the&#10;property, represented as text. Numeric values are converted to their&#10;text representation. This is less efficient than using native database&#10;types, but is easier to query." size="2147483647" type="text"/>
+         <column autoUpdated="false" defaultValue="0" digits="0" id="4" name="rank" nullable="false" remarks="Property-Value&#10;ordering. Any expression_cvterm can have multiple values for any particular&#10;property type - these are ordered in a list using rank, counting from&#10;zero. For properties that are single-valued rather than multi-valued,&#10;the default 0 value should be used." size="10" type="int4"/>
+         <primaryKey column="expression_cvtermprop_id" sequenceNumberInPK="1"/>
+         <index name="expression_cvtermprop_pkey" unique="true">
+            <column ascending="true" name="expression_cvtermprop_id"/>
+         </index>
+         <index name="expression_cvtermprop_c1" unique="true">
+            <column ascending="true" name="expression_cvterm_id"/>
+            <column ascending="true" name="type_id"/>
+            <column ascending="true" name="rank"/>
+         </index>
+         <index name="expression_cvtermprop_idx1" unique="false">
+            <column ascending="true" name="expression_cvterm_id"/>
+         </index>
+         <index name="expression_cvtermprop_idx2" unique="false">
+            <column ascending="true" name="type_id"/>
+         </index>
+      </table>
+      <table name="expression_image" remarks="" schema="expression" type="TABLE">
+         <column autoUpdated="false" defaultValue="nextval('expression.expression_image_expression_image_id_seq'::regclass)" digits="0" id="0" name="expression_image_id" nullable="false" remarks="" size="19" type="bigserial"/>
+         <column autoUpdated="false" digits="0" id="1" name="expression_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="expression_id" foreignKey="expression_image_expression_id_fkey" implied="false" onDeleteCascade="true" schema="expression" table="expression"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="2" name="eimage_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="eimage_id" foreignKey="expression_image_eimage_id_fkey" implied="false" onDeleteCascade="true" schema="expression" table="eimage"/>
+         </column>
+         <primaryKey column="expression_image_id" sequenceNumberInPK="1"/>
+         <index name="expression_image_pkey" unique="true">
+            <column ascending="true" name="expression_image_id"/>
+         </index>
+         <index name="expression_image_c1" unique="true">
+            <column ascending="true" name="expression_id"/>
+            <column ascending="true" name="eimage_id"/>
+         </index>
+         <index name="expression_image_idx1" unique="false">
+            <column ascending="true" name="expression_id"/>
+         </index>
+         <index name="expression_image_idx2" unique="false">
+            <column ascending="true" name="eimage_id"/>
+         </index>
+      </table>
+      <table name="expression_pub" remarks="" schema="expression" type="TABLE">
+         <column autoUpdated="false" defaultValue="nextval('expression.expression_pub_expression_pub_id_seq'::regclass)" digits="0" id="0" name="expression_pub_id" nullable="false" remarks="" size="19" type="bigserial"/>
+         <column autoUpdated="false" digits="0" id="1" name="expression_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="expression_id" foreignKey="expression_pub_expression_id_fkey" implied="false" onDeleteCascade="true" schema="expression" table="expression"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="2" name="pub_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="pub_id" foreignKey="expression_pub_pub_id_fkey" implied="false" onDeleteCascade="true" schema="pub" table="pub"/>
+         </column>
+         <primaryKey column="expression_pub_id" sequenceNumberInPK="1"/>
+         <index name="expression_pub_pkey" unique="true">
+            <column ascending="true" name="expression_pub_id"/>
+         </index>
+         <index name="expression_pub_c1" unique="true">
+            <column ascending="true" name="expression_id"/>
+            <column ascending="true" name="pub_id"/>
+         </index>
+         <index name="expression_pub_idx1" unique="false">
+            <column ascending="true" name="expression_id"/>
+         </index>
+         <index name="expression_pub_idx2" unique="false">
+            <column ascending="true" name="pub_id"/>
+         </index>
+      </table>
+      <table name="expressionprop" remarks="" schema="expression" type="TABLE">
+         <column autoUpdated="false" defaultValue="nextval('expression.expressionprop_expressionprop_id_seq'::regclass)" digits="0" id="0" name="expressionprop_id" nullable="false" remarks="" size="19" type="bigserial"/>
+         <column autoUpdated="false" digits="0" id="1" name="expression_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="expression_id" foreignKey="expressionprop_expression_id_fkey" implied="false" onDeleteCascade="true" schema="expression" table="expression"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="2" name="type_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="cvterm_id" foreignKey="expressionprop_type_id_fkey" implied="false" onDeleteCascade="true" schema="cv" table="cvterm"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="3" name="value" nullable="true" remarks="" size="2147483647" type="text"/>
+         <column autoUpdated="false" defaultValue="0" digits="0" id="4" name="rank" nullable="false" remarks="" size="10" type="int4"/>
+         <primaryKey column="expressionprop_id" sequenceNumberInPK="1"/>
+         <index name="expressionprop_pkey" unique="true">
+            <column ascending="true" name="expressionprop_id"/>
+         </index>
+         <index name="expressionprop_c1" unique="true">
+            <column ascending="true" name="expression_id"/>
+            <column ascending="true" name="type_id"/>
+            <column ascending="true" name="rank"/>
+         </index>
+         <index name="expressionprop_idx1" unique="false">
+            <column ascending="true" name="expression_id"/>
+         </index>
+         <index name="expressionprop_idx2" unique="false">
+            <column ascending="true" name="type_id"/>
+         </index>
+      </table>
+      <table name="feature_expression" remarks="" schema="expression" type="TABLE">
+         <column autoUpdated="false" defaultValue="nextval('expression.feature_expression_feature_expression_id_seq'::regclass)" digits="0" id="0" name="feature_expression_id" nullable="false" remarks="" size="19" type="bigserial">
+            <child column="feature_expression_id" foreignKey="feature_expressionprop_feature_expression_id_fkey" implied="false" onDeleteCascade="true" schema="expression" table="feature_expressionprop"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="1" name="expression_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="expression_id" foreignKey="feature_expression_expression_id_fkey" implied="false" onDeleteCascade="true" schema="expression" table="expression"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="2" name="feature_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="feature_id" foreignKey="feature_expression_feature_id_fkey" implied="false" onDeleteCascade="true" schema="sequence" table="feature"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="3" name="pub_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="pub_id" foreignKey="feature_expression_pub_id_fkey" implied="false" onDeleteCascade="true" schema="pub" table="pub"/>
+         </column>
+         <primaryKey column="feature_expression_id" sequenceNumberInPK="1"/>
+         <index name="feature_expression_pkey" unique="true">
+            <column ascending="true" name="feature_expression_id"/>
+         </index>
+         <index name="feature_expression_c1" unique="true">
+            <column ascending="true" name="expression_id"/>
+            <column ascending="true" name="feature_id"/>
+            <column ascending="true" name="pub_id"/>
+         </index>
+         <index name="feature_expression_idx1" unique="false">
+            <column ascending="true" name="expression_id"/>
+         </index>
+         <index name="feature_expression_idx2" unique="false">
+            <column ascending="true" name="feature_id"/>
+         </index>
+         <index name="feature_expression_idx3" unique="false">
+            <column ascending="true" name="pub_id"/>
+         </index>
+      </table>
+      <table name="feature_expressionprop" remarks="Extensible properties for&#10;feature_expression (comments, for example). Modeled on feature_cvtermprop." schema="expression" type="TABLE">
+         <column autoUpdated="false" defaultValue="nextval('expression.feature_expressionprop_feature_expressionprop_id_seq'::regclass)" digits="0" id="0" name="feature_expressionprop_id" nullable="false" remarks="" size="19" type="bigserial"/>
+         <column autoUpdated="false" digits="0" id="1" name="feature_expression_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="feature_expression_id" foreignKey="feature_expressionprop_feature_expression_id_fkey" implied="false" onDeleteCascade="true" schema="expression" table="feature_expression"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="2" name="type_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="cvterm_id" foreignKey="feature_expressionprop_type_id_fkey" implied="false" onDeleteCascade="true" schema="cv" table="cvterm"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="3" name="value" nullable="true" remarks="" size="2147483647" type="text"/>
+         <column autoUpdated="false" defaultValue="0" digits="0" id="4" name="rank" nullable="false" remarks="" size="10" type="int4"/>
+         <primaryKey column="feature_expressionprop_id" sequenceNumberInPK="1"/>
+         <index name="feature_expressionprop_pkey" unique="true">
+            <column ascending="true" name="feature_expressionprop_id"/>
+         </index>
+         <index name="feature_expressionprop_c1" unique="true">
+            <column ascending="true" name="feature_expression_id"/>
+            <column ascending="true" name="type_id"/>
+            <column ascending="true" name="rank"/>
+         </index>
+         <index name="feature_expressionprop_idx1" unique="false">
+            <column ascending="true" name="feature_expression_id"/>
+         </index>
+         <index name="feature_expressionprop_idx2" unique="false">
+            <column ascending="true" name="type_id"/>
+         </index>
+      </table>
+   </tables>
+</database>

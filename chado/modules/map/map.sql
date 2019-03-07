@@ -91,15 +91,19 @@ CREATE TABLE featureposprop (
     type_id bigint NOT NULL,
     value text,
     rank integer DEFAULT 0 NOT NULL,
+    cvalue_id bigint,
     CONSTRAINT featureposprop_c1 UNIQUE (featurepos_id, type_id, rank),
     FOREIGN KEY (featurepos_id) REFERENCES featurepos(featurepos_id) ON DELETE CASCADE,
-    FOREIGN KEY (type_id) REFERENCES cvterm(cvterm_id) ON DELETE CASCADE
+    FOREIGN KEY (type_id) REFERENCES cvterm(cvterm_id) ON DELETE CASCADE,
+    FOREIGN KEY (cvalue_id) REFERENCES cvterm (cvterm_id) ON DELETE SET NULL
 );
 
 CREATE INDEX featureposprop_idx1 ON featureposprop USING btree (featurepos_id);
 CREATE INDEX featureposprop_idx2 ON featureposprop USING btree (type_id);
+CREATE INDEX featureposprop_idx3 ON featureposprop USING btree (cvalue_id);
 
 COMMENT ON TABLE featureposprop IS 'Property or attribute of a featurepos record.';
+COMMENT ON COLUMN featureposprop.cvalue_id IS 'The value of the property if that value should be the name of a controlled vocabulary term.  It is preferred that a property either use the value or cvalue_id column but not both.  For example, if the property type is "color" then the cvalue_id could be a term named "green".';
 
 -- ================================================
 -- TABLE: featuremap_pub
@@ -126,16 +130,21 @@ CREATE TABLE featuremapprop (
     type_id bigint NOT NULL,
     value text,
     rank integer DEFAULT 0 NOT NULL,
+    cvalue_id bigint,
+    FOREIGN KEY (cvalue_id) REFERENCES cvterm (cvterm_id) ON DELETE SET NULL,
     FOREIGN KEY (featuremap_id) REFERENCES featuremap(featuremap_id) ON DELETE CASCADE,
     FOREIGN KEY (type_id) REFERENCES cvterm(cvterm_id) ON DELETE CASCADE,
     CONSTRAINT featuremapprop_c1 UNIQUE (featuremap_id, type_id, rank)
 );
 create index featuremapprop_idx1 on featuremapprop(featuremap_id);
 create index featuremapprop_idx2 on featuremapprop(type_id);
+create index featuremapprop_idx3 on featuremapprop(cvalue_id);
 
 COMMENT ON TABLE featuremapprop IS 'A featuremap can have any number of slot-value property 
 tags attached to it. This is an alternative to hardcoding a list of columns in the 
 relational schema, and is completely extensible.';
+COMMENT ON COLUMN featuremapprop.cvalue_id IS 'The value of the property if that value should be the name of a controlled vocabulary term.  It is preferred that a property either use the value or cvalue_id column but not both.  For example, if the property type is "color" then the cvalue_id could be a term named "green".';
+
 
 -- ================================================
 -- TABLE: featuremap_contact

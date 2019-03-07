@@ -1,0 +1,9 @@
+featuremap
+featurepos
+featuremap_contact
+featuremap_dbxref
+featuremap_organism
+featuremap_pub
+featuremapprop
+featureposprop
+featurerange

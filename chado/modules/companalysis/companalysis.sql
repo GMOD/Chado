@@ -27,6 +27,8 @@ create table analysis (
     sourceversion varchar(255),
     sourceuri text,
     timeexecuted timestamp not null default current_timestamp,
+    type_id bigint,
+    foreign key (type_id) references cvterm (cvterm_id),
     constraint analysis_c1 unique (program,programversion,sourcename)
 );
 COMMENT ON TABLE analysis IS 'An analysis is a particular type of a
@@ -42,6 +44,7 @@ COMMENT ON COLUMN analysis.programversion IS 'Version description, e.g. TBLASTX 
 COMMENT ON COLUMN analysis.algorithm IS 'Algorithm name, e.g. blast.';
 COMMENT ON COLUMN analysis.sourcename IS 'Source name, e.g. cDNA, SwissProt.';
 COMMENT ON COLUMN analysis.sourceuri IS 'This is an optional, permanent URL or URI for the source of the  analysis. The idea is that someone could recreate the analysis directly by going to this URI and fetching the source data (e.g. the blast database, or the training model).';
+COMMENT ON COLUMN analysis.type_id IS 'An optional cvterm_id that specifies what type of analysis this record is.  Prior to 1.4, analysis type was set with an analysisprop.';
 
 -- ================================================
 -- TABLE: analysisprop
@@ -56,10 +59,16 @@ create table analysisprop (
     foreign key (type_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
     value text,
     rank int not null default 0,
+    cvalue_id bigint,
+    FOREIGN KEY (cvalue_id) REFERENCES cvterm (cvterm_id) ON DELETE SET NULL,
     constraint analysisprop_c1 unique (analysis_id,type_id,rank)
 );
 create index analysisprop_idx1 on analysisprop (analysis_id);
 create index analysisprop_idx2 on analysisprop (type_id);
+CREATE index analysisprop_idx3 ON analysisprop (cvalue_id);
+
+COMMENT ON COLUMN analysisprop.cvalue_id IS 'The value of the property if that value should be the name of a controlled vocabulary term.  It is preferred that a property either use the value or cvalue_id column but not both.  For example, if the property type is "color" then the cvalue_id could be a term named "green".';
+
 
 -- ================================================
 -- TABLE: analysisfeature
@@ -105,10 +114,16 @@ CREATE TABLE analysisfeatureprop (
     type_id bigint NOT NULL REFERENCES cvterm(cvterm_id) ON DELETE CASCADE DEFERRABLE INITIALLY DEFERRED,
     value TEXT,
     rank int NOT NULL,
+    cvalue_id bigint,
+    FOREIGN KEY (cvalue_id) REFERENCES cvterm (cvterm_id) ON DELETE SET NULL,
     CONSTRAINT analysisfeature_id_type_id_rank UNIQUE(analysisfeature_id, type_id, rank)
 );
 create index analysisfeatureprop_idx1 on analysisfeatureprop (analysisfeature_id);
 create index analysisfeatureprop_idx2 on analysisfeatureprop (type_id);
+create index analysisfeatureprop_idx3 on analysisfeatureprop (cvalue_id);
+
+COMMENT ON COLUMN analysisfeatureprop.cvalue_id IS 'The value of the property if that value should be the name of a controlled vocabulary term.  It is preferred that a property either use the value or cvalue_id column but not both.  For example, if the property type is "color" then the cvalue_id could be a term named "green".';
+
 
 -- ================================================
 -- TABLE: analysis_dbxref

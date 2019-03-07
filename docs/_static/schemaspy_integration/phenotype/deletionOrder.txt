@@ -1,0 +1,4 @@
+phenotypeprop
+phenotype_cvterm
+feature_phenotype
+phenotype

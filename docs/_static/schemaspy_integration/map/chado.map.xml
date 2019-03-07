@@ -1,0 +1,238 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<database name="chado" schema="map" type="PostgreSQL - 9.3.18">
+   <tables>
+      <table name="featuremap" remarks="" schema="map" type="TABLE">
+         <column autoUpdated="false" defaultValue="nextval('map.featuremap_featuremap_id_seq'::regclass)" digits="0" id="0" name="featuremap_id" nullable="false" remarks="" size="19" type="bigserial">
+            <child column="featuremap_id" foreignKey="featuremap_contact_featuremap_id_fkey" implied="false" onDeleteCascade="true" schema="map" table="featuremap_contact"/>
+            <child column="featuremap_id" foreignKey="featuremap_dbxref_featuremap_id_fkey" implied="false" onDeleteCascade="true" schema="map" table="featuremap_dbxref"/>
+            <child column="featuremap_id" foreignKey="featuremap_organism_featuremap_id_fkey" implied="false" onDeleteCascade="true" schema="map" table="featuremap_organism"/>
+            <child column="featuremap_id" foreignKey="featuremap_pub_featuremap_id_fkey" implied="false" onDeleteCascade="true" schema="map" table="featuremap_pub"/>
+            <child column="featuremap_id" foreignKey="featuremapprop_featuremap_id_fkey" implied="false" onDeleteCascade="true" schema="map" table="featuremapprop"/>
+            <child column="featuremap_id" foreignKey="featurepos_featuremap_id_fkey" implied="false" onDeleteCascade="true" schema="map" table="featurepos"/>
+            <child column="featuremap_id" foreignKey="featurerange_featuremap_id_fkey" implied="false" onDeleteCascade="true" schema="map" table="featurerange"/>
+            <child column="featuremap_id" foreignKey="stock_featuremap_featuremap_id_fkey" implied="false" onDeleteCascade="true" schema="stock" table="stock_featuremap"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="1" name="name" nullable="true" remarks="" size="255" type="varchar"/>
+         <column autoUpdated="false" digits="0" id="2" name="description" nullable="true" remarks="" size="2147483647" type="text"/>
+         <column autoUpdated="false" digits="0" id="3" name="unittype_id" nullable="true" remarks="" size="19" type="int8">
+            <parent column="cvterm_id" foreignKey="featuremap_unittype_id_fkey" implied="false" onDeleteCascade="false" schema="cv" table="cvterm"/>
+         </column>
+         <primaryKey column="featuremap_id" sequenceNumberInPK="1"/>
+         <index name="featuremap_pkey" unique="true">
+            <column ascending="true" name="featuremap_id"/>
+         </index>
+         <index name="featuremap_c1" unique="true">
+            <column ascending="true" name="name"/>
+         </index>
+      </table>
+      <table name="featuremap_contact" remarks="Links contact(s) with a featuremap.  Used to &#10;indicate a particular person or organization responsible for constrution of or &#10;that can provide more information on a particular featuremap." schema="map" type="TABLE">
+         <column autoUpdated="false" defaultValue="nextval('map.featuremap_contact_featuremap_contact_id_seq'::regclass)" digits="0" id="0" name="featuremap_contact_id" nullable="false" remarks="" size="19" type="bigserial"/>
+         <column autoUpdated="false" digits="0" id="1" name="featuremap_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="featuremap_id" foreignKey="featuremap_contact_featuremap_id_fkey" implied="false" onDeleteCascade="true" schema="map" table="featuremap"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="2" name="contact_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="contact_id" foreignKey="featuremap_contact_contact_id_fkey" implied="false" onDeleteCascade="true" schema="contact" table="contact"/>
+         </column>
+         <primaryKey column="featuremap_contact_id" sequenceNumberInPK="1"/>
+         <index name="featuremap_contact_pkey" unique="true">
+            <column ascending="true" name="featuremap_contact_id"/>
+         </index>
+         <index name="featuremap_contact_c1" unique="true">
+            <column ascending="true" name="featuremap_id"/>
+            <column ascending="true" name="contact_id"/>
+         </index>
+         <index name="featuremap_contact_idx1" unique="false">
+            <column ascending="true" name="featuremap_id"/>
+         </index>
+         <index name="featuremap_contact_idx2" unique="false">
+            <column ascending="true" name="contact_id"/>
+         </index>
+      </table>
+      <table name="featuremap_dbxref" remarks="" schema="map" type="TABLE">
+         <column autoUpdated="false" defaultValue="nextval('map.featuremap_dbxref_featuremap_dbxref_id_seq'::regclass)" digits="0" id="0" name="featuremap_dbxref_id" nullable="false" remarks="" size="19" type="bigserial"/>
+         <column autoUpdated="false" digits="0" id="1" name="featuremap_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="featuremap_id" foreignKey="featuremap_dbxref_featuremap_id_fkey" implied="false" onDeleteCascade="true" schema="map" table="featuremap"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="2" name="dbxref_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="dbxref_id" foreignKey="featuremap_dbxref_dbxref_id_fkey" implied="false" onDeleteCascade="true" schema="db" table="dbxref"/>
+         </column>
+         <column autoUpdated="false" defaultValue="true" digits="0" id="3" name="is_current" nullable="false" remarks="" size="1" type="bool"/>
+         <primaryKey column="featuremap_dbxref_id" sequenceNumberInPK="1"/>
+         <index name="featuremap_dbxref_pkey" unique="true">
+            <column ascending="true" name="featuremap_dbxref_id"/>
+         </index>
+         <index name="featuremap_dbxref_idx1" unique="false">
+            <column ascending="true" name="featuremap_id"/>
+         </index>
+         <index name="featuremap_dbxref_idx2" unique="false">
+            <column ascending="true" name="dbxref_id"/>
+         </index>
+      </table>
+      <table name="featuremap_organism" remarks="Links a featuremap to the organism(s) with which it is associated." schema="map" type="TABLE">
+         <column autoUpdated="false" defaultValue="nextval('map.featuremap_organism_featuremap_organism_id_seq'::regclass)" digits="0" id="0" name="featuremap_organism_id" nullable="false" remarks="" size="19" type="bigserial"/>
+         <column autoUpdated="false" digits="0" id="1" name="featuremap_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="featuremap_id" foreignKey="featuremap_organism_featuremap_id_fkey" implied="false" onDeleteCascade="true" schema="map" table="featuremap"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="2" name="organism_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="organism_id" foreignKey="featuremap_organism_organism_id_fkey" implied="false" onDeleteCascade="true" schema="organism" table="organism"/>
+         </column>
+         <primaryKey column="featuremap_organism_id" sequenceNumberInPK="1"/>
+         <index name="featuremap_organism_pkey" unique="true">
+            <column ascending="true" name="featuremap_organism_id"/>
+         </index>
+         <index name="featuremap_organism_c1" unique="true">
+            <column ascending="true" name="featuremap_id"/>
+            <column ascending="true" name="organism_id"/>
+         </index>
+         <index name="featuremap_organism_idx1" unique="false">
+            <column ascending="true" name="featuremap_id"/>
+         </index>
+         <index name="featuremap_organism_idx2" unique="false">
+            <column ascending="true" name="organism_id"/>
+         </index>
+      </table>
+      <table name="featuremap_pub" remarks="" schema="map" type="TABLE">
+         <column autoUpdated="false" defaultValue="nextval('map.featuremap_pub_featuremap_pub_id_seq'::regclass)" digits="0" id="0" name="featuremap_pub_id" nullable="false" remarks="" size="19" type="bigserial"/>
+         <column autoUpdated="false" digits="0" id="1" name="featuremap_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="featuremap_id" foreignKey="featuremap_pub_featuremap_id_fkey" implied="false" onDeleteCascade="true" schema="map" table="featuremap"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="2" name="pub_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="pub_id" foreignKey="featuremap_pub_pub_id_fkey" implied="false" onDeleteCascade="true" schema="pub" table="pub"/>
+         </column>
+         <primaryKey column="featuremap_pub_id" sequenceNumberInPK="1"/>
+         <index name="featuremap_pub_pkey" unique="true">
+            <column ascending="true" name="featuremap_pub_id"/>
+         </index>
+         <index name="featuremap_pub_idx1" unique="false">
+            <column ascending="true" name="featuremap_id"/>
+         </index>
+         <index name="featuremap_pub_idx2" unique="false">
+            <column ascending="true" name="pub_id"/>
+         </index>
+      </table>
+      <table name="featuremapprop" remarks="A featuremap can have any number of slot-value property &#10;tags attached to it. This is an alternative to hardcoding a list of columns in the &#10;relational schema, and is completely extensible." schema="map" type="TABLE">
+         <column autoUpdated="false" defaultValue="nextval('map.featuremapprop_featuremapprop_id_seq'::regclass)" digits="0" id="0" name="featuremapprop_id" nullable="false" remarks="" size="19" type="bigserial"/>
+         <column autoUpdated="false" digits="0" id="1" name="featuremap_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="featuremap_id" foreignKey="featuremapprop_featuremap_id_fkey" implied="false" onDeleteCascade="true" schema="map" table="featuremap"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="2" name="type_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="cvterm_id" foreignKey="featuremapprop_type_id_fkey" implied="false" onDeleteCascade="true" schema="cv" table="cvterm"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="3" name="value" nullable="true" remarks="" size="2147483647" type="text"/>
+         <column autoUpdated="false" defaultValue="0" digits="0" id="4" name="rank" nullable="false" remarks="" size="10" type="int4"/>
+         <primaryKey column="featuremapprop_id" sequenceNumberInPK="1"/>
+         <index name="featuremapprop_pkey" unique="true">
+            <column ascending="true" name="featuremapprop_id"/>
+         </index>
+         <index name="featuremapprop_c1" unique="true">
+            <column ascending="true" name="featuremap_id"/>
+            <column ascending="true" name="type_id"/>
+            <column ascending="true" name="rank"/>
+         </index>
+         <index name="featuremapprop_idx1" unique="false">
+            <column ascending="true" name="featuremap_id"/>
+         </index>
+         <index name="featuremapprop_idx2" unique="false">
+            <column ascending="true" name="type_id"/>
+         </index>
+      </table>
+      <table name="featurepos" remarks="" schema="map" type="TABLE">
+         <column autoUpdated="false" defaultValue="nextval('map.featurepos_featurepos_id_seq'::regclass)" digits="0" id="0" name="featurepos_id" nullable="false" remarks="" size="19" type="bigserial">
+            <child column="featurepos_id" foreignKey="featureposprop_featurepos_id_fkey" implied="false" onDeleteCascade="true" schema="map" table="featureposprop"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="1" name="featuremap_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="featuremap_id" foreignKey="featurepos_featuremap_id_fkey" implied="false" onDeleteCascade="true" schema="map" table="featuremap"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="2" name="feature_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="feature_id" foreignKey="featurepos_feature_id_fkey" implied="false" onDeleteCascade="true" schema="sequence" table="feature"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="3" name="map_feature_id" nullable="false" remarks="map_feature_id&#10;links to the feature (map) upon which the feature is being localized." size="19" type="int8">
+            <parent column="feature_id" foreignKey="featurepos_map_feature_id_fkey" implied="false" onDeleteCascade="true" schema="sequence" table="feature"/>
+         </column>
+         <column autoUpdated="false" digits="17" id="4" name="mappos" nullable="false" remarks="" size="17" type="float8"/>
+         <primaryKey column="featurepos_id" sequenceNumberInPK="1"/>
+         <index name="featurepos_pkey" unique="true">
+            <column ascending="true" name="featurepos_id"/>
+         </index>
+         <index name="featurepos_idx1" unique="false">
+            <column ascending="true" name="featuremap_id"/>
+         </index>
+         <index name="featurepos_idx2" unique="false">
+            <column ascending="true" name="feature_id"/>
+         </index>
+         <index name="featurepos_idx3" unique="false">
+            <column ascending="true" name="map_feature_id"/>
+         </index>
+      </table>
+      <table name="featureposprop" remarks="Property or attribute of a featurepos record." schema="map" type="TABLE">
+         <column autoUpdated="false" defaultValue="nextval('map.featureposprop_featureposprop_id_seq'::regclass)" digits="0" id="0" name="featureposprop_id" nullable="false" remarks="" size="19" type="bigserial"/>
+         <column autoUpdated="false" digits="0" id="1" name="featurepos_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="featurepos_id" foreignKey="featureposprop_featurepos_id_fkey" implied="false" onDeleteCascade="true" schema="map" table="featurepos"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="2" name="type_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="cvterm_id" foreignKey="featureposprop_type_id_fkey" implied="false" onDeleteCascade="true" schema="cv" table="cvterm"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="3" name="value" nullable="true" remarks="" size="2147483647" type="text"/>
+         <column autoUpdated="false" defaultValue="0" digits="0" id="4" name="rank" nullable="false" remarks="" size="10" type="int4"/>
+         <primaryKey column="featureposprop_id" sequenceNumberInPK="1"/>
+         <index name="featureposprop_pkey" unique="true">
+            <column ascending="true" name="featureposprop_id"/>
+         </index>
+         <index name="featureposprop_c1" unique="true">
+            <column ascending="true" name="featurepos_id"/>
+            <column ascending="true" name="type_id"/>
+            <column ascending="true" name="rank"/>
+         </index>
+         <index name="featureposprop_idx1" unique="false">
+            <column ascending="true" name="featurepos_id"/>
+         </index>
+         <index name="featureposprop_idx2" unique="false">
+            <column ascending="true" name="type_id"/>
+         </index>
+      </table>
+      <table name="featurerange" remarks="In cases where the start and end of a mapped feature is a range, leftendf and rightstartf are populated. leftstartf_id, leftendf_id, rightstartf_id, rightendf_id are the ids of features with respect to which the feature is being mapped. These may be cytological bands." schema="map" type="TABLE">
+         <column autoUpdated="false" defaultValue="nextval('map.featurerange_featurerange_id_seq'::regclass)" digits="0" id="0" name="featurerange_id" nullable="false" remarks="" size="19" type="bigserial"/>
+         <column autoUpdated="false" digits="0" id="1" name="featuremap_id" nullable="false" remarks="featuremap_id is the id of the feature being mapped." size="19" type="int8">
+            <parent column="featuremap_id" foreignKey="featurerange_featuremap_id_fkey" implied="false" onDeleteCascade="true" schema="map" table="featuremap"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="2" name="feature_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="feature_id" foreignKey="featurerange_feature_id_fkey" implied="false" onDeleteCascade="true" schema="sequence" table="feature"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="3" name="leftstartf_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="feature_id" foreignKey="featurerange_leftstartf_id_fkey" implied="false" onDeleteCascade="true" schema="sequence" table="feature"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="4" name="leftendf_id" nullable="true" remarks="" size="19" type="int8">
+            <parent column="feature_id" foreignKey="featurerange_leftendf_id_fkey" implied="false" onDeleteCascade="false" schema="sequence" table="feature"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="5" name="rightstartf_id" nullable="true" remarks="" size="19" type="int8">
+            <parent column="feature_id" foreignKey="featurerange_rightstartf_id_fkey" implied="false" onDeleteCascade="false" schema="sequence" table="feature"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="6" name="rightendf_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="feature_id" foreignKey="featurerange_rightendf_id_fkey" implied="false" onDeleteCascade="true" schema="sequence" table="feature"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="7" name="rangestr" nullable="true" remarks="" size="255" type="varchar"/>
+         <primaryKey column="featurerange_id" sequenceNumberInPK="1"/>
+         <index name="featurerange_pkey" unique="true">
+            <column ascending="true" name="featurerange_id"/>
+         </index>
+         <index name="featurerange_idx1" unique="false">
+            <column ascending="true" name="featuremap_id"/>
+         </index>
+         <index name="featurerange_idx2" unique="false">
+            <column ascending="true" name="feature_id"/>
+         </index>
+         <index name="featurerange_idx3" unique="false">
+            <column ascending="true" name="leftstartf_id"/>
+         </index>
+         <index name="featurerange_idx4" unique="false">
+            <column ascending="true" name="leftendf_id"/>
+         </index>
+         <index name="featurerange_idx5" unique="false">
+            <column ascending="true" name="rightstartf_id"/>
+         </index>
+         <index name="featurerange_idx6" unique="false">
+            <column ascending="true" name="rightendf_id"/>
+         </index>
+      </table>
+   </tables>
+</database>

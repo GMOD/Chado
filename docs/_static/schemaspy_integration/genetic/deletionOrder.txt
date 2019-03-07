@@ -1,0 +1,9 @@
+phenstatement
+phendesc
+feature_genotype
+phenotype_comparison_cvterm
+genotypeprop
+environment_cvterm
+phenotype_comparison
+genotype
+environment

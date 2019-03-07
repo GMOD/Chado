@@ -1,0 +1,406 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<database name="chado" schema="cv" type="PostgreSQL - 9.3.18">
+   <tables>
+      <table name="chadoprop" remarks="This table is different from other prop tables in the database, as it is for storing information about the database itself, like schema version" schema="cv" type="TABLE">
+         <column autoUpdated="false" defaultValue="nextval('cv.chadoprop_chadoprop_id_seq'::regclass)" digits="0" id="0" name="chadoprop_id" nullable="false" remarks="" size="19" type="bigserial"/>
+         <column autoUpdated="false" digits="0" id="1" name="type_id" nullable="false" remarks="The name of the property or slot is a cvterm. The meaning of the property is defined in that cvterm." size="19" type="int8">
+            <parent column="cvterm_id" foreignKey="chadoprop_type_id_fkey" implied="false" onDeleteCascade="false" schema="cv" table="cvterm"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="2" name="value" nullable="true" remarks="The value of the property, represented as text. Numeric values are converted to their text representation." size="2147483647" type="text"/>
+         <column autoUpdated="false" defaultValue="0" digits="0" id="3" name="rank" nullable="false" remarks="Property-Value ordering. Any&#10;cv can have multiple values for any particular property type -&#10;these are ordered in a list using rank, counting from zero. For&#10;properties that are single-valued rather than multi-valued, the&#10;default 0 value should be used." size="10" type="int4"/>
+         <primaryKey column="chadoprop_id" sequenceNumberInPK="1"/>
+         <index name="chadoprop_pkey" unique="true">
+            <column ascending="true" name="chadoprop_id"/>
+         </index>
+         <index name="chadoprop_c1" unique="true">
+            <column ascending="true" name="type_id"/>
+            <column ascending="true" name="rank"/>
+         </index>
+      </table>
+      <table name="cv" remarks="A controlled vocabulary or ontology. A cv is&#10;composed of cvterms (AKA terms, classes, types, universals - relations&#10;and properties are also stored in cvterm) and the relationships&#10;between them." schema="cv" type="TABLE">
+         <column autoUpdated="false" defaultValue="nextval('cv.cv_cv_id_seq'::regclass)" digits="0" id="0" name="cv_id" nullable="false" remarks="" size="19" type="bigserial">
+            <child column="cv_id" foreignKey="cvprop_cv_id_fkey" implied="false" onDeleteCascade="false" schema="cv" table="cvprop"/>
+            <child column="cv_id" foreignKey="cvterm_cv_id_fkey" implied="false" onDeleteCascade="true" schema="cv" table="cvterm"/>
+            <child column="cv_id" foreignKey="cvtermpath_cv_id_fkey" implied="false" onDeleteCascade="true" schema="cv" table="cvtermpath"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="1" name="name" nullable="false" remarks="The name of the ontology. This&#10;corresponds to the obo-format -namespace-. cv names uniquely identify&#10;the cv. In OBO file format, the cv.name is known as the namespace." size="255" type="varchar"/>
+         <column autoUpdated="false" digits="0" id="2" name="definition" nullable="true" remarks="A text description of the criteria for&#10;membership of this ontology." size="2147483647" type="text"/>
+         <primaryKey column="cv_id" sequenceNumberInPK="1"/>
+         <index name="cv_pkey" unique="true">
+            <column ascending="true" name="cv_id"/>
+         </index>
+         <index name="cv_c1" unique="true">
+            <column ascending="true" name="name"/>
+         </index>
+      </table>
+      <table name="cvprop" remarks="Additional extensible properties can be attached to a cv using this table.  A notable example would be the cv version" schema="cv" type="TABLE">
+         <column autoUpdated="false" defaultValue="nextval('cv.cvprop_cvprop_id_seq'::regclass)" digits="0" id="0" name="cvprop_id" nullable="false" remarks="" size="19" type="bigserial"/>
+         <column autoUpdated="false" digits="0" id="1" name="cv_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="cv_id" foreignKey="cvprop_cv_id_fkey" implied="false" onDeleteCascade="false" schema="cv" table="cv"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="2" name="type_id" nullable="false" remarks="The name of the property or slot is a cvterm. The meaning of the property is defined in that cvterm." size="19" type="int8">
+            <parent column="cvterm_id" foreignKey="cvprop_type_id_fkey" implied="false" onDeleteCascade="false" schema="cv" table="cvterm"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="3" name="value" nullable="true" remarks="The value of the property, represented as text. Numeric values are converted to their text representation." size="2147483647" type="text"/>
+         <column autoUpdated="false" defaultValue="0" digits="0" id="4" name="rank" nullable="false" remarks="Property-Value ordering. Any&#10;cv can have multiple values for any particular property type -&#10;these are ordered in a list using rank, counting from zero. For&#10;properties that are single-valued rather than multi-valued, the&#10;default 0 value should be used." size="10" type="int4"/>
+         <primaryKey column="cvprop_id" sequenceNumberInPK="1"/>
+         <index name="cvprop_pkey" unique="true">
+            <column ascending="true" name="cvprop_id"/>
+         </index>
+         <index name="cvprop_c1" unique="true">
+            <column ascending="true" name="cv_id"/>
+            <column ascending="true" name="type_id"/>
+            <column ascending="true" name="rank"/>
+         </index>
+      </table>
+      <table name="cvterm" remarks="A term, class, universal or type within an&#10;ontology or controlled vocabulary.  This table is also used for&#10;relations and properties. cvterms constitute nodes in the graph&#10;defined by the collection of cvterms and cvterm_relationships." schema="cv" type="TABLE">
+         <column autoUpdated="false" defaultValue="nextval('cv.cvterm_cvterm_id_seq'::regclass)" digits="0" id="0" name="cvterm_id" nullable="false" remarks="" size="19" type="bigserial">
+            <child column="cvterm_id" foreignKey="cell_line_cvterm_cvterm_id_fkey" implied="false" onDeleteCascade="true" schema="cell_line" table="cell_line_cvterm"/>
+            <child column="type_id" foreignKey="cell_line_cvtermprop_type_id_fkey" implied="false" onDeleteCascade="true" schema="cell_line" table="cell_line_cvtermprop"/>
+            <child column="type_id" foreignKey="cell_line_relationship_type_id_fkey" implied="false" onDeleteCascade="true" schema="cell_line" table="cell_line_relationship"/>
+            <child column="type_id" foreignKey="cell_lineprop_type_id_fkey" implied="false" onDeleteCascade="true" schema="cell_line" table="cell_lineprop"/>
+            <child column="cvterm_id" foreignKey="analysis_cvterm_cvterm_id_fkey" implied="false" onDeleteCascade="true" schema="companalysis" table="analysis_cvterm"/>
+            <child column="type_id" foreignKey="analysis_relationship_type_id_fkey" implied="false" onDeleteCascade="true" schema="companalysis" table="analysis_relationship"/>
+            <child column="type_id" foreignKey="analysisfeatureprop_type_id_fkey" implied="false" onDeleteCascade="true" schema="companalysis" table="analysisfeatureprop"/>
+            <child column="type_id" foreignKey="analysisprop_type_id_fkey" implied="false" onDeleteCascade="true" schema="companalysis" table="analysisprop"/>
+            <child column="type_id" foreignKey="contact_type_id_fkey" implied="false" onDeleteCascade="false" schema="contact" table="contact"/>
+            <child column="type_id" foreignKey="contact_relationship_type_id_fkey" implied="false" onDeleteCascade="true" schema="contact" table="contact_relationship"/>
+            <child column="type_id" foreignKey="contactprop_type_id_fkey" implied="false" onDeleteCascade="true" schema="contact" table="contactprop"/>
+            <child column="type_id" foreignKey="chadoprop_type_id_fkey" implied="false" onDeleteCascade="false" schema="cv" table="chadoprop"/>
+            <child column="type_id" foreignKey="cvprop_type_id_fkey" implied="false" onDeleteCascade="false" schema="cv" table="cvprop"/>
+            <child column="cvterm_id" foreignKey="cvterm_dbxref_cvterm_id_fkey" implied="false" onDeleteCascade="true" schema="cv" table="cvterm_dbxref"/>
+            <child column="object_id" foreignKey="cvterm_relationship_object_id_fkey" implied="false" onDeleteCascade="true" schema="cv" table="cvterm_relationship"/>
+            <child column="subject_id" foreignKey="cvterm_relationship_subject_id_fkey" implied="false" onDeleteCascade="true" schema="cv" table="cvterm_relationship"/>
+            <child column="type_id" foreignKey="cvterm_relationship_type_id_fkey" implied="false" onDeleteCascade="true" schema="cv" table="cvterm_relationship"/>
+            <child column="object_id" foreignKey="cvtermpath_object_id_fkey" implied="false" onDeleteCascade="true" schema="cv" table="cvtermpath"/>
+            <child column="subject_id" foreignKey="cvtermpath_subject_id_fkey" implied="false" onDeleteCascade="true" schema="cv" table="cvtermpath"/>
+            <child column="type_id" foreignKey="cvtermpath_type_id_fkey" implied="false" onDeleteCascade="false" schema="cv" table="cvtermpath"/>
+            <child column="cvterm_id" foreignKey="cvtermprop_cvterm_id_fkey" implied="false" onDeleteCascade="true" schema="cv" table="cvtermprop"/>
+            <child column="type_id" foreignKey="cvtermprop_type_id_fkey" implied="false" onDeleteCascade="true" schema="cv" table="cvtermprop"/>
+            <child column="cvterm_id" foreignKey="cvtermsynonym_cvterm_id_fkey" implied="false" onDeleteCascade="true" schema="cv" table="cvtermsynonym"/>
+            <child column="type_id" foreignKey="cvtermsynonym_type_id_fkey" implied="false" onDeleteCascade="true" schema="cv" table="cvtermsynonym"/>
+            <child column="type_id" foreignKey="dbprop_type_id_fkey" implied="false" onDeleteCascade="true" schema="cv" table="dbprop"/>
+            <child column="type_id" foreignKey="dbxrefprop_type_id_fkey" implied="false" onDeleteCascade="false" schema="cv" table="dbxrefprop"/>
+            <child column="cvterm_id" foreignKey="expression_cvterm_cvterm_id_fkey" implied="false" onDeleteCascade="true" schema="expression" table="expression_cvterm"/>
+            <child column="cvterm_type_id" foreignKey="expression_cvterm_cvterm_type_id_fkey" implied="false" onDeleteCascade="true" schema="expression" table="expression_cvterm"/>
+            <child column="type_id" foreignKey="expression_cvtermprop_type_id_fkey" implied="false" onDeleteCascade="true" schema="expression" table="expression_cvtermprop"/>
+            <child column="type_id" foreignKey="expressionprop_type_id_fkey" implied="false" onDeleteCascade="true" schema="expression" table="expressionprop"/>
+            <child column="type_id" foreignKey="feature_expressionprop_type_id_fkey" implied="false" onDeleteCascade="true" schema="expression" table="feature_expressionprop"/>
+            <child column="cvterm_id" foreignKey="environment_cvterm_cvterm_id_fkey" implied="false" onDeleteCascade="true" schema="genetic" table="environment_cvterm"/>
+            <child column="cvterm_id" foreignKey="feature_genotype_cvterm_id_fkey" implied="false" onDeleteCascade="true" schema="genetic" table="feature_genotype"/>
+            <child column="type_id" foreignKey="genotype_type_id_fkey" implied="false" onDeleteCascade="true" schema="genetic" table="genotype"/>
+            <child column="type_id" foreignKey="genotypeprop_type_id_fkey" implied="false" onDeleteCascade="true" schema="genetic" table="genotypeprop"/>
+            <child column="type_id" foreignKey="phendesc_type_id_fkey" implied="false" onDeleteCascade="true" schema="genetic" table="phendesc"/>
+            <child column="cvterm_id" foreignKey="phenotype_comparison_cvterm_cvterm_id_fkey" implied="false" onDeleteCascade="true" schema="genetic" table="phenotype_comparison_cvterm"/>
+            <child column="type_id" foreignKey="phenstatement_type_id_fkey" implied="false" onDeleteCascade="true" schema="genetic" table="phenstatement"/>
+            <child column="type_id" foreignKey="library_type_id_fkey" implied="false" onDeleteCascade="false" schema="library" table="library"/>
+            <child column="cvterm_id" foreignKey="library_cvterm_cvterm_id_fkey" implied="false" onDeleteCascade="false" schema="library" table="library_cvterm"/>
+            <child column="type_id" foreignKey="library_expressionprop_type_id_fkey" implied="false" onDeleteCascade="false" schema="library" table="library_expressionprop"/>
+            <child column="type_id" foreignKey="library_featureprop_type_id_fkey" implied="false" onDeleteCascade="false" schema="library" table="library_featureprop"/>
+            <child column="type_id" foreignKey="library_relationship_type_id_fkey" implied="false" onDeleteCascade="false" schema="library" table="library_relationship"/>
+            <child column="type_id" foreignKey="libraryprop_type_id_fkey" implied="false" onDeleteCascade="false" schema="library" table="libraryprop"/>
+            <child column="type_id" foreignKey="acquisition_relationship_type_id_fkey" implied="false" onDeleteCascade="true" schema="mage" table="acquisition_relationship"/>
+            <child column="type_id" foreignKey="acquisitionprop_type_id_fkey" implied="false" onDeleteCascade="true" schema="mage" table="acquisitionprop"/>
+            <child column="platformtype_id" foreignKey="arraydesign_platformtype_id_fkey" implied="false" onDeleteCascade="true" schema="mage" table="arraydesign"/>
+            <child column="substratetype_id" foreignKey="arraydesign_substratetype_id_fkey" implied="false" onDeleteCascade="false" schema="mage" table="arraydesign"/>
+            <child column="type_id" foreignKey="arraydesignprop_type_id_fkey" implied="false" onDeleteCascade="true" schema="mage" table="arraydesignprop"/>
+            <child column="type_id" foreignKey="assayprop_type_id_fkey" implied="false" onDeleteCascade="true" schema="mage" table="assayprop"/>
+            <child column="type_id" foreignKey="biomaterial_relationship_type_id_fkey" implied="false" onDeleteCascade="false" schema="mage" table="biomaterial_relationship"/>
+            <child column="unittype_id" foreignKey="biomaterial_treatment_unittype_id_fkey" implied="false" onDeleteCascade="false" schema="mage" table="biomaterial_treatment"/>
+            <child column="type_id" foreignKey="biomaterialprop_type_id_fkey" implied="false" onDeleteCascade="true" schema="mage" table="biomaterialprop"/>
+            <child column="type_id" foreignKey="control_type_id_fkey" implied="false" onDeleteCascade="true" schema="mage" table="control"/>
+            <child column="type_id" foreignKey="element_type_id_fkey" implied="false" onDeleteCascade="false" schema="mage" table="element"/>
+            <child column="type_id" foreignKey="element_relationship_type_id_fkey" implied="false" onDeleteCascade="false" schema="mage" table="element_relationship"/>
+            <child column="type_id" foreignKey="elementresult_relationship_type_id_fkey" implied="false" onDeleteCascade="false" schema="mage" table="elementresult_relationship"/>
+            <child column="type_id" foreignKey="protocol_type_id_fkey" implied="false" onDeleteCascade="true" schema="mage" table="protocol"/>
+            <child column="datatype_id" foreignKey="protocolparam_datatype_id_fkey" implied="false" onDeleteCascade="false" schema="mage" table="protocolparam"/>
+            <child column="unittype_id" foreignKey="protocolparam_unittype_id_fkey" implied="false" onDeleteCascade="false" schema="mage" table="protocolparam"/>
+            <child column="type_id" foreignKey="quantification_relationship_type_id_fkey" implied="false" onDeleteCascade="true" schema="mage" table="quantification_relationship"/>
+            <child column="type_id" foreignKey="quantificationprop_type_id_fkey" implied="false" onDeleteCascade="true" schema="mage" table="quantificationprop"/>
+            <child column="type_id" foreignKey="studydesignprop_type_id_fkey" implied="false" onDeleteCascade="true" schema="mage" table="studydesignprop"/>
+            <child column="type_id" foreignKey="studyfactor_type_id_fkey" implied="false" onDeleteCascade="false" schema="mage" table="studyfactor"/>
+            <child column="type_id" foreignKey="studyprop_type_id_fkey" implied="false" onDeleteCascade="true" schema="mage" table="studyprop"/>
+            <child column="type_id" foreignKey="studyprop_feature_type_id_fkey" implied="false" onDeleteCascade="true" schema="mage" table="studyprop_feature"/>
+            <child column="type_id" foreignKey="treatment_type_id_fkey" implied="false" onDeleteCascade="true" schema="mage" table="treatment"/>
+            <child column="unittype_id" foreignKey="featuremap_unittype_id_fkey" implied="false" onDeleteCascade="false" schema="map" table="featuremap"/>
+            <child column="type_id" foreignKey="featuremapprop_type_id_fkey" implied="false" onDeleteCascade="true" schema="map" table="featuremapprop"/>
+            <child column="type_id" foreignKey="featureposprop_type_id_fkey" implied="false" onDeleteCascade="true" schema="map" table="featureposprop"/>
+            <child column="type_id" foreignKey="nd_experiment_type_id_fkey" implied="false" onDeleteCascade="true" schema="natural_diversity" table="nd_experiment"/>
+            <child column="type_id" foreignKey="nd_experiment_analysis_type_id_fkey" implied="false" onDeleteCascade="true" schema="natural_diversity" table="nd_experiment_analysis"/>
+            <child column="type_id" foreignKey="nd_experiment_stock_type_id_fkey" implied="false" onDeleteCascade="true" schema="natural_diversity" table="nd_experiment_stock"/>
+            <child column="type_id" foreignKey="nd_experiment_stockprop_type_id_fkey" implied="false" onDeleteCascade="true" schema="natural_diversity" table="nd_experiment_stockprop"/>
+            <child column="type_id" foreignKey="nd_experimentprop_type_id_fkey" implied="false" onDeleteCascade="true" schema="natural_diversity" table="nd_experimentprop"/>
+            <child column="type_id" foreignKey="nd_geolocationprop_type_id_fkey" implied="false" onDeleteCascade="true" schema="natural_diversity" table="nd_geolocationprop"/>
+            <child column="type_id" foreignKey="nd_protocol_type_id_fkey" implied="false" onDeleteCascade="true" schema="natural_diversity" table="nd_protocol"/>
+            <child column="type_id" foreignKey="nd_protocol_reagent_type_id_fkey" implied="false" onDeleteCascade="true" schema="natural_diversity" table="nd_protocol_reagent"/>
+            <child column="type_id" foreignKey="nd_protocolprop_type_id_fkey" implied="false" onDeleteCascade="true" schema="natural_diversity" table="nd_protocolprop"/>
+            <child column="type_id" foreignKey="nd_reagent_type_id_fkey" implied="false" onDeleteCascade="true" schema="natural_diversity" table="nd_reagent"/>
+            <child column="type_id" foreignKey="nd_reagent_relationship_type_id_fkey" implied="false" onDeleteCascade="true" schema="natural_diversity" table="nd_reagent_relationship"/>
+            <child column="type_id" foreignKey="nd_reagentprop_type_id_fkey" implied="false" onDeleteCascade="true" schema="natural_diversity" table="nd_reagentprop"/>
+            <child column="type_id" foreignKey="organism_type_id_fkey" implied="false" onDeleteCascade="true" schema="organism" table="organism"/>
+            <child column="cvterm_id" foreignKey="organism_cvterm_cvterm_id_fkey" implied="false" onDeleteCascade="true" schema="organism" table="organism_cvterm"/>
+            <child column="type_id" foreignKey="organism_cvtermprop_type_id_fkey" implied="false" onDeleteCascade="true" schema="organism" table="organism_cvtermprop"/>
+            <child column="type_id" foreignKey="organism_relationship_type_id_fkey" implied="false" onDeleteCascade="true" schema="organism" table="organism_relationship"/>
+            <child column="type_id" foreignKey="organismprop_type_id_fkey" implied="false" onDeleteCascade="true" schema="organism" table="organismprop"/>
+            <child column="assay_id" foreignKey="phenotype_assay_id_fkey" implied="false" onDeleteCascade="false" schema="phenotype" table="phenotype"/>
+            <child column="attr_id" foreignKey="phenotype_attr_id_fkey" implied="false" onDeleteCascade="false" schema="phenotype" table="phenotype"/>
+            <child column="cvalue_id" foreignKey="phenotype_cvalue_id_fkey" implied="false" onDeleteCascade="false" schema="phenotype" table="phenotype"/>
+            <child column="observable_id" foreignKey="phenotype_observable_id_fkey" implied="false" onDeleteCascade="true" schema="phenotype" table="phenotype"/>
+            <child column="cvterm_id" foreignKey="phenotype_cvterm_cvterm_id_fkey" implied="false" onDeleteCascade="true" schema="phenotype" table="phenotype_cvterm"/>
+            <child column="type_id" foreignKey="phenotypeprop_type_id_fkey" implied="false" onDeleteCascade="true" schema="phenotype" table="phenotypeprop"/>
+            <child column="type_id" foreignKey="phylonode_type_id_fkey" implied="false" onDeleteCascade="true" schema="phylogeny" table="phylonode"/>
+            <child column="type_id" foreignKey="phylonode_relationship_type_id_fkey" implied="false" onDeleteCascade="true" schema="phylogeny" table="phylonode_relationship"/>
+            <child column="type_id" foreignKey="phylonodeprop_type_id_fkey" implied="false" onDeleteCascade="true" schema="phylogeny" table="phylonodeprop"/>
+            <child column="type_id" foreignKey="phylotree_type_id_fkey" implied="false" onDeleteCascade="true" schema="phylogeny" table="phylotree"/>
+            <child column="type_id" foreignKey="phylotreeprop_type_id_fkey" implied="false" onDeleteCascade="true" schema="phylogeny" table="phylotreeprop"/>
+            <child column="type_id" foreignKey="project_relationship_type_id_fkey" implied="false" onDeleteCascade="false" schema="project" table="project_relationship"/>
+            <child column="type_id" foreignKey="projectprop_type_id_fkey" implied="false" onDeleteCascade="true" schema="project" table="projectprop"/>
+            <child column="type_id" foreignKey="pub_type_id_fkey" implied="false" onDeleteCascade="true" schema="pub" table="pub"/>
+            <child column="type_id" foreignKey="pub_relationship_type_id_fkey" implied="false" onDeleteCascade="true" schema="pub" table="pub_relationship"/>
+            <child column="type_id" foreignKey="pubprop_type_id_fkey" implied="false" onDeleteCascade="true" schema="pub" table="pubprop"/>
+            <child column="type_id" foreignKey="feature_type_id_fkey" implied="false" onDeleteCascade="true" schema="sequence" table="feature"/>
+            <child column="cvterm_id" foreignKey="feature_cvterm_cvterm_id_fkey" implied="false" onDeleteCascade="true" schema="sequence" table="feature_cvterm"/>
+            <child column="type_id" foreignKey="feature_cvtermprop_type_id_fkey" implied="false" onDeleteCascade="true" schema="sequence" table="feature_cvtermprop"/>
+            <child column="type_id" foreignKey="feature_pubprop_type_id_fkey" implied="false" onDeleteCascade="true" schema="sequence" table="feature_pubprop"/>
+            <child column="type_id" foreignKey="feature_relationship_type_id_fkey" implied="false" onDeleteCascade="true" schema="sequence" table="feature_relationship"/>
+            <child column="type_id" foreignKey="feature_relationshipprop_type_id_fkey" implied="false" onDeleteCascade="true" schema="sequence" table="feature_relationshipprop"/>
+            <child column="type_id" foreignKey="featureprop_type_id_fkey" implied="false" onDeleteCascade="true" schema="sequence" table="featureprop"/>
+            <child column="type_id" foreignKey="synonym_type_id_fkey" implied="false" onDeleteCascade="true" schema="sequence" table="synonym"/>
+            <child column="type_id" foreignKey="stock_type_id_fkey" implied="false" onDeleteCascade="true" schema="stock" table="stock"/>
+            <child column="cvterm_id" foreignKey="stock_cvterm_cvterm_id_fkey" implied="false" onDeleteCascade="true" schema="stock" table="stock_cvterm"/>
+            <child column="type_id" foreignKey="stock_cvtermprop_type_id_fkey" implied="false" onDeleteCascade="true" schema="stock" table="stock_cvtermprop"/>
+            <child column="type_id" foreignKey="stock_dbxrefprop_type_id_fkey" implied="false" onDeleteCascade="true" schema="stock" table="stock_dbxrefprop"/>
+            <child column="type_id" foreignKey="stock_feature_type_id_fkey" implied="false" onDeleteCascade="true" schema="stock" table="stock_feature"/>
+            <child column="type_id" foreignKey="stock_featuremap_type_id_fkey" implied="false" onDeleteCascade="true" schema="stock" table="stock_featuremap"/>
+            <child column="type_id" foreignKey="stock_relationship_type_id_fkey" implied="false" onDeleteCascade="true" schema="stock" table="stock_relationship"/>
+            <child column="cvterm_id" foreignKey="stock_relationship_cvterm_cvterm_id_fkey" implied="false" onDeleteCascade="false" schema="stock" table="stock_relationship_cvterm"/>
+            <child column="type_id" foreignKey="stockcollection_type_id_fkey" implied="false" onDeleteCascade="true" schema="stock" table="stockcollection"/>
+            <child column="type_id" foreignKey="stockcollectionprop_type_id_fkey" implied="false" onDeleteCascade="false" schema="stock" table="stockcollectionprop"/>
+            <child column="type_id" foreignKey="stockprop_type_id_fkey" implied="false" onDeleteCascade="true" schema="stock" table="stockprop"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="1" name="cv_id" nullable="false" remarks="The cv or ontology or namespace to which&#10;this cvterm belongs." size="19" type="int8">
+            <parent column="cv_id" foreignKey="cvterm_cv_id_fkey" implied="false" onDeleteCascade="true" schema="cv" table="cv"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="2" name="name" nullable="false" remarks="A concise human-readable name or&#10;label for the cvterm. Uniquely identifies a cvterm within a cv." size="1024" type="varchar"/>
+         <column autoUpdated="false" digits="0" id="3" name="definition" nullable="true" remarks="A human-readable text&#10;definition." size="2147483647" type="text"/>
+         <column autoUpdated="false" digits="0" id="4" name="dbxref_id" nullable="false" remarks="Primary identifier dbxref - The&#10;unique global OBO identifier for this cvterm.  Note that a cvterm may&#10;have multiple secondary dbxrefs - see also table: cvterm_dbxref." size="19" type="int8">
+            <parent column="dbxref_id" foreignKey="cvterm_dbxref_id_fkey" implied="false" onDeleteCascade="false" schema="db" table="dbxref"/>
+         </column>
+         <column autoUpdated="false" defaultValue="0" digits="0" id="5" name="is_obsolete" nullable="false" remarks="Boolean 0=false,1=true; see&#10;GO documentation for details of obsoletion. Note that two terms with&#10;different primary dbxrefs may exist if one is obsolete." size="10" type="int4"/>
+         <column autoUpdated="false" defaultValue="0" digits="0" id="6" name="is_relationshiptype" nullable="false" remarks="Boolean&#10;0=false,1=true relations or relationship types (also known as Typedefs&#10;in OBO format, or as properties or slots) form a cv/ontology in&#10;themselves. We use this flag to indicate whether this cvterm is an&#10;actual term/class/universal or a relation. Relations may be drawn from&#10;the OBO Relations ontology, but are not exclusively drawn from there." size="10" type="int4"/>
+         <primaryKey column="cvterm_id" sequenceNumberInPK="1"/>
+         <index name="cvterm_pkey" unique="true">
+            <column ascending="true" name="cvterm_id"/>
+         </index>
+         <index name="cvterm_c1" unique="true">
+            <column ascending="true" name="name"/>
+            <column ascending="true" name="cv_id"/>
+            <column ascending="true" name="is_obsolete"/>
+         </index>
+         <index name="cvterm_c2" unique="true">
+            <column ascending="true" name="dbxref_id"/>
+         </index>
+         <index name="cvterm_idx1" unique="false">
+            <column ascending="true" name="cv_id"/>
+         </index>
+         <index name="cvterm_idx2" unique="false">
+            <column ascending="true" name="name"/>
+         </index>
+         <index name="cvterm_idx3" unique="false">
+            <column ascending="true" name="dbxref_id"/>
+         </index>
+      </table>
+      <table name="cvterm_dbxref" remarks="In addition to the primary&#10;identifier (cvterm.dbxref_id) a cvterm can have zero or more secondary&#10;identifiers/dbxrefs, which may refer to records in external&#10;databases. The exact semantics of cvterm_dbxref are not fixed. For&#10;example: the dbxref could be a pubmed ID that is pertinent to the&#10;cvterm, or it could be an equivalent or similar term in another&#10;ontology. For example, GO cvterms are typically linked to InterPro&#10;IDs, even though the nature of the relationship between them is&#10;largely one of statistical association. The dbxref may be have data&#10;records attached in the same database instance, or it could be a&#10;&quot;hanging&quot; dbxref pointing to some external database. NOTE: If the&#10;desired objective is to link two cvterms together, and the nature of&#10;the relation is known and holds for all instances of the subject&#10;cvterm then consider instead using cvterm_relationship together with a&#10;well-defined relation." schema="cv" type="TABLE">
+         <column autoUpdated="false" defaultValue="nextval('cv.cvterm_dbxref_cvterm_dbxref_id_seq'::regclass)" digits="0" id="0" name="cvterm_dbxref_id" nullable="false" remarks="" size="19" type="bigserial"/>
+         <column autoUpdated="false" digits="0" id="1" name="cvterm_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="cvterm_id" foreignKey="cvterm_dbxref_cvterm_id_fkey" implied="false" onDeleteCascade="true" schema="cv" table="cvterm"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="2" name="dbxref_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="dbxref_id" foreignKey="cvterm_dbxref_dbxref_id_fkey" implied="false" onDeleteCascade="true" schema="db" table="dbxref"/>
+         </column>
+         <column autoUpdated="false" defaultValue="0" digits="0" id="3" name="is_for_definition" nullable="false" remarks="A&#10;cvterm.definition should be supported by one or more references. If&#10;this column is true, the dbxref is not for a term in an external database -&#10;it is a dbxref for provenance information for the definition." size="10" type="int4"/>
+         <primaryKey column="cvterm_dbxref_id" sequenceNumberInPK="1"/>
+         <index name="cvterm_dbxref_pkey" unique="true">
+            <column ascending="true" name="cvterm_dbxref_id"/>
+         </index>
+         <index name="cvterm_dbxref_c1" unique="true">
+            <column ascending="true" name="cvterm_id"/>
+            <column ascending="true" name="dbxref_id"/>
+         </index>
+         <index name="cvterm_dbxref_idx1" unique="false">
+            <column ascending="true" name="cvterm_id"/>
+         </index>
+         <index name="cvterm_dbxref_idx2" unique="false">
+            <column ascending="true" name="dbxref_id"/>
+         </index>
+      </table>
+      <table name="cvterm_relationship" remarks="A relationship linking two&#10;cvterms. Each cvterm_relationship constitutes an edge in the graph&#10;defined by the collection of cvterms and cvterm_relationships. The&#10;meaning of the cvterm_relationship depends on the definition of the&#10;cvterm R refered to by type_id. However, in general the definitions&#10;are such that the statement &quot;all SUBJs REL some OBJ&quot; is true. The&#10;cvterm_relationship statement is about the subject, not the&#10;object. For example &quot;insect wing part_of thorax&quot;." schema="cv" type="TABLE">
+         <column autoUpdated="false" defaultValue="nextval('cv.cvterm_relationship_cvterm_relationship_id_seq'::regclass)" digits="0" id="0" name="cvterm_relationship_id" nullable="false" remarks="" size="19" type="bigserial"/>
+         <column autoUpdated="false" digits="0" id="1" name="type_id" nullable="false" remarks="The nature of the&#10;relationship between subject and object. Note that relations are also&#10;housed in the cvterm table, typically from the OBO relationship&#10;ontology, although other relationship types are allowed." size="19" type="int8">
+            <parent column="cvterm_id" foreignKey="cvterm_relationship_type_id_fkey" implied="false" onDeleteCascade="true" schema="cv" table="cvterm"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="2" name="subject_id" nullable="false" remarks="The subject of&#10;the subj-predicate-obj sentence. The cvterm_relationship is about the&#10;subject. In a graph, this typically corresponds to the child node." size="19" type="int8">
+            <parent column="cvterm_id" foreignKey="cvterm_relationship_subject_id_fkey" implied="false" onDeleteCascade="true" schema="cv" table="cvterm"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="3" name="object_id" nullable="false" remarks="The object of the&#10;subj-predicate-obj sentence. The cvterm_relationship refers to the&#10;object. In a graph, this typically corresponds to the parent node." size="19" type="int8">
+            <parent column="cvterm_id" foreignKey="cvterm_relationship_object_id_fkey" implied="false" onDeleteCascade="true" schema="cv" table="cvterm"/>
+         </column>
+         <primaryKey column="cvterm_relationship_id" sequenceNumberInPK="1"/>
+         <index name="cvterm_relationship_pkey" unique="true">
+            <column ascending="true" name="cvterm_relationship_id"/>
+         </index>
+         <index name="cvterm_relationship_c1" unique="true">
+            <column ascending="true" name="subject_id"/>
+            <column ascending="true" name="object_id"/>
+            <column ascending="true" name="type_id"/>
+         </index>
+         <index name="cvterm_relationship_idx1" unique="false">
+            <column ascending="true" name="type_id"/>
+         </index>
+         <index name="cvterm_relationship_idx2" unique="false">
+            <column ascending="true" name="subject_id"/>
+         </index>
+         <index name="cvterm_relationship_idx3" unique="false">
+            <column ascending="true" name="object_id"/>
+         </index>
+      </table>
+      <table name="cvtermpath" remarks="The reflexive transitive closure of&#10;the cvterm_relationship relation." schema="cv" type="TABLE">
+         <column autoUpdated="false" defaultValue="nextval('cv.cvtermpath_cvtermpath_id_seq'::regclass)" digits="0" id="0" name="cvtermpath_id" nullable="false" remarks="" size="19" type="bigserial"/>
+         <column autoUpdated="false" digits="0" id="1" name="type_id" nullable="true" remarks="The relationship type that&#10;this is a closure over. If null, then this is a closure over ALL&#10;relationship types. If non-null, then this references a relationship&#10;cvterm - note that the closure will apply to both this relationship&#10;AND the OBO_REL:is_a (subclass) relationship." size="19" type="int8">
+            <parent column="cvterm_id" foreignKey="cvtermpath_type_id_fkey" implied="false" onDeleteCascade="false" schema="cv" table="cvterm"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="2" name="subject_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="cvterm_id" foreignKey="cvtermpath_subject_id_fkey" implied="false" onDeleteCascade="true" schema="cv" table="cvterm"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="3" name="object_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="cvterm_id" foreignKey="cvtermpath_object_id_fkey" implied="false" onDeleteCascade="true" schema="cv" table="cvterm"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="4" name="cv_id" nullable="false" remarks="Closures will mostly be within&#10;one cv. If the closure of a relationship traverses a cv, then this&#10;refers to the cv of the object_id cvterm." size="19" type="int8">
+            <parent column="cv_id" foreignKey="cvtermpath_cv_id_fkey" implied="false" onDeleteCascade="true" schema="cv" table="cv"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="5" name="pathdistance" nullable="true" remarks="The number of steps&#10;required to get from the subject cvterm to the object cvterm, counting&#10;from zero (reflexive relationship)." size="10" type="int4"/>
+         <primaryKey column="cvtermpath_id" sequenceNumberInPK="1"/>
+         <index name="cvtermpath_pkey" unique="true">
+            <column ascending="true" name="cvtermpath_id"/>
+         </index>
+         <index name="cvtermpath_c1" unique="true">
+            <column ascending="true" name="subject_id"/>
+            <column ascending="true" name="object_id"/>
+            <column ascending="true" name="type_id"/>
+            <column ascending="true" name="pathdistance"/>
+         </index>
+         <index name="cvtermpath_idx1" unique="false">
+            <column ascending="true" name="type_id"/>
+         </index>
+         <index name="cvtermpath_idx2" unique="false">
+            <column ascending="true" name="subject_id"/>
+         </index>
+         <index name="cvtermpath_idx3" unique="false">
+            <column ascending="true" name="object_id"/>
+         </index>
+         <index name="cvtermpath_idx4" unique="false">
+            <column ascending="true" name="cv_id"/>
+         </index>
+      </table>
+      <table name="cvtermprop" remarks="Additional extensible properties can be attached to a cvterm using this table. Corresponds to -AnnotationProperty- in W3C OWL format." schema="cv" type="TABLE">
+         <column autoUpdated="false" defaultValue="nextval('cv.cvtermprop_cvtermprop_id_seq'::regclass)" digits="0" id="0" name="cvtermprop_id" nullable="false" remarks="" size="19" type="bigserial"/>
+         <column autoUpdated="false" digits="0" id="1" name="cvterm_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="cvterm_id" foreignKey="cvtermprop_cvterm_id_fkey" implied="false" onDeleteCascade="true" schema="cv" table="cvterm"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="2" name="type_id" nullable="false" remarks="The name of the property or slot is a cvterm. The meaning of the property is defined in that cvterm." size="19" type="int8">
+            <parent column="cvterm_id" foreignKey="cvtermprop_type_id_fkey" implied="false" onDeleteCascade="true" schema="cv" table="cvterm"/>
+         </column>
+         <column autoUpdated="false" defaultValue="''::text" digits="0" id="3" name="value" nullable="false" remarks="The value of the property, represented as text. Numeric values are converted to their text representation." size="2147483647" type="text"/>
+         <column autoUpdated="false" defaultValue="0" digits="0" id="4" name="rank" nullable="false" remarks="Property-Value ordering. Any&#10;cvterm can have multiple values for any particular property type -&#10;these are ordered in a list using rank, counting from zero. For&#10;properties that are single-valued rather than multi-valued, the&#10;default 0 value should be used." size="10" type="int4"/>
+         <primaryKey column="cvtermprop_id" sequenceNumberInPK="1"/>
+         <index name="cvtermprop_pkey" unique="true">
+            <column ascending="true" name="cvtermprop_id"/>
+         </index>
+         <index name="cvtermprop_cvterm_id_type_id_value_rank_key" unique="true">
+            <column ascending="true" name="cvterm_id"/>
+            <column ascending="true" name="type_id"/>
+            <column ascending="true" name="value"/>
+            <column ascending="true" name="rank"/>
+         </index>
+         <index name="cvtermprop_idx1" unique="false">
+            <column ascending="true" name="cvterm_id"/>
+         </index>
+         <index name="cvtermprop_idx2" unique="false">
+            <column ascending="true" name="type_id"/>
+         </index>
+      </table>
+      <table name="cvtermsynonym" remarks="A cvterm actually represents a&#10;distinct class or concept. A concept can be refered to by different&#10;phrases or names. In addition to the primary name (cvterm.name) there&#10;can be a number of alternative aliases or synonyms. For example, &quot;T&#10;cell&quot; as a synonym for &quot;T lymphocyte&quot;." schema="cv" type="TABLE">
+         <column autoUpdated="false" defaultValue="nextval('cv.cvtermsynonym_cvtermsynonym_id_seq'::regclass)" digits="0" id="0" name="cvtermsynonym_id" nullable="false" remarks="" size="19" type="bigserial"/>
+         <column autoUpdated="false" digits="0" id="1" name="cvterm_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="cvterm_id" foreignKey="cvtermsynonym_cvterm_id_fkey" implied="false" onDeleteCascade="true" schema="cv" table="cvterm"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="2" name="synonym" nullable="false" remarks="" size="1024" type="varchar"/>
+         <column autoUpdated="false" digits="0" id="3" name="type_id" nullable="true" remarks="A synonym can be exact,&#10;narrower, or broader than." size="19" type="int8">
+            <parent column="cvterm_id" foreignKey="cvtermsynonym_type_id_fkey" implied="false" onDeleteCascade="true" schema="cv" table="cvterm"/>
+         </column>
+         <primaryKey column="cvtermsynonym_id" sequenceNumberInPK="1"/>
+         <index name="cvtermsynonym_pkey" unique="true">
+            <column ascending="true" name="cvtermsynonym_id"/>
+         </index>
+         <index name="cvtermsynonym_c1" unique="true">
+            <column ascending="true" name="cvterm_id"/>
+            <column ascending="true" name="synonym"/>
+         </index>
+         <index name="cvtermsynonym_idx1" unique="false">
+            <column ascending="true" name="cvterm_id"/>
+         </index>
+      </table>
+      <table name="dbprop" remarks="An external database can have any number of&#10;slot-value property tags attached to it. This is an alternative to&#10;hardcoding a list of columns in the relational schema, and is&#10;completely extensible. There is a unique constraint, dbprop_c1, for&#10;the combination of db_id, rank, and type_id. Multivalued property-value pairs must be differentiated by rank." schema="cv" type="TABLE">
+         <column autoUpdated="false" defaultValue="nextval('cv.dbprop_dbprop_id_seq'::regclass)" digits="0" id="0" name="dbprop_id" nullable="false" remarks="" size="19" type="bigserial"/>
+         <column autoUpdated="false" digits="0" id="1" name="db_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="db_id" foreignKey="dbprop_db_id_fkey" implied="false" onDeleteCascade="true" schema="db" table="db"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="2" name="type_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="cvterm_id" foreignKey="dbprop_type_id_fkey" implied="false" onDeleteCascade="true" schema="cv" table="cvterm"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="3" name="value" nullable="true" remarks="" size="2147483647" type="text"/>
+         <column autoUpdated="false" defaultValue="0" digits="0" id="4" name="rank" nullable="false" remarks="" size="10" type="int4"/>
+         <primaryKey column="dbprop_id" sequenceNumberInPK="1"/>
+         <index name="dbprop_pkey" unique="true">
+            <column ascending="true" name="dbprop_id"/>
+         </index>
+         <index name="dbprop_c1" unique="true">
+            <column ascending="true" name="db_id"/>
+            <column ascending="true" name="type_id"/>
+            <column ascending="true" name="rank"/>
+         </index>
+         <index name="dbprop_idx1" unique="false">
+            <column ascending="true" name="db_id"/>
+         </index>
+         <index name="dbprop_idx2" unique="false">
+            <column ascending="true" name="type_id"/>
+         </index>
+      </table>
+      <table name="dbxrefprop" remarks="Metadata about a dbxref. Note that this is not defined in the dbxref module, as it depends on the cvterm table. This table has a structure analagous to cvtermprop." schema="cv" type="TABLE">
+         <column autoUpdated="false" defaultValue="nextval('cv.dbxrefprop_dbxrefprop_id_seq'::regclass)" digits="0" id="0" name="dbxrefprop_id" nullable="false" remarks="" size="19" type="bigserial"/>
+         <column autoUpdated="false" digits="0" id="1" name="dbxref_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="dbxref_id" foreignKey="dbxrefprop_dbxref_id_fkey" implied="false" onDeleteCascade="false" schema="db" table="dbxref"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="2" name="type_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="cvterm_id" foreignKey="dbxrefprop_type_id_fkey" implied="false" onDeleteCascade="false" schema="cv" table="cvterm"/>
+         </column>
+         <column autoUpdated="false" defaultValue="''::text" digits="0" id="3" name="value" nullable="false" remarks="" size="2147483647" type="text"/>
+         <column autoUpdated="false" defaultValue="0" digits="0" id="4" name="rank" nullable="false" remarks="" size="10" type="int4"/>
+         <primaryKey column="dbxrefprop_id" sequenceNumberInPK="1"/>
+         <index name="dbxrefprop_pkey" unique="true">
+            <column ascending="true" name="dbxrefprop_id"/>
+         </index>
+         <index name="dbxrefprop_c1" unique="true">
+            <column ascending="true" name="dbxref_id"/>
+            <column ascending="true" name="type_id"/>
+            <column ascending="true" name="rank"/>
+         </index>
+         <index name="dbxrefprop_idx1" unique="false">
+            <column ascending="true" name="dbxref_id"/>
+         </index>
+         <index name="dbxrefprop_idx2" unique="false">
+            <column ascending="true" name="type_id"/>
+         </index>
+      </table>
+   </tables>
+</database>

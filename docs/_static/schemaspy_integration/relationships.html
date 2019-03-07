@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title> Chado</title>
+  <!-- Tell the browser to be responsive to screen width -->
+  <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+  <link rel="icon" type="image/png" sizes="16x16" href="favicon.ico">
+  <!-- Bootstrap 3.3.5 -->
+  <link rel="stylesheet" href="bower/admin-lte/bootstrap/css/bootstrap.min.css">
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="bower/font-awesome/css/font-awesome.min.css">
+  <!-- Ionicons -->
+  <link rel="stylesheet" href="bower/ionicons/css/ionicons.min.css">
+  <!-- DataTables -->
+  <link rel="stylesheet" href="bower/datatables.net-bs/css/dataTables.bootstrap.min.css">
+  <link rel="stylesheet" href="bower/datatables.net-buttons-bs/css/buttons.bootstrap.min.css">
+  <!-- Code Mirror -->
+  <link rel="stylesheet" href="bower/codemirror/codemirror.css">
+  <!-- Fonts -->
+  <link href='fonts/indieflower/indie-flower.css' rel='stylesheet' type='text/css'>
+  <link href='fonts/source-sans-pro/source-sans-pro.css' rel='stylesheet' type='text/css'>
+
+  <!-- Theme style -->
+  <link rel="stylesheet" href="bower/admin-lte/dist/css/AdminLTE.min.css">
+  <!-- Salvattore -->
+  <link rel="stylesheet" href="bower/salvattore/salvattore.css">
+  <!-- AdminLTE Skins. Choose a skin from the css/skins
+       folder instead of downloading all of them to reduce the load. -->
+  <link rel="stylesheet" href="bower/admin-lte/dist/css/skins/_all-skins.min.css">
+  <!-- SchemaSpy -->
+  <link rel="stylesheet" href="schemaSpy.css">
+  <!-- GMOD Chado Specific CSS -->
+  <link rel="stylesheet" href="main.css">
+  
+  <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+  <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+  <!--[if lt IE 9]>
+  <script src="bower/html5shiv/html5shiv.min.js"></script>
+  <script src="bower/respond/respond.min.js"></script>
+  <![endif]-->
+</head>
+<!-- ADD THE CLASS layout-top-nav TO REMOVE THE SIDEBAR. -->
+<!-- Skins: skin-black, black-light, green-light, red-light, yellow-light, purple-light, blue-light -->
+<body class="hold-transition skin-black layout-top-nav">
+<div class="wrapper">
+  <header class="main-header">
+    <nav class="navbar navbar-static-top">
+      <div class="container">
+        <div class="navbar-header">
+          <a href="index.html" class="navbar-brand" style="padding:0;">
+            <img src="GMOD-cogs.png" class="gmod-logo" />
+            <span class="gmod-title">Chado</span>
+          </a>
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar-collapse">
+            <i class="fa fa-bars"></i>
+          </button>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-collapse pull-left" id="navbar-collapse">
+          <ul class="nav navbar-nav">
+            <li>
+              <a href="index.html" title="All Chado Tables.">
+                Home</span>
+              </a>
+            </li>
+            <li>
+              <a href="index.html" title="All Chado Tables.">
+                All Tables</span>
+              </a>
+            </li>
+            <li>
+              <a href="constraints.html" title="All Constraints in Chado.">
+                All Constraints
+              </a>
+            </li>
+          </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+        <!-- Navbar Right Menu -->
+
+      </div>
+      <!-- /.container-fluid -->
+    </nav>
+  </header>
+  <!-- Main content -->
+  <!-- Full Width Column -->
+  <div class="content-wrapper">
+    
+    <div class="box box-solid">
+      <div class="box-body">
+        <p><span class="version-label">Schema Version:</span> 1.3</p>
+      </div>
+    </div>
+		
+          <!-- Content Header (Page header) -->
+      <section class="content-header">
+        <h1>All Relationships</h1>
+      </section>
+      <!-- Main content -->
+      <section class="content">
+				<div class="box box-primary">		
+			<div class="box-header with-border">
+              <i class="fa fa-code-fork"></i>
+              <h3 class="box-title">Diagrams</h3>
+            </div>	
+			<div class="box-body">	
+			<div class="nav-tabs-custom" style="cursor: move;">
+            <!-- Tabs within a box -->
+			<h5>By default only columns that are primary keys, foreign keys or indexes are shown.</h5>
+            <ul class="nav nav-tabs pull-left ui-sortable-handle">
+			  			              <li class="active"><a href="#compactDegreeImg-chart" data-toggle="tab" aria-expanded="true">Compact</a></li>			  			 
+			  			              <li class=""><a href="#largeDegreeImg-chart" data-toggle="tab" aria-expanded="true">Large</a></li>			  			 
+            </ul>
+            <div class="tab-content no-padding">            
+				<div class="chart tab-pane active" id="compactDegreeImg-chart" style="position: relative; overflow-x:auto;">
+																					<map id="compactRelationshipsDiagram" name="compactRelationshipsDiagram">
+<area shape="rect" id="node1" href="tables/acquisition.html" title="acquisition" alt="" coords="2062,3135,2239,3371">
+<area shape="rect" id="node14" href="tables/assay.html" title="assay" alt="" coords="1683,3389,1898,3654">
+<area shape="rect" id="node35" href="tables/channel.html" title="channel" alt="" coords="1722,3223,1859,3371">
+<area shape="rect" id="node168" href="tables/protocol.html" title="protocol" alt="" coords="960,3402,1181,3638">
+<area shape="rect" id="node2" href="tables/acquisition_relationship.html" title="acquisition_relationship" alt="" coords="2355,3047,2627,3283">
+<area shape="rect" id="node42" href="tables/cvterm.html" title="cvterm" alt="" coords="382,8118,589,8354">
+<area shape="rect" id="node3" href="tables/acquisitionprop.html" title="acquisitionprop" alt="" coords="2389,5238,2593,5445">
+<area shape="rect" id="node4" href="tables/analysis.html" title="analysis" alt="" coords="395,855,576,1062">
+<area shape="rect" id="node5" href="tables/analysis_cvterm.html" title="analysis_cvterm" alt="" coords="655,1258,860,1465">
+<area shape="rect" id="node6" href="tables/analysis_dbxref.html" title="analysis_dbxref" alt="" coords="656,558,859,735">
+<area shape="rect" id="node50" href="tables/dbxref.html" title="dbxref" alt="" coords="194,479,337,686">
+<area shape="rect" id="node7" href="tables/analysis_pub.html" title="analysis_pub" alt="" coords="981,8427,1161,8581">
+<area shape="rect" id="node170" href="tables/pub.html" title="pub" alt="" coords="681,14379,833,14557">
+<area shape="rect" id="node8" href="tables/analysis_relationship.html" title="analysis_relationship" alt="" coords="633,933,881,1169">
+<area shape="rect" id="node9" href="tables/analysisfeature.html" title="analysisfeature" alt="" coords="1325,4539,1525,4717">
+<area shape="rect" id="node65" href="tables/feature.html" title="feature" alt="" coords="975,11853,1166,12118">
+<area shape="rect" id="node10" href="tables/analysisfeatureprop.html" title="analysisfeatureprop" alt="" coords="1671,3671,1910,3878">
+<area shape="rect" id="node11" href="tables/analysisprop.html" title="analysisprop" alt="" coords="667,1482,847,1689">
+<area shape="rect" id="node12" href="tables/arraydesign.html" title="arraydesign" alt="" coords="1316,3043,1535,3338">
+<area shape="rect" id="node36" href="tables/contact.html" title="contact" alt="" coords="686,5798,829,5975">
+<area shape="rect" id="node13" href="tables/arraydesignprop.html" title="arraydesignprop" alt="" coords="1685,2962,1896,3169">
+<area shape="rect" id="node15" href="tables/assay_biomaterial.html" title="assay_biomaterial" alt="" coords="2040,3389,2261,3601">
+<area shape="rect" id="node18" href="tables/biomaterial.html" title="biomaterial" alt="" coords="958,5610,1183,5846">
+<area shape="rect" id="node16" href="tables/assay_project.html" title="assay_project" alt="" coords="2058,4454,2243,4607">
+<area shape="rect" id="node159" href="tables/project.html" title="project" alt="" coords="686,7994,829,8142">
+<area shape="rect" id="node17" href="tables/assayprop.html" title="assayprop" alt="" coords="2071,2782,2230,2989">
+<area shape="rect" id="node135" href="tables/organism.html" title="organism" alt="" coords="655,11911,860,12147">
+<area shape="rect" id="node19" href="tables/biomaterial_dbxref.html" title="biomaterial_dbxref" alt="" coords="1311,3429,1540,3582">
+<area shape="rect" id="node20" href="tables/biomaterial_relationship.html" title="biomaterial_relationship" alt="" coords="1288,4995,1563,5178">
+<area shape="rect" id="node21" href="tables/biomaterial_treatment.html" title="biomaterial_treatment" alt="" coords="1663,4351,1919,4558">
+<area shape="rect" id="node208" href="tables/treatment.html" title="treatment" alt="" coords="1341,3637,1509,3843">
+<area shape="rect" id="node22" href="tables/biomaterialprop.html" title="biomaterialprop" alt="" coords="1322,4771,1529,4978">
+<area shape="rect" id="node23" href="tables/cell_line.html" title="cell_line" alt="" coords="975,12409,1166,12586">
+<area shape="rect" id="node24" href="tables/cell_line_cvterm.html" title="cell_line_cvterm" alt="" coords="1323,12242,1528,12454">
+<area shape="rect" id="node25" href="tables/cell_line_cvtermprop.html" title="cell_line_cvtermprop" alt="" coords="1669,8014,1913,8221">
+<area shape="rect" id="node26" href="tables/cell_line_dbxref.html" title="cell_line_dbxref" alt="" coords="1324,5233,1527,5410">
+<area shape="rect" id="node27" href="tables/cell_line_feature.html" title="cell_line_feature" alt="" coords="1321,12725,1529,12907">
+<area shape="rect" id="node28" href="tables/cell_line_library.html" title="cell_line_library" alt="" coords="1324,13621,1527,13803">
+<area shape="rect" id="node98" href="tables/library.html" title="library" alt="" coords="975,14583,1166,14819">
+<area shape="rect" id="node29" href="tables/cell_line_pub.html" title="cell_line_pub" alt="" coords="1335,14065,1515,14218">
+<area shape="rect" id="node30" href="tables/cell_line_relationship.html" title="cell_line_relationship" alt="" coords="1301,12925,1549,13107">
+<area shape="rect" id="node31" href="tables/cell_line_synonym.html" title="cell_line_synonym" alt="" coords="1314,15493,1537,15699">
+<area shape="rect" id="node206" href="tables/synonym.html" title="synonym" alt="" coords="984,16694,1157,16871">
+<area shape="rect" id="node32" href="tables/cell_lineprop.html" title="cell_lineprop" alt="" coords="1336,15269,1515,15475">
+<area shape="rect" id="node33" href="tables/cell_lineprop_pub.html" title="cell_lineprop_pub" alt="" coords="1681,15689,1900,15842">
+<area shape="rect" id="node34" href="tables/chadoprop.html" title="chadoprop" alt="" coords="677,6915,838,7093">
+<area shape="rect" id="node37" href="tables/contact_relationship.html" title="contact_relationship" alt="" coords="950,4942,1191,5125">
+<area shape="rect" id="node38" href="tables/contactprop.html" title="contactprop" alt="" coords="985,4523,1157,4730">
+<area shape="rect" id="node39" href="tables/control.html" title="control" alt="" coords="2077,4729,2225,4965">
+<area shape="rect" id="node207" href="tables/tableinfo.html" title="tableinfo" alt="" coords="1681,7849,1901,7997">
+<area shape="rect" id="node40" href="tables/cv.html" title="cv" alt="" coords="201,8147,330,8295">
+<area shape="rect" id="node41" href="tables/cvprop.html" title="cvprop" alt="" coords="692,17286,823,17493">
+<area shape="rect" id="node43" href="tables/cvterm_dbxref.html" title="cvterm_dbxref" alt="" coords="661,1967,853,2145">
+<area shape="rect" id="node44" href="tables/cvterm_relationship.html" title="cvterm_relationship" alt="" coords="639,7183,876,7366">
+<area shape="rect" id="node45" href="tables/cvtermpath.html" title="cvtermpath" alt="" coords="673,2927,841,3169">
+<area shape="rect" id="node46" href="tables/cvtermprop.html" title="cvtermprop" alt="" coords="673,7383,842,7595">
+<area shape="rect" id="node47" href="tables/cvtermsynonym.html" title="cvtermsynonym" alt="" coords="655,7613,860,7795">
+<area shape="rect" id="node48" href="tables/db.html" title="db" alt="" coords="6,17539,149,17687">
+<area shape="rect" id="node49" href="tables/dbprop.html" title="dbprop" alt="" coords="691,17510,824,17717">
+<area shape="rect" id="node51" href="tables/dbxrefprop.html" title="dbxrefprop" alt="" coords="674,2162,841,2369">
+<area shape="rect" id="node52" href="tables/eimage.html" title="eimage" alt="" coords="409,18102,562,18221">
+<area shape="rect" id="node53" href="tables/element.html" title="element" alt="" coords="1705,6299,1877,6511">
+<area shape="rect" id="node54" href="tables/element_relationship.html" title="element_relationship" alt="" coords="2027,6269,2274,6510">
+<area shape="rect" id="node55" href="tables/elementresult.html" title="elementresult" alt="" coords="2724,6161,2913,6343">
+<area shape="rect" id="node176" href="tables/quantification.html" title="quantification" alt="" coords="2390,4185,2591,4450">
+<area shape="rect" id="node56" href="tables/elementresult_relationship.html" title="elementresult_relationship" alt="" coords="3011,6131,3306,6373">
+<area shape="rect" id="node57" href="tables/environment.html" title="environment" alt="" coords="668,10873,847,11021">
+<area shape="rect" id="node58" href="tables/environment_cvterm.html" title="environment_cvterm" alt="" coords="949,7222,1192,7375">
+<area shape="rect" id="node59" href="tables/expression.html" title="expression" alt="" coords="401,17926,570,18074">
+<area shape="rect" id="node60" href="tables/expression_cvterm.html" title="expression_cvterm" alt="" coords="643,9595,871,9807">
+<area shape="rect" id="node61" href="tables/expression_cvtermprop.html" title="expression_cvtermprop" alt="" coords="937,9598,1204,9805">
+<area shape="rect" id="node62" href="tables/expression_image.html" title="expression_image" alt="" coords="647,18067,868,18221">
+<area shape="rect" id="node63" href="tables/expression_pub.html" title="expression_pub" alt="" coords="969,16450,1173,16603">
+<area shape="rect" id="node64" href="tables/expressionprop.html" title="expressionprop" alt="" coords="656,17734,859,17941">
+<area shape="rect" id="node66" href="tables/feature_contact.html" title="feature_contact" alt="" coords="1325,8522,1526,8675">
+<area shape="rect" id="node67" href="tables/feature_cvterm.html" title="feature_cvterm" alt="" coords="1327,13161,1524,13397">
+<area shape="rect" id="node68" href="tables/feature_cvterm_dbxref.html" title="feature_cvterm_dbxref" alt="" coords="1661,7046,1921,7199">
+<area shape="rect" id="node69" href="tables/feature_cvterm_pub.html" title="feature_cvterm_pub" alt="" coords="1672,15347,1909,15501">
+<area shape="rect" id="node70" href="tables/feature_cvtermprop.html" title="feature_cvtermprop" alt="" coords="1673,13222,1909,13429">
+<area shape="rect" id="node71" href="tables/feature_dbxref.html" title="feature_dbxref" alt="" coords="1328,5427,1523,5605">
+<area shape="rect" id="node72" href="tables/feature_expression.html" title="feature_expression" alt="" coords="1310,17342,1541,17525">
+<area shape="rect" id="node73" href="tables/feature_expressionprop.html" title="feature_expressionprop" alt="" coords="1656,17294,1925,17501">
+<area shape="rect" id="node74" href="tables/feature_genotype.html" title="feature_genotype" alt="" coords="1317,10655,1534,10926">
+<area shape="rect" id="node96" href="tables/genotype.html" title="genotype" alt="" coords="681,10529,833,10735">
+<area shape="rect" id="node75" href="tables/feature_phenotype.html" title="feature_phenotype" alt="" coords="1311,12035,1539,12189">
+<area shape="rect" id="node144" href="tables/phenotype.html" title="phenotype" alt="" coords="675,11038,839,11303">
+<area shape="rect" id="node76" href="tables/feature_pub.html" title="feature_pub" alt="" coords="1339,13894,1511,14047">
+<area shape="rect" id="node77" href="tables/feature_pubprop.html" title="feature_pubprop" alt="" coords="1685,16675,1896,16882">
+<area shape="rect" id="node78" href="tables/feature_relationship.html" title="feature_relationship" alt="" coords="1305,12471,1545,12707">
+<area shape="rect" id="node79" href="tables/feature_relationship_pub.html" title="feature_relationship_pub" alt="" coords="1651,14022,1931,14175">
+<area shape="rect" id="node80" href="tables/feature_relationshipprop.html" title="feature_relationshipprop" alt="" coords="1651,15123,1930,15330">
+<area shape="rect" id="node81" href="tables/feature_relationshipprop_pub.html" title="feature_relationshipprop_pub" alt="" coords="1991,16323,2310,16477">
+<area shape="rect" id="node82" href="tables/feature_synonym.html" title="feature_synonym" alt="" coords="1318,14801,1533,15007">
+<area shape="rect" id="node83" href="tables/featureloc.html" title="featureloc" alt="" coords="1338,11723,1513,12018">
+<area shape="rect" id="node84" href="tables/featureloc_pub.html" title="featureloc_pub" alt="" coords="1693,13746,1889,13899">
+<area shape="rect" id="node85" href="tables/featuremap.html" title="featuremap" alt="" coords="673,10005,841,10182">
+<area shape="rect" id="node86" href="tables/featuremap_contact.html" title="featuremap_contact" alt="" coords="953,7051,1189,7205">
+<area shape="rect" id="node87" href="tables/featuremap_dbxref.html" title="featuremap_dbxref" alt="" coords="955,2487,1186,2665">
+<area shape="rect" id="node88" href="tables/featuremap_organism.html" title="featuremap_organism" alt="" coords="943,10417,1198,10570">
+<area shape="rect" id="node89" href="tables/featuremap_pub.html" title="featuremap_pub" alt="" coords="967,13093,1175,13246">
+<area shape="rect" id="node90" href="tables/featuremapprop.html" title="featuremapprop" alt="" coords="967,9822,1174,10029">
+<area shape="rect" id="node91" href="tables/featurepos.html" title="featurepos" alt="" coords="1337,10943,1513,11150">
+<area shape="rect" id="node92" href="tables/featureposprop.html" title="featureposprop" alt="" coords="1690,14794,1891,15001">
+<area shape="rect" id="node93" href="tables/featureprop.html" title="featureprop" alt="" coords="1339,16311,1511,16518">
+<area shape="rect" id="node94" href="tables/featureprop_pub.html" title="featureprop_pub" alt="" coords="1685,16281,1896,16434">
+<area shape="rect" id="node95" href="tables/featurerange.html" title="featurerange" alt="" coords="1335,11167,1515,11462">
+<area shape="rect" id="node97" href="tables/genotypeprop.html" title="genotypeprop" alt="" coords="976,10155,1165,10362">
+<area shape="rect" id="node99" href="tables/library_contact.html" title="library_contact" alt="" coords="1327,10314,1523,10467">
+<area shape="rect" id="node100" href="tables/library_cvterm.html" title="library_cvterm" alt="" coords="1329,16535,1522,16718">
+<area shape="rect" id="node101" href="tables/library_dbxref.html" title="library_dbxref" alt="" coords="1330,9101,1521,9278">
+<area shape="rect" id="node102" href="tables/library_expression.html" title="library_expression" alt="" coords="1312,17142,1539,17325">
+<area shape="rect" id="node103" href="tables/library_expressionprop.html" title="library_expressionprop" alt="" coords="1658,17070,1923,17277">
+<area shape="rect" id="node104" href="tables/library_feature.html" title="library_feature" alt="" coords="1328,13450,1523,13603">
+<area shape="rect" id="node105" href="tables/library_featureprop.html" title="library_featureprop" alt="" coords="1674,16451,1907,16658">
+<area shape="rect" id="node106" href="tables/library_pub.html" title="library_pub" alt="" coords="1341,14430,1509,14583">
+<area shape="rect" id="node107" href="tables/library_relationship.html" title="library_relationship" alt="" coords="1308,14601,1543,14783">
+<area shape="rect" id="node108" href="tables/library_relationship_pub.html" title="library_relationship_pub" alt="" coords="1653,15518,1928,15671">
+<area shape="rect" id="node109" href="tables/library_synonym.html" title="library_synonym" alt="" coords="1320,15826,1531,16033">
+<area shape="rect" id="node110" href="tables/libraryprop.html" title="libraryprop" alt="" coords="1342,16809,1509,17015">
+<area shape="rect" id="node111" href="tables/libraryprop_pub.html" title="libraryprop_pub" alt="" coords="1687,16899,1894,17053">
+<area shape="rect" id="node112" href="tables/magedocumentation.html" title="magedocumentation" alt="" coords="2029,12205,2272,12411">
+<area shape="rect" id="node113" href="tables/mageml.html" title="mageml" alt="" coords="1705,17518,1876,17637">
+<area shape="rect" id="node114" href="tables/nd_experiment.html" title="nd_experiment" alt="" coords="658,2386,857,2539">
+<area shape="rect" id="node127" href="tables/nd_geolocation.html" title="nd_geolocation" alt="" coords="386,2393,585,2599">
+<area shape="rect" id="node115" href="tables/nd_experiment_analysis.html" title="nd_experiment_analysis" alt="" coords="935,1831,1206,2014">
+<area shape="rect" id="node116" href="tables/nd_experiment_contact.html" title="nd_experiment_contact" alt="" coords="939,4123,1203,4277">
+<area shape="rect" id="node117" href="tables/nd_experiment_dbxref.html" title="nd_experiment_dbxref" alt="" coords="941,1366,1200,1519">
+<area shape="rect" id="node118" href="tables/nd_experiment_genotype.html" title="nd_experiment_genotype" alt="" coords="931,6187,1211,6341">
+<area shape="rect" id="node119" href="tables/nd_experiment_phenotype.html" title="nd_experiment_phenotype" alt="" coords="925,6358,1216,6511">
+<area shape="rect" id="node120" href="tables/nd_experiment_project.html" title="nd_experiment_project" alt="" coords="940,5439,1201,5593">
+<area shape="rect" id="node121" href="tables/nd_experiment_protocol.html" title="nd_experiment_protocol" alt="" coords="934,3015,1207,3169">
+<area shape="rect" id="node129" href="tables/nd_protocol.html" title="nd_protocol" alt="" coords="671,3835,843,3989">
+<area shape="rect" id="node122" href="tables/nd_experiment_pub.html" title="nd_experiment_pub" alt="" coords="953,8915,1189,9069">
+<area shape="rect" id="node123" href="tables/nd_experiment_stock.html" title="nd_experiment_stock" alt="" coords="1301,3861,1549,4043">
+<area shape="rect" id="node179" href="tables/stock.html" title="stock" alt="" coords="995,7646,1147,7911">
+<area shape="rect" id="node124" href="tables/nd_experiment_stock_dbxref.html" title="nd_experiment_stock_dbxref" alt="" coords="1635,2791,1946,2945">
+<area shape="rect" id="node125" href="tables/nd_experiment_stockprop.html" title="nd_experiment_stockprop" alt="" coords="1647,4575,1934,4782">
+<area shape="rect" id="node126" href="tables/nd_experimentprop.html" title="nd_experimentprop" alt="" coords="953,2031,1188,2238">
+<area shape="rect" id="node128" href="tables/nd_geolocationprop.html" title="nd_geolocationprop" alt="" coords="639,2630,876,2837">
+<area shape="rect" id="node130" href="tables/nd_protocol_reagent.html" title="nd_protocol_reagent" alt="" coords="1669,5061,1912,5243">
+<area shape="rect" id="node132" href="tables/nd_reagent.html" title="nd_reagent" alt="" coords="1343,5825,1508,6002">
+<area shape="rect" id="node131" href="tables/nd_protocolprop.html" title="nd_protocolprop" alt="" coords="965,5215,1176,5422">
+<area shape="rect" id="node133" href="tables/nd_reagent_relationship.html" title="nd_reagent_relationship" alt="" coords="1654,5766,1927,5949">
+<area shape="rect" id="node134" href="tables/nd_reagentprop.html" title="nd_reagentprop" alt="" coords="1689,4090,1893,4297">
+<area shape="rect" id="node136" href="tables/organism_cvterm.html" title="organism_cvterm" alt="" coords="963,11555,1179,11762">
+<area shape="rect" id="node137" href="tables/organism_cvtermprop.html" title="organism_cvtermprop" alt="" coords="1298,9690,1553,9897">
+<area shape="rect" id="node138" href="tables/organism_dbxref.html" title="organism_dbxref" alt="" coords="964,6881,1177,7034">
+<area shape="rect" id="node139" href="tables/organism_pub.html" title="organism_pub" alt="" coords="975,13561,1166,13714">
+<area shape="rect" id="node140" href="tables/organism_relationship.html" title="organism_relationship" alt="" coords="941,12827,1200,13039">
+<area shape="rect" id="node141" href="tables/organismprop.html" title="organismprop" alt="" coords="975,13263,1166,13470">
+<area shape="rect" id="node142" href="tables/organismprop_pub.html" title="organismprop_pub" alt="" coords="1311,14235,1540,14413">
+<area shape="rect" id="node143" href="tables/phendesc.html" title="phendesc" alt="" coords="981,10623,1160,10859">
+<area shape="rect" id="node145" href="tables/phenotype_comparison.html" title="phenotype_comparison" alt="" coords="938,10877,1203,11206">
+<area shape="rect" id="node146" href="tables/phenotype_comparison_cvterm.html" title="phenotype_comparison_cvterm" alt="" coords="1261,16050,1590,16257">
+<area shape="rect" id="node147" href="tables/phenotype_cvterm.html" title="phenotype_cvterm" alt="" coords="958,12209,1183,12391">
+<area shape="rect" id="node148" href="tables/phenotypeprop.html" title="phenotypeprop" alt="" coords="971,12603,1171,12810">
+<area shape="rect" id="node149" href="tables/phenstatement.html" title="phenstatement" alt="" coords="972,11223,1169,11465">
+<area shape="rect" id="node150" href="tables/phylonode.html" title="phylonode" alt="" coords="1314,6697,1537,6991">
+<area shape="rect" id="node156" href="tables/phylotree.html" title="phylotree" alt="" coords="681,1743,833,1950">
+<area shape="rect" id="node151" href="tables/phylonode_dbxref.html" title="phylonode_dbxref" alt="" coords="1679,6129,1902,6282">
+<area shape="rect" id="node152" href="tables/phylonode_organism.html" title="phylonode_organism" alt="" coords="1667,7678,1914,7831">
+<area shape="rect" id="node153" href="tables/phylonode_pub.html" title="phylonode_pub" alt="" coords="1691,9045,1891,9198">
+<area shape="rect" id="node154" href="tables/phylonode_relationship.html" title="phylonode_relationship" alt="" coords="1657,6563,1925,6799">
+<area shape="rect" id="node155" href="tables/phylonodeprop.html" title="phylonodeprop" alt="" coords="1691,6817,1890,7029">
+<area shape="rect" id="node157" href="tables/phylotree_pub.html" title="phylotree_pub" alt="" coords="975,8671,1167,8825">
+<area shape="rect" id="node158" href="tables/phylotreeprop.html" title="phylotreeprop" alt="" coords="975,2791,1166,2998">
+<area shape="rect" id="node160" href="tables/project_analysis.html" title="project_analysis" alt="" coords="967,4747,1174,4925">
+<area shape="rect" id="node161" href="tables/project_contact.html" title="project_contact" alt="" coords="971,6710,1171,6863">
+<area shape="rect" id="node162" href="tables/project_dbxref.html" title="project_dbxref" alt="" coords="974,2255,1167,2433">
+<area shape="rect" id="node163" href="tables/project_feature.html" title="project_feature" alt="" coords="1326,10485,1525,10638">
+<area shape="rect" id="node164" href="tables/project_pub.html" title="project_pub" alt="" coords="985,9427,1156,9581">
+<area shape="rect" id="node165" href="tables/project_relationship.html" title="project_relationship" alt="" coords="951,7966,1190,8149">
+<area shape="rect" id="node166" href="tables/project_stock.html" title="project_stock" alt="" coords="1333,7289,1517,7442">
+<area shape="rect" id="node167" href="tables/projectprop.html" title="projectprop" alt="" coords="985,8166,1156,8373">
+<area shape="rect" id="node169" href="tables/protocolparam.html" title="protocolparam" alt="" coords="1328,8298,1523,8505">
+<area shape="rect" id="node171" href="tables/pub_dbxref.html" title="pub_dbxref" alt="" coords="987,9123,1155,9301">
+<area shape="rect" id="node172" href="tables/pub_relationship.html" title="pub_relationship" alt="" coords="965,16177,1177,16359">
+<area shape="rect" id="node173" href="tables/pubauthor.html" title="pubauthor" alt="" coords="991,13993,1151,14170">
+<area shape="rect" id="node174" href="tables/pubauthor_contact.html" title="pubauthor_contact" alt="" coords="1311,9295,1539,9449">
+<area shape="rect" id="node175" href="tables/pubprop.html" title="pubprop" alt="" coords="999,13731,1143,13938">
+<area shape="rect" id="node177" href="tables/quantification_relationship.html" title="quantification_relationship" alt="" coords="2671,4097,2967,4279">
+<area shape="rect" id="node178" href="tables/quantificationprop.html" title="quantificationprop" alt="" coords="2705,7205,2933,7411">
+<area shape="rect" id="node180" href="tables/stock_cvterm.html" title="stock_cvterm" alt="" coords="1334,7937,1517,8173">
+<area shape="rect" id="node181" href="tables/stock_cvtermprop.html" title="stock_cvtermprop" alt="" coords="1680,7454,1901,7661">
+<area shape="rect" id="node182" href="tables/stock_dbxref.html" title="stock_dbxref" alt="" coords="1335,2523,1515,2701">
+<area shape="rect" id="node183" href="tables/stock_dbxrefprop.html" title="stock_dbxrefprop" alt="" coords="1681,2526,1900,2733">
+<area shape="rect" id="node184" href="tables/stock_feature.html" title="stock_feature" alt="" coords="1333,9914,1518,10126">
+<area shape="rect" id="node185" href="tables/stock_featuremap.html" title="stock_featuremap" alt="" coords="1315,8693,1536,8875">
+<area shape="rect" id="node186" href="tables/stock_genotype.html" title="stock_genotype" alt="" coords="1324,8930,1527,9083">
+<area shape="rect" id="node187" href="tables/stock_library.html" title="stock_library" alt="" coords="1335,11479,1515,11633">
+<area shape="rect" id="node188" href="tables/stock_pub.html" title="stock_pub" alt="" coords="1347,10143,1504,10297">
+<area shape="rect" id="node189" href="tables/stock_relationship.html" title="stock_relationship" alt="" coords="1313,7459,1538,7695">
+<area shape="rect" id="node190" href="tables/stock_relationship_cvterm.html" title="stock_relationship_cvterm" alt="" coords="1646,7254,1935,7437">
+<area shape="rect" id="node191" href="tables/stock_relationship_pub.html" title="stock_relationship_pub" alt="" coords="1658,9949,1923,10102">
+<area shape="rect" id="node192" href="tables/stockcollection.html" title="stockcollection" alt="" coords="972,4294,1169,4506">
+<area shape="rect" id="node193" href="tables/stockcollection_db.html" title="stockcollection_db" alt="" coords="1312,15025,1539,15178">
+<area shape="rect" id="node194" href="tables/stockcollection_stock.html" title="stockcollection_stock" alt="" coords="1300,7009,1551,7162">
+<area shape="rect" id="node195" href="tables/stockcollectionprop.html" title="stockcollectionprop" alt="" coords="1307,4278,1543,4485">
+<area shape="rect" id="node196" href="tables/stockprop.html" title="stockprop" alt="" coords="1347,9466,1504,9673">
+<area shape="rect" id="node197" href="tables/stockprop_pub.html" title="stockprop_pub" alt="" coords="1693,12373,1889,12526">
+<area shape="rect" id="node198" href="tables/study.html" title="study" alt="" coords="999,5898,1142,6134">
+<area shape="rect" id="node199" href="tables/study_assay.html" title="study_assay" alt="" coords="2063,3978,2238,4131">
+<area shape="rect" id="node200" href="tables/studydesign.html" title="studydesign" alt="" coords="1338,5659,1513,5807">
+<area shape="rect" id="node201" href="tables/studydesignprop.html" title="studydesignprop" alt="" coords="1684,4837,1897,5043">
+<area shape="rect" id="node202" href="tables/studyfactor.html" title="studyfactor" alt="" coords="1703,3895,1878,4073">
+<area shape="rect" id="node203" href="tables/studyfactorvalue.html" title="studyfactorvalue" alt="" coords="2045,3742,2257,3919">
+<area shape="rect" id="node204" href="tables/studyprop.html" title="studyprop" alt="" coords="1346,7713,1505,7919">
+<area shape="rect" id="node205" href="tables/studyprop_feature.html" title="studyprop_feature" alt="" coords="1678,11586,1903,11769">
+</map>
+
+					<a name='diagram'><img id='compactDegreeImg' src='diagrams/summary/relationships.real.compact.png' usemap='#compactRelationshipsDiagram' class='diagram' border='0' alt='' align='left'></a>							
+				</div>
+				<div class="chart tab-pane " id="largeDegreeImg-chart" style="position: relative; overflow-x:auto;">
+																					<map id="largeRelationshipsDiagram" name="largeRelationshipsDiagram">
+<area shape="rect" id="node1" href="tables/acquisition.html" title="acquisition" alt="" coords="2062,2405,2239,2675">
+<area shape="rect" id="node14" href="tables/assay.html" title="assay" alt="" coords="1683,2663,1898,3022">
+<area shape="rect" id="node35" href="tables/channel.html" title="channel" alt="" coords="1722,2493,1859,2646">
+<area shape="rect" id="node168" href="tables/protocol.html" title="protocol" alt="" coords="960,3355,1181,3685">
+<area shape="rect" id="node2" href="tables/acquisition_relationship.html" title="acquisition_relationship" alt="" coords="2355,2317,2627,2558">
+<area shape="rect" id="node42" href="tables/cvterm.html" title="cvterm" alt="" coords="382,8291,589,8562">
+<area shape="rect" id="node3" href="tables/acquisitionprop.html" title="acquisitionprop" alt="" coords="2389,4845,2593,5057">
+<area shape="rect" id="node4" href="tables/analysis.html" title="analysis" alt="" coords="395,801,576,1159">
+<area shape="rect" id="node5" href="tables/analysis_cvterm.html" title="analysis_cvterm" alt="" coords="655,1249,860,1461">
+<area shape="rect" id="node6" href="tables/analysis_dbxref.html" title="analysis_dbxref" alt="" coords="656,537,859,719">
+<area shape="rect" id="node50" href="tables/dbxref.html" title="dbxref" alt="" coords="194,458,337,670">
+<area shape="rect" id="node7" href="tables/analysis_pub.html" title="analysis_pub" alt="" coords="981,8602,1161,8755">
+<area shape="rect" id="node170" href="tables/pub.html" title="pub" alt="" coords="681,14894,833,15370">
+<area shape="rect" id="node8" href="tables/analysis_relationship.html" title="analysis_relationship" alt="" coords="633,918,881,1159">
+<area shape="rect" id="node9" href="tables/analysisfeature.html" title="analysisfeature" alt="" coords="1325,4301,1525,4571">
+<area shape="rect" id="node65" href="tables/feature.html" title="feature" alt="" coords="975,12054,1166,12501">
+<area shape="rect" id="node10" href="tables/analysisfeatureprop.html" title="analysisfeatureprop" alt="" coords="1671,3039,1910,3251">
+<area shape="rect" id="node11" href="tables/analysisprop.html" title="analysisprop" alt="" coords="667,1478,847,1690">
+<area shape="rect" id="node12" href="tables/arraydesign.html" title="arraydesign" alt="" coords="1316,2342,1535,2935">
+<area shape="rect" id="node36" href="tables/contact.html" title="contact" alt="" coords="686,5527,829,5710">
+<area shape="rect" id="node13" href="tables/arraydesignprop.html" title="arraydesignprop" alt="" coords="1685,2194,1896,2406">
+<area shape="rect" id="node15" href="tables/assay_biomaterial.html" title="assay_biomaterial" alt="" coords="2040,2693,2261,2905">
+<area shape="rect" id="node18" href="tables/biomaterial.html" title="biomaterial" alt="" coords="958,5102,1183,5343">
+<area shape="rect" id="node16" href="tables/assay_project.html" title="assay_project" alt="" coords="2058,3886,2243,4039">
+<area shape="rect" id="node159" href="tables/project.html" title="project" alt="" coords="686,8162,829,8315">
+<area shape="rect" id="node17" href="tables/assayprop.html" title="assayprop" alt="" coords="2071,2099,2230,2311">
+<area shape="rect" id="node135" href="tables/organism.html" title="organism" alt="" coords="655,12113,860,12413">
+<area shape="rect" id="node19" href="tables/biomaterial_dbxref.html" title="biomaterial_dbxref" alt="" coords="1311,3026,1540,3179">
+<area shape="rect" id="node20" href="tables/biomaterial_relationship.html" title="biomaterial_relationship" alt="" coords="1288,5299,1563,5482">
+<area shape="rect" id="node21" href="tables/biomaterial_treatment.html" title="biomaterial_treatment" alt="" coords="1663,3763,1919,4005">
+<area shape="rect" id="node208" href="tables/treatment.html" title="treatment" alt="" coords="1341,3434,1509,3675">
+<area shape="rect" id="node22" href="tables/biomaterialprop.html" title="biomaterialprop" alt="" coords="1322,4589,1529,4801">
+<area shape="rect" id="node23" href="tables/cell_line.html" title="cell_line" alt="" coords="975,13021,1166,13262">
+<area shape="rect" id="node24" href="tables/cell_line_cvterm.html" title="cell_line_cvterm" alt="" coords="1323,12666,1528,12878">
+<area shape="rect" id="node25" href="tables/cell_line_cvtermprop.html" title="cell_line_cvtermprop" alt="" coords="1669,8209,1913,8421">
+<area shape="rect" id="node26" href="tables/cell_line_dbxref.html" title="cell_line_dbxref" alt="" coords="1324,3197,1527,3379">
+<area shape="rect" id="node27" href="tables/cell_line_feature.html" title="cell_line_feature" alt="" coords="1321,13154,1529,13337">
+<area shape="rect" id="node28" href="tables/cell_line_library.html" title="cell_line_library" alt="" coords="1324,14058,1527,14241">
+<area shape="rect" id="node98" href="tables/library.html" title="library" alt="" coords="975,15135,1166,15435">
+<area shape="rect" id="node29" href="tables/cell_line_pub.html" title="cell_line_pub" alt="" coords="1335,14502,1515,14655">
+<area shape="rect" id="node30" href="tables/cell_line_relationship.html" title="cell_line_relationship" alt="" coords="1301,13354,1549,13537">
+<area shape="rect" id="node31" href="tables/cell_line_synonym.html" title="cell_line_synonym" alt="" coords="1314,16003,1537,16245">
+<area shape="rect" id="node206" href="tables/synonym.html" title="synonym" alt="" coords="984,16265,1157,16447">
+<area shape="rect" id="node32" href="tables/cell_lineprop.html" title="cell_lineprop" alt="" coords="1336,15774,1515,15986">
+<area shape="rect" id="node33" href="tables/cell_lineprop_pub.html" title="cell_lineprop_pub" alt="" coords="1681,15774,1900,15927">
+<area shape="rect" id="node34" href="tables/chadoprop.html" title="chadoprop" alt="" coords="677,7078,838,7261">
+<area shape="rect" id="node37" href="tables/contact_relationship.html" title="contact_relationship" alt="" coords="950,4629,1191,4811">
+<area shape="rect" id="node38" href="tables/contactprop.html" title="contactprop" alt="" coords="985,4399,1157,4611">
+<area shape="rect" id="node39" href="tables/control.html" title="control" alt="" coords="2077,4179,2225,4479">
+<area shape="rect" id="node207" href="tables/tableinfo.html" title="tableinfo" alt="" coords="1681,7891,1901,8191">
+<area shape="rect" id="node40" href="tables/cv.html" title="cv" alt="" coords="201,8321,330,8474">
+<area shape="rect" id="node41" href="tables/cvprop.html" title="cvprop" alt="" coords="692,18111,823,18323">
+<area shape="rect" id="node43" href="tables/cvterm_dbxref.html" title="cvterm_dbxref" alt="" coords="661,2002,853,2185">
+<area shape="rect" id="node44" href="tables/cvterm_relationship.html" title="cvterm_relationship" alt="" coords="639,7351,876,7534">
+<area shape="rect" id="node45" href="tables/cvtermpath.html" title="cvtermpath" alt="" coords="673,2975,841,3217">
+<area shape="rect" id="node46" href="tables/cvtermprop.html" title="cvtermprop" alt="" coords="673,7551,842,7763">
+<area shape="rect" id="node47" href="tables/cvtermsynonym.html" title="cvtermsynonym" alt="" coords="655,7781,860,7963">
+<area shape="rect" id="node48" href="tables/db.html" title="db" alt="" coords="6,18370,149,18582">
+<area shape="rect" id="node49" href="tables/dbprop.html" title="dbprop" alt="" coords="691,18341,824,18553">
+<area shape="rect" id="node51" href="tables/dbxrefprop.html" title="dbxrefprop" alt="" coords="674,2202,841,2414">
+<area shape="rect" id="node52" href="tables/eimage.html" title="eimage" alt="" coords="409,18878,562,19061">
+<area shape="rect" id="node53" href="tables/element.html" title="element" alt="" coords="1705,6071,1877,6283">
+<area shape="rect" id="node54" href="tables/element_relationship.html" title="element_relationship" alt="" coords="2027,6041,2274,6282">
+<area shape="rect" id="node55" href="tables/elementresult.html" title="elementresult" alt="" coords="2724,5933,2913,6115">
+<area shape="rect" id="node176" href="tables/quantification.html" title="quantification" alt="" coords="2390,3597,2591,3897">
+<area shape="rect" id="node56" href="tables/elementresult_relationship.html" title="elementresult_relationship" alt="" coords="3011,5903,3306,6145">
+<area shape="rect" id="node57" href="tables/environment.html" title="environment" alt="" coords="668,11066,847,11219">
+<area shape="rect" id="node58" href="tables/environment_cvterm.html" title="environment_cvterm" alt="" coords="949,7358,1192,7511">
+<area shape="rect" id="node59" href="tables/expression.html" title="expression" alt="" coords="401,18678,570,18861">
+<area shape="rect" id="node60" href="tables/expression_cvterm.html" title="expression_cvterm" alt="" coords="643,9791,871,10003">
+<area shape="rect" id="node61" href="tables/expression_cvtermprop.html" title="expression_cvtermprop" alt="" coords="937,9778,1204,9990">
+<area shape="rect" id="node62" href="tables/expression_image.html" title="expression_image" alt="" coords="647,18907,868,19061">
+<area shape="rect" id="node63" href="tables/expression_pub.html" title="expression_pub" alt="" coords="969,18106,1173,18259">
+<area shape="rect" id="node64" href="tables/expressionprop.html" title="expressionprop" alt="" coords="656,18570,859,18782">
+<area shape="rect" id="node66" href="tables/feature_contact.html" title="feature_contact" alt="" coords="1325,8997,1526,9150">
+<area shape="rect" id="node67" href="tables/feature_cvterm.html" title="feature_cvterm" alt="" coords="1327,13591,1524,13833">
+<area shape="rect" id="node68" href="tables/feature_cvterm_dbxref.html" title="feature_cvterm_dbxref" alt="" coords="1661,6697,1921,6850">
+<area shape="rect" id="node69" href="tables/feature_cvterm_pub.html" title="feature_cvterm_pub" alt="" coords="1672,15949,1909,16102">
+<area shape="rect" id="node70" href="tables/feature_cvtermprop.html" title="feature_cvtermprop" alt="" coords="1673,13657,1909,13869">
+<area shape="rect" id="node71" href="tables/feature_dbxref.html" title="feature_dbxref" alt="" coords="1328,5062,1523,5245">
+<area shape="rect" id="node72" href="tables/feature_expression.html" title="feature_expression" alt="" coords="1310,18005,1541,18187">
+<area shape="rect" id="node73" href="tables/feature_expressionprop.html" title="feature_expressionprop" alt="" coords="1656,17805,1925,18017">
+<area shape="rect" id="node74" href="tables/feature_genotype.html" title="feature_genotype" alt="" coords="1317,10946,1534,11217">
+<area shape="rect" id="node96" href="tables/genotype.html" title="genotype" alt="" coords="681,10738,833,10950">
+<area shape="rect" id="node75" href="tables/feature_phenotype.html" title="feature_phenotype" alt="" coords="1311,12459,1539,12613">
+<area shape="rect" id="node144" href="tables/phenotype.html" title="phenotype" alt="" coords="675,11237,839,11537">
+<area shape="rect" id="node76" href="tables/feature_pub.html" title="feature_pub" alt="" coords="1339,14331,1511,14485">
+<area shape="rect" id="node77" href="tables/feature_pubprop.html" title="feature_pubprop" alt="" coords="1685,17005,1896,17217">
+<area shape="rect" id="node78" href="tables/feature_relationship.html" title="feature_relationship" alt="" coords="1305,12895,1545,13137">
+<area shape="rect" id="node79" href="tables/feature_relationship_pub.html" title="feature_relationship_pub" alt="" coords="1651,15146,1931,15299">
+<area shape="rect" id="node80" href="tables/feature_relationshipprop.html" title="feature_relationshipprop" alt="" coords="1651,16546,1930,16758">
+<area shape="rect" id="node81" href="tables/feature_relationshipprop_pub.html" title="feature_relationshipprop_pub" alt="" coords="1991,17310,2310,17463">
+<area shape="rect" id="node82" href="tables/feature_synonym.html" title="feature_synonym" alt="" coords="1318,15273,1533,15514">
+<area shape="rect" id="node83" href="tables/featureloc.html" title="featureloc" alt="" coords="1338,12025,1513,12442">
+<area shape="rect" id="node84" href="tables/featureloc_pub.html" title="featureloc_pub" alt="" coords="1693,14249,1889,14402">
+<area shape="rect" id="node85" href="tables/featuremap.html" title="featuremap" alt="" coords="673,10194,841,10377">
+<area shape="rect" id="node86" href="tables/featuremap_contact.html" title="featuremap_contact" alt="" coords="953,7187,1189,7341">
+<area shape="rect" id="node87" href="tables/featuremap_dbxref.html" title="featuremap_dbxref" alt="" coords="955,4829,1186,5011">
+<area shape="rect" id="node88" href="tables/featuremap_organism.html" title="featuremap_organism" alt="" coords="943,10609,1198,10762">
+<area shape="rect" id="node89" href="tables/featuremap_pub.html" title="featuremap_pub" alt="" coords="967,13509,1175,13662">
+<area shape="rect" id="node90" href="tables/featuremapprop.html" title="featuremapprop" alt="" coords="967,10007,1174,10219">
+<area shape="rect" id="node91" href="tables/featurepos.html" title="featurepos" alt="" coords="1337,11234,1513,11446">
+<area shape="rect" id="node92" href="tables/featureposprop.html" title="featureposprop" alt="" coords="1690,16123,1891,16335">
+<area shape="rect" id="node93" href="tables/featureprop.html" title="featureprop" alt="" coords="1339,17130,1511,17342">
+<area shape="rect" id="node94" href="tables/featureprop_pub.html" title="featureprop_pub" alt="" coords="1685,17234,1896,17387">
+<area shape="rect" id="node95" href="tables/featurerange.html" title="featurerange" alt="" coords="1335,11463,1515,11763">
+<area shape="rect" id="node97" href="tables/genotypeprop.html" title="genotypeprop" alt="" coords="976,10343,1165,10555">
+<area shape="rect" id="node99" href="tables/library_contact.html" title="library_contact" alt="" coords="1327,10605,1523,10758">
+<area shape="rect" id="node100" href="tables/library_cvterm.html" title="library_cvterm" alt="" coords="1329,16630,1522,16813">
+<area shape="rect" id="node101" href="tables/library_dbxref.html" title="library_dbxref" alt="" coords="1330,9375,1521,9558">
+<area shape="rect" id="node102" href="tables/library_expression.html" title="library_expression" alt="" coords="1312,17695,1539,17878">
+<area shape="rect" id="node103" href="tables/library_expressionprop.html" title="library_expressionprop" alt="" coords="1658,17575,1923,17787">
+<area shape="rect" id="node104" href="tables/library_feature.html" title="library_feature" alt="" coords="1328,13887,1523,14041">
+<area shape="rect" id="node105" href="tables/library_featureprop.html" title="library_featureprop" alt="" coords="1674,16775,1907,16987">
+<area shape="rect" id="node106" href="tables/library_pub.html" title="library_pub" alt="" coords="1341,14902,1509,15055">
+<area shape="rect" id="node107" href="tables/library_relationship.html" title="library_relationship" alt="" coords="1308,15073,1543,15255">
+<area shape="rect" id="node108" href="tables/library_relationship_pub.html" title="library_relationship_pub" alt="" coords="1653,16361,1928,16514">
+<area shape="rect" id="node109" href="tables/library_synonym.html" title="library_synonym" alt="" coords="1320,16371,1531,16613">
+<area shape="rect" id="node110" href="tables/libraryprop.html" title="libraryprop" alt="" coords="1342,17394,1509,17606">
+<area shape="rect" id="node111" href="tables/libraryprop_pub.html" title="libraryprop_pub" alt="" coords="1687,17405,1894,17558">
+<area shape="rect" id="node112" href="tables/magedocumentation.html" title="magedocumentation" alt="" coords="2029,12794,2272,13006">
+<area shape="rect" id="node113" href="tables/mageml.html" title="mageml" alt="" coords="1705,18034,1876,18187">
+<area shape="rect" id="node114" href="tables/nd_experiment.html" title="nd_experiment" alt="" coords="658,2431,857,2585">
+<area shape="rect" id="node127" href="tables/nd_geolocation.html" title="nd_geolocation" alt="" coords="386,2421,585,2662">
+<area shape="rect" id="node115" href="tables/nd_experiment_analysis.html" title="nd_experiment_analysis" alt="" coords="935,1821,1206,2003">
+<area shape="rect" id="node116" href="tables/nd_experiment_contact.html" title="nd_experiment_contact" alt="" coords="939,2658,1203,2811">
+<area shape="rect" id="node117" href="tables/nd_experiment_dbxref.html" title="nd_experiment_dbxref" alt="" coords="941,1338,1200,1491">
+<area shape="rect" id="node118" href="tables/nd_experiment_genotype.html" title="nd_experiment_genotype" alt="" coords="931,6129,1211,6282">
+<area shape="rect" id="node119" href="tables/nd_experiment_phenotype.html" title="nd_experiment_phenotype" alt="" coords="925,6337,1216,6490">
+<area shape="rect" id="node120" href="tables/nd_experiment_project.html" title="nd_experiment_project" alt="" coords="940,5590,1201,5743">
+<area shape="rect" id="node121" href="tables/nd_experiment_protocol.html" title="nd_experiment_protocol" alt="" coords="934,2250,1207,2403">
+<area shape="rect" id="node129" href="tables/nd_protocol.html" title="nd_protocol" alt="" coords="671,3991,843,4145">
+<area shape="rect" id="node122" href="tables/nd_experiment_pub.html" title="nd_experiment_pub" alt="" coords="953,9090,1189,9243">
+<area shape="rect" id="node123" href="tables/nd_experiment_stock.html" title="nd_experiment_stock" alt="" coords="1301,3693,1549,3875">
+<area shape="rect" id="node179" href="tables/stock.html" title="stock" alt="" coords="995,7746,1147,8046">
+<area shape="rect" id="node124" href="tables/nd_experiment_stock_dbxref.html" title="nd_experiment_stock_dbxref" alt="" coords="1635,734,1946,887">
+<area shape="rect" id="node125" href="tables/nd_experiment_stockprop.html" title="nd_experiment_stockprop" alt="" coords="1647,4022,1934,4234">
+<area shape="rect" id="node126" href="tables/nd_experimentprop.html" title="nd_experimentprop" alt="" coords="953,2021,1188,2233">
+<area shape="rect" id="node128" href="tables/nd_geolocationprop.html" title="nd_geolocationprop" alt="" coords="639,2674,876,2886">
+<area shape="rect" id="node130" href="tables/nd_protocol_reagent.html" title="nd_protocol_reagent" alt="" coords="1669,4918,1912,5101">
+<area shape="rect" id="node132" href="tables/nd_reagent.html" title="nd_reagent" alt="" coords="1343,5573,1508,5755">
+<area shape="rect" id="node131" href="tables/nd_protocolprop.html" title="nd_protocolprop" alt="" coords="965,6543,1176,6755">
+<area shape="rect" id="node133" href="tables/nd_reagent_relationship.html" title="nd_reagent_relationship" alt="" coords="1654,5514,1927,5697">
+<area shape="rect" id="node134" href="tables/nd_reagentprop.html" title="nd_reagentprop" alt="" coords="1689,3498,1893,3710">
+<area shape="rect" id="node136" href="tables/organism_cvterm.html" title="organism_cvterm" alt="" coords="963,11825,1179,12037">
+<area shape="rect" id="node137" href="tables/organism_cvtermprop.html" title="organism_cvtermprop" alt="" coords="1298,9975,1553,10187">
+<area shape="rect" id="node138" href="tables/organism_dbxref.html" title="organism_dbxref" alt="" coords="964,7017,1177,7170">
+<area shape="rect" id="node139" href="tables/organism_pub.html" title="organism_pub" alt="" coords="975,14017,1166,14170">
+<area shape="rect" id="node140" href="tables/organism_relationship.html" title="organism_relationship" alt="" coords="941,13279,1200,13491">
+<area shape="rect" id="node141" href="tables/organismprop.html" title="organismprop" alt="" coords="975,13715,1166,13927">
+<area shape="rect" id="node142" href="tables/organismprop_pub.html" title="organismprop_pub" alt="" coords="1311,14673,1540,14885">
+<area shape="rect" id="node143" href="tables/phendesc.html" title="phendesc" alt="" coords="981,10817,1160,11058">
+<area shape="rect" id="node145" href="tables/phenotype_comparison.html" title="phenotype_comparison" alt="" coords="938,11075,1203,11405">
+<area shape="rect" id="node146" href="tables/phenotype_comparison_cvterm.html" title="phenotype_comparison_cvterm" alt="" coords="1261,16830,1590,17042">
+<area shape="rect" id="node147" href="tables/phenotype_cvterm.html" title="phenotype_cvterm" alt="" coords="958,12555,1183,12738">
+<area shape="rect" id="node148" href="tables/phenotypeprop.html" title="phenotypeprop" alt="" coords="971,12791,1171,13003">
+<area shape="rect" id="node149" href="tables/phenstatement.html" title="phenstatement" alt="" coords="972,11422,1169,11663">
+<area shape="rect" id="node150" href="tables/phylonode.html" title="phylonode" alt="" coords="1314,6855,1537,7185">
+<area shape="rect" id="node156" href="tables/phylotree.html" title="phylotree" alt="" coords="681,1743,833,1985">
+<area shape="rect" id="node151" href="tables/phylonode_dbxref.html" title="phylonode_dbxref" alt="" coords="1679,5901,1902,6054">
+<area shape="rect" id="node152" href="tables/phylonode_organism.html" title="phylonode_organism" alt="" coords="1667,7721,1914,7874">
+<area shape="rect" id="node153" href="tables/phylonode_pub.html" title="phylonode_pub" alt="" coords="1691,9269,1891,9422">
+<area shape="rect" id="node154" href="tables/phylonode_relationship.html" title="phylonode_relationship" alt="" coords="1657,6409,1925,6650">
+<area shape="rect" id="node155" href="tables/phylonodeprop.html" title="phylonodeprop" alt="" coords="1691,6926,1890,7138">
+<area shape="rect" id="node157" href="tables/phylotree_pub.html" title="phylotree_pub" alt="" coords="975,8846,1167,8999">
+<area shape="rect" id="node158" href="tables/phylotreeprop.html" title="phylotreeprop" alt="" coords="975,5361,1166,5573">
+<area shape="rect" id="node160" href="tables/project_analysis.html" title="project_analysis" alt="" coords="967,2974,1174,3157">
+<area shape="rect" id="node161" href="tables/project_contact.html" title="project_contact" alt="" coords="971,6809,1171,6962">
+<area shape="rect" id="node162" href="tables/project_dbxref.html" title="project_dbxref" alt="" coords="974,2458,1167,2641">
+<area shape="rect" id="node163" href="tables/project_feature.html" title="project_feature" alt="" coords="1326,10775,1525,10929">
+<area shape="rect" id="node164" href="tables/project_pub.html" title="project_pub" alt="" coords="985,9607,1156,9761">
+<area shape="rect" id="node165" href="tables/project_relationship.html" title="project_relationship" alt="" coords="951,8137,1190,8319">
+<area shape="rect" id="node166" href="tables/project_stock.html" title="project_stock" alt="" coords="1333,7483,1517,7637">
+<area shape="rect" id="node167" href="tables/projectprop.html" title="projectprop" alt="" coords="985,8337,1156,8549">
+<area shape="rect" id="node169" href="tables/protocolparam.html" title="protocolparam" alt="" coords="1328,8509,1523,8779">
+<area shape="rect" id="node171" href="tables/pub_dbxref.html" title="pub_dbxref" alt="" coords="987,9298,1155,9481">
+<area shape="rect" id="node172" href="tables/pub_relationship.html" title="pub_relationship" alt="" coords="965,15919,1177,16102">
+<area shape="rect" id="node173" href="tables/pubauthor.html" title="pubauthor" alt="" coords="991,14451,1151,14722">
+<area shape="rect" id="node174" href="tables/pubauthor_contact.html" title="pubauthor_contact" alt="" coords="1311,9575,1539,9729">
+<area shape="rect" id="node175" href="tables/pubprop.html" title="pubprop" alt="" coords="999,14187,1143,14399">
+<area shape="rect" id="node177" href="tables/quantification_relationship.html" title="quantification_relationship" alt="" coords="2671,3509,2967,3691">
+<area shape="rect" id="node178" href="tables/quantificationprop.html" title="quantificationprop" alt="" coords="2705,7189,2933,7401">
+<area shape="rect" id="node180" href="tables/stock_cvterm.html" title="stock_cvterm" alt="" coords="1334,8142,1517,8383">
+<area shape="rect" id="node181" href="tables/stock_cvtermprop.html" title="stock_cvtermprop" alt="" coords="1680,7491,1901,7703">
+<area shape="rect" id="node182" href="tables/stock_dbxref.html" title="stock_dbxref" alt="" coords="1335,1326,1515,1509">
+<area shape="rect" id="node183" href="tables/stock_dbxrefprop.html" title="stock_dbxrefprop" alt="" coords="1681,1362,1900,1574">
+<area shape="rect" id="node184" href="tables/stock_feature.html" title="stock_feature" alt="" coords="1333,10205,1518,10417">
+<area shape="rect" id="node185" href="tables/stock_featuremap.html" title="stock_featuremap" alt="" coords="1315,8797,1536,8979">
+<area shape="rect" id="node186" href="tables/stock_genotype.html" title="stock_genotype" alt="" coords="1324,9167,1527,9321">
+<area shape="rect" id="node187" href="tables/stock_library.html" title="stock_library" alt="" coords="1335,11781,1515,11934">
+<area shape="rect" id="node188" href="tables/stock_pub.html" title="stock_pub" alt="" coords="1347,10434,1504,10587">
+<area shape="rect" id="node189" href="tables/stock_relationship.html" title="stock_relationship" alt="" coords="1313,7654,1538,7895">
+<area shape="rect" id="node190" href="tables/stock_relationship_cvterm.html" title="stock_relationship_cvterm" alt="" coords="1646,7291,1935,7474">
+<area shape="rect" id="node191" href="tables/stock_relationship_pub.html" title="stock_relationship_pub" alt="" coords="1658,10199,1923,10353">
+<area shape="rect" id="node192" href="tables/stockcollection.html" title="stockcollection" alt="" coords="972,4170,1169,4382">
+<area shape="rect" id="node193" href="tables/stockcollection_db.html" title="stockcollection_db" alt="" coords="1312,15531,1539,15685">
+<area shape="rect" id="node194" href="tables/stockcollection_stock.html" title="stockcollection_stock" alt="" coords="1300,7239,1551,7393">
+<area shape="rect" id="node195" href="tables/stockcollectionprop.html" title="stockcollectionprop" alt="" coords="1307,4037,1543,4249">
+<area shape="rect" id="node196" href="tables/stockprop.html" title="stockprop" alt="" coords="1347,9746,1504,9958">
+<area shape="rect" id="node197" href="tables/stockprop_pub.html" title="stockprop_pub" alt="" coords="1693,12833,1889,12986">
+<area shape="rect" id="node198" href="tables/study.html" title="study" alt="" coords="999,5761,1142,6002">
+<area shape="rect" id="node199" href="tables/study_assay.html" title="study_assay" alt="" coords="2063,3367,2238,3521">
+<area shape="rect" id="node200" href="tables/studydesign.html" title="studydesign" alt="" coords="1338,4818,1513,4971">
+<area shape="rect" id="node201" href="tables/studydesignprop.html" title="studydesignprop" alt="" coords="1684,4487,1897,4699">
+<area shape="rect" id="node202" href="tables/studyfactor.html" title="studyfactor" alt="" coords="1703,3269,1878,3481">
+<area shape="rect" id="node203" href="tables/studyfactorvalue.html" title="studyfactorvalue" alt="" coords="2045,3081,2257,3322">
+<area shape="rect" id="node204" href="tables/studyprop.html" title="studyprop" alt="" coords="1346,7913,1505,8125">
+<area shape="rect" id="node205" href="tables/studyprop_feature.html" title="studyprop_feature" alt="" coords="1678,11887,1903,12070">
+</map>
+
+					<a name='diagram'><img id='largeDegreeImg' src='diagrams/summary/relationships.real.large.png' usemap='#largeRelationshipsDiagram' class='diagram' border='0' alt='' align='left'></a>							
+				</div>
+			  			</div>
+			</div>
+		  </div><!-- /.box-body -->
+		</div>
+		      </section>    
+  </div>
+  <!-- /.content-wrapper -->
+  <footer class="main-footer">
+    <div>
+      <div class="pull-right hidden-xs">
+        <a href="https://github.com/schemaspy/schemaspy" title="GitHub for SchemaSpy"><i class="fa fa-github-square fa-2x"></i></a>
+        <a href="http://stackoverflow.com/questions/tagged/schemaspy" title="StackOverflow for SchemaSpy"><i class="fa fa-stack-overflow fa-2x"></i></a>
+      </div>
+      <strong>Generated by <a href="http://schemaspy.org/" class="logo-text"><i class="fa fa-database"></i> SchemaSpy @project.version@</a></strong>
+    </div>
+    <!-- /.container -->
+  </footer>
+</div>
+<!-- ./wrapper -->
+
+<!-- jQuery 2.2.3 -->
+<script src="bower/admin-lte/plugins/jQuery/jquery-2.2.3.min.js"></script>
+<script src="bower/admin-lte/plugins/jQueryUI/jquery-ui.min.js"></script>
+<!-- Bootstrap 3.3.5 -->
+<script src="bower/admin-lte/bootstrap/js/bootstrap.min.js"></script>
+<!-- DataTables -->
+<script src="bower/datatables.net/jquery.dataTables.min.js"></script>
+<script src="bower/datatables.net-bs/js/dataTables.bootstrap.min.js"></script>
+<script src="bower/datatables.net-buttons/dataTables.buttons.min.js"></script>
+<script src="bower/datatables.net-buttons-bs/js/buttons.bootstrap.min.js"></script>
+<script src="bower/datatables.net-buttons/buttons.html5.min.js"></script>
+<script src="bower/datatables.net-buttons/buttons.print.min.js"></script>
+<script src="bower/datatables.net-buttons/buttons.colVis.min.js"></script>
+
+<!-- SlimScroll -->
+<script src="bower/admin-lte/plugins/slimScroll/jquery.slimscroll.min.js"></script>
+<!-- FastClick -->
+<script src="bower/admin-lte/plugins/fastclick/fastclick.js"></script>
+<!-- Salvattore -->
+<script src="bower/salvattore/salvattore.min.js"></script>
+<!-- AnchorJS -->
+<script src="bower/anchor-js/anchor.min.js"></script>
+<!-- CodeMirror -->
+<script src="bower/codemirror/codemirror.js"></script>
+<script src="bower/codemirror/sql.js"></script>
+<!-- AdminLTE App -->
+<script src="bower/admin-lte/dist/js/app.min.js"></script>
+<script src="relationships.js"></script>
+<script src="schemaSpy.js"></script>
+</body>
+</html>

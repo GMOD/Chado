@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>phylotree_pub -  Chado</title>
+  <!-- Tell the browser to be responsive to screen width -->
+  <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+  <link rel="icon" type="image/png" sizes="16x16" href="../favicon.ico">
+  <!-- Bootstrap 3.3.5 -->
+  <link rel="stylesheet" href="../bower/admin-lte/bootstrap/css/bootstrap.min.css">
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="../bower/font-awesome/css/font-awesome.min.css">
+  <!-- Ionicons -->
+  <link rel="stylesheet" href="../bower/ionicons/css/ionicons.min.css">
+  <!-- DataTables -->
+  <link rel="stylesheet" href="../bower/datatables.net-bs/css/dataTables.bootstrap.min.css">
+  <link rel="stylesheet" href="../bower/datatables.net-buttons-bs/css/buttons.bootstrap.min.css">
+  <!-- Code Mirror -->
+  <link rel="stylesheet" href="../bower/codemirror/codemirror.css">
+  <!-- Fonts -->
+  <link href='../fonts/indieflower/indie-flower.css' rel='stylesheet' type='text/css'>
+  <link href='../fonts/source-sans-pro/source-sans-pro.css' rel='stylesheet' type='text/css'>
+
+  <!-- Theme style -->
+  <link rel="stylesheet" href="../bower/admin-lte/dist/css/AdminLTE.min.css">
+  <!-- Salvattore -->
+  <link rel="stylesheet" href="../bower/salvattore/salvattore.css">
+  <!-- AdminLTE Skins. Choose a skin from the css/skins
+       folder instead of downloading all of them to reduce the load. -->
+  <link rel="stylesheet" href="../bower/admin-lte/dist/css/skins/_all-skins.min.css">
+  <!-- SchemaSpy -->
+  <link rel="stylesheet" href="../schemaSpy.css">
+  <!-- GMOD Chado Specific CSS -->
+  <link rel="stylesheet" href="../main.css">
+  
+  <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+  <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+  <!--[if lt IE 9]>
+  <script src="../bower/html5shiv/html5shiv.min.js"></script>
+  <script src="../bower/respond/respond.min.js"></script>
+  <![endif]-->
+</head>
+<!-- ADD THE CLASS layout-top-nav TO REMOVE THE SIDEBAR. -->
+<!-- Skins: skin-black, black-light, green-light, red-light, yellow-light, purple-light, blue-light -->
+<body class="hold-transition skin-black layout-top-nav">
+<div class="wrapper">
+  <header class="main-header">
+    <nav class="navbar navbar-static-top">
+      <div class="container">
+        <div class="navbar-header">
+          <a href="../index.html" class="navbar-brand" style="padding:0;">
+            <img src="../GMOD-cogs.png" class="gmod-logo" />
+            <span class="gmod-title">Chado</span>
+          </a>
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar-collapse">
+            <i class="fa fa-bars"></i>
+          </button>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-collapse pull-left" id="navbar-collapse">
+          <ul class="nav navbar-nav">
+            <li>
+              <a href="../index.html" title="All Chado Tables.">
+                Home</span>
+              </a>
+            </li>
+            <li>
+              <a href="../index.html" title="All Chado Tables.">
+                All Tables</span>
+              </a>
+            </li>
+            <li>
+              <a href="../constraints.html" title="All Constraints in Chado.">
+                All Constraints
+              </a>
+            </li>
+          </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+        <!-- Navbar Right Menu -->
+
+      </div>
+      <!-- /.container-fluid -->
+    </nav>
+  </header>
+  <!-- Main content -->
+  <!-- Full Width Column -->
+  <div class="content-wrapper">
+    
+    <div class="box box-solid">
+      <div class="box-body">
+        <p><span class="version-label">Schema Version:</span> 1.3</p>
+      </div>
+    </div>
+		
+          <!-- Content Header (Page header) -->
+      <section class="content-header">
+        <h1>phylotree_pub</h1></br>
+		<div class="box box-primary">
+            <div class="box-header with-border">
+              <i class="fa fa-file-text-o"></i>
+              <h3 id="Description" class="box-title">Description</h3>
+              <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
+                </button>
+                <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
+              </div>			  
+            </div>
+            <!-- /.box-header -->
+            <div class="box-body clearfix">
+				<p><p>Tracks citations global to the tree e.g. multiple sequence alignment supporting tree construction.</p></p>              
+            </div>
+            <!-- /.box-body -->
+		</div>
+		      </section>
+      <!-- Main content -->
+      <section class="content">
+		<div class="box box-primary">
+			<div class="box-header with-border">
+			  <span class="glyphicon glyphicon-list-alt" aria-hidden="true"></span>
+              <h3 id="Columns" class="box-title">Columns</h3>
+              <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
+                </button>
+                <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
+              </div>
+            </div>	
+            <div class="box-body">
+				<table id="standard_table" class="table table-bordered table-striped dataTable" role="grid">
+				<thead align='left'>
+				<tr>
+				  <th>Column</th>
+				  <th>Type</th>
+				  <th>Size</th>
+				  <th title='Columns in tables that are referenced by this column'>Foreign Key</th>
+				  <th title='Are nulls allowed?'>Nullable</th>
+				  <th title='Default value'>Default</th>
+				  <th title='Comments' class="toggle"><span>Comments</span></th>
+				</tr>
+				</thead>
+				<tbody>
+				<tr>
+				 <td class='primaryKey' title='Primary Key'><i class='icon ion-key iconkey' style='padding-left: 5px;'></i><span id="phylotree_pub_id">phylotree_pub_id</span></td>
+				 <td>bigserial</td>
+				 <td>19</td>
+				 <td>
+				  <table border='0' cellspacing='0' cellpadding='0'>
+				  </table>					 
+				 </td>
+				 <td title=''></td>
+				 <td>nextval(&#39;chado.phylotree_pub_phylotree_pub_id_seq&#39;::regclass)</td>
+				 <td></td>
+				</tr>
+				<tr>
+				 <td class='foreignKey' title='Foreign Key'><i class='icon ion-key iconkey' style='padding-left: 5px;'></i><span id="phylotree_id">phylotree_id</span></td>
+				 <td>int8</td>
+				 <td>19</td>
+				 <td>
+				  <table border='0' cellspacing='0' cellpadding='0'>
+				   <tr>
+					<td title="phylotree_pub.phylotree_id references phylotree.phylotree_id via phylotree_pub_phylotree_id_fkey">
+						<a href='phylotree.html'>phylotree</a><span class='relatedKey'>.phylotree_id</span>
+					</td>
+					<td class="constraint detail">
+						phylotree_pub_phylotree_id_fkey <span title='Cascade on delete:&#10;Deletion of parent deletes child'>C</span>
+					</td>
+				   </tr>
+				  </table>					 
+				 </td>
+				 <td title=''></td>
+				 <td>null</td>
+				 <td></td>
+				</tr>
+				<tr>
+				 <td class='foreignKey' title='Foreign Key'><i class='icon ion-key iconkey' style='padding-left: 5px;'></i><span id="pub_id">pub_id</span></td>
+				 <td>int8</td>
+				 <td>19</td>
+				 <td>
+				  <table border='0' cellspacing='0' cellpadding='0'>
+				   <tr>
+					<td title="phylotree_pub.pub_id references pub.pub_id via phylotree_pub_pub_id_fkey">
+						<a href='pub.html'>pub</a><span class='relatedKey'>.pub_id</span>
+					</td>
+					<td class="constraint detail">
+						phylotree_pub_pub_id_fkey <span title='Cascade on delete:&#10;Deletion of parent deletes child'>C</span>
+					</td>
+				   </tr>
+				  </table>					 
+				 </td>
+				 <td title=''></td>
+				 <td>null</td>
+				 <td></td>
+				</tr>
+								</tbody>
+				</table>
+				<p title='3 columns'>Table contained <span id="recordNumber">-1</span> rows<p/>
+			</div>
+		</div>
+		<div class="box box-primary">		
+			<div class="box-header with-border">
+              <i class="fa fa-sitemap"></i>
+
+              <h3 id="Indexes" class="box-title">Indexes</h3>
+
+              <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
+                </button>
+                <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
+              </div>
+            </div>	
+			<div class="box-body">
+				<table id="indexes_table" class="table table-bordered table-striped dataTable" role="grid">
+				<thead>
+				 <tr>
+				  <th>Constraint Name</th>
+				  <th>Type</th>
+				  <th>Sort</th>
+				  <th>Column(s)</th>
+				 </tr>
+				</thead>
+				<tbody>
+				 <tr>
+				  <td class='primaryKey' title='Primary Key'><i class='icon ion-key iconkey'></i> phylotree_pub_pkey</td>
+				  <td>Primary key</td>
+				  <td><span title='Ascending'>Asc</span></td>
+				  <td>phylotree_pub_id</td>
+				 </tr>				 
+				 <tr>
+				  <td title='Indexed'>phylotree_pub_idx1</td>
+				  <td>Performance</td>
+				  <td><span title='Ascending'>Asc</span></td>
+				  <td>phylotree_id</td>
+				 </tr>				 
+				 <tr>
+				  <td title='Indexed'>phylotree_pub_idx2</td>
+				  <td>Performance</td>
+				  <td><span title='Ascending'>Asc</span></td>
+				  <td>pub_id</td>
+				 </tr>				 
+				 <tr>
+				  <td class='uniqueKey' title='Unique Key'><i class='icon ion-key iconkey'></i> phylotree_pub_phylotree_id_pub_id_key</td>
+				  <td>Must be unique</td>
+				  <td><span title='Ascending'>Asc</span>/<span title='Ascending'>Asc</span></td>
+				  <td>phylotree_id + pub_id</td>
+				 </tr>				 
+				</tbody>
+				</table>   			  
+			</div><!-- /.box-body -->
+		</div>
+				<div class="box box-primary">		
+			<div class="box-header with-border">
+              <i class="fa fa-code-fork"></i>
+
+              <h3 id="Relationships" class="box-title">Relationships</h3>
+
+              <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
+                </button>
+                <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
+              </div>
+            </div>	
+			<div class="box-body">	
+			<div class="nav-tabs-custom" style="cursor: move;">
+				<p>The following entity relationship (ER) diagram shows the relationships involving the phylotree_pub table. </p>
+            <!-- Tabs within a box -->
+			<h4>Show relationships within degrees of separation</h4>
+            <ul class="nav nav-tabs pull-left ui-sortable-handle">
+			  			              <li class="active"><a href="#oneDegreeImg-chart" data-toggle="tab" aria-expanded="true">One</a></li>			  			 
+			  			              <li class=""><a href="#twodegreesDegreeImg-chart" data-toggle="tab" aria-expanded="true">Two degrees</a></li>			  			 
+            </ul>
+            <div class="tab-content no-padding">            
+				<div class="chart tab-pane active" id="oneDegreeImg-chart" style="position: relative; overflow-x:auto;">					
+					<map id="oneDegreeRelationshipsDiagram" name="oneDegreeRelationshipsDiagram">
+<area shape="rect" id="node1" href="phylotree_pub.html" title="phylotree_pub" alt="" coords="201,70,484,229">
+<area shape="rect" id="node2" href="phylotree.html" title="phylotree" alt="" coords="5,5,157,211">
+<area shape="rect" id="node3" href="pub.html" title="pub" alt="" coords="5,229,157,406">
+</map>
+
+					<a name='diagram'><img id='oneDegreeImg' src='../diagrams/phylotree_pub.1degree.png' usemap='#oneDegreeRelationshipsDiagram' class='diagram' border='0' alt='' align='left'></a>							
+				</div>
+				<div class="chart tab-pane " id="twodegreesDegreeImg-chart" style="position: relative; overflow-x:auto;">					
+					<map id="twoDegreesRelationshipsDiagram" name="twoDegreesRelationshipsDiagram">
+<area shape="rect" id="node1" href="analysis_pub.html" title="analysis_pub" alt="" coords="614,489,789,578">
+<area shape="rect" id="node2" href="analysis.html" title="analysis" alt="" coords="177,441,316,530">
+<area shape="rect" id="node3" href="pub.html" title="pub" alt="" coords="360,2594,512,2771">
+<area shape="rect" id="node5" href="cvterm.html" title="cvterm" alt="" coords="181,991,312,1081">
+<area shape="rect" id="node4" href="cell_line_cvterm.html" title="cell_line_cvterm" alt="" coords="604,953,799,1042">
+<area shape="rect" id="node11" href="dbxref.html" title="dbxref" alt="" coords="6,991,133,1081">
+<area shape="rect" id="node6" href="cell_line_feature.html" title="cell_line_feature" alt="" coords="603,2558,799,2647">
+<area shape="rect" id="node7" href="cell_line_library.html" title="cell_line_library" alt="" coords="605,2665,797,2754">
+<area shape="rect" id="node8" href="cell_line_pub.html" title="cell_line_pub" alt="" coords="614,2771,789,2861">
+<area shape="rect" id="node9" href="cell_line_synonym.html" title="cell_line_synonym" alt="" coords="596,2878,807,2967">
+<area shape="rect" id="node10" href="cell_lineprop_pub.html" title="cell_lineprop_pub" alt="" coords="598,2985,805,3074">
+<area shape="rect" id="node12" href="expression_pub.html" title="expression_pub" alt="" coords="604,3091,799,3181">
+<area shape="rect" id="node13" href="feature_cvterm.html" title="feature_cvterm" alt="" coords="608,4371,795,4461">
+<area shape="rect" id="node14" href="feature_cvterm_pub.html" title="feature_cvterm_pub" alt="" coords="931,3427,1154,3517">
+<area shape="rect" id="node15" href="feature_expression.html" title="feature_expression" alt="" coords="593,3198,809,3287">
+<area shape="rect" id="node16" href="feature_pub.html" title="feature_pub" alt="" coords="618,3305,785,3394">
+<area shape="rect" id="node17" href="feature_relationship_pub.html" title="feature_relationship_pub" alt="" coords="573,3411,830,3501">
+<area shape="rect" id="node18" href="feature_relationshipprop_pub.html" title="feature_relationshipprop_pub" alt="" coords="556,3518,847,3607">
+<area shape="rect" id="node19" href="feature_synonym.html" title="feature_synonym" alt="" coords="600,3625,803,3714">
+<area shape="rect" id="node20" href="featureloc_pub.html" title="featureloc_pub" alt="" coords="608,3731,795,3821">
+<area shape="rect" id="node21" href="featuremap_pub.html" title="featuremap_pub" alt="" coords="603,3838,799,3927">
+<area shape="rect" id="node22" href="featureprop_pub.html" title="featureprop_pub" alt="" coords="602,3945,801,4034">
+<area shape="rect" id="node23" href="library_cvterm.html" title="library_cvterm" alt="" coords="610,4478,793,4567">
+<area shape="rect" id="node24" href="library_expression.html" title="library_expression" alt="" coords="595,4051,807,4141">
+<area shape="rect" id="node25" href="library_pub.html" title="library_pub" alt="" coords="620,4158,783,4247">
+<area shape="rect" id="node26" href="library_relationship_pub.html" title="library_relationship_pub" alt="" coords="575,1203,828,1293">
+<area shape="rect" id="node27" href="library_synonym.html" title="library_synonym" alt="" coords="602,1310,801,1399">
+<area shape="rect" id="node28" href="libraryprop_pub.html" title="libraryprop_pub" alt="" coords="604,1417,799,1506">
+<area shape="rect" id="node29" href="nd_experiment_pub.html" title="nd_experiment_pub" alt="" coords="591,1523,812,1613">
+<area shape="rect" id="node30" href="organism_cvterm.html" title="organism_cvterm" alt="" coords="599,4585,803,4674">
+<area shape="rect" id="node31" href="organism_pub.html" title="organism_pub" alt="" coords="610,1630,793,1719">
+<area shape="rect" id="node32" href="organismprop_pub.html" title="organismprop_pub" alt="" coords="593,1737,809,1826">
+<area shape="rect" id="node33" href="phendesc.html" title="phendesc" alt="" coords="626,4691,777,4781">
+<area shape="rect" id="node34" href="phenotype_comparison.html" title="phenotype_comparison" alt="" coords="578,1987,825,2077">
+<area shape="rect" id="node35" href="phenotype_comparison_cvterm.html" title="phenotype_comparison_cvterm" alt="" coords="891,1805,1194,1894">
+<area shape="rect" id="node36" href="phenstatement.html" title="phenstatement" alt="" coords="608,4798,795,4887">
+<area shape="rect" id="node37" href="phylonode.html" title="phylonode" alt="" coords="623,206,779,295">
+<area shape="rect" id="node38" href="phylotree.html" title="phylotree" alt="" coords="360,94,512,301">
+<area shape="rect" id="node39" href="phylonode_pub.html" title="phylonode_pub" alt="" coords="947,702,1138,791">
+<area shape="rect" id="node40" href="phylonode_relationship.html" title="phylonode_relationship" alt="" coords="919,169,1166,258">
+<area shape="rect" id="node41" href="phylotree_pub.html" title="phylotree_pub" alt="" coords="560,313,843,471">
+<area shape="rect" id="node42" href="phylotreeprop.html" title="phylotreeprop" alt="" coords="611,62,792,151">
+<area shape="rect" id="node43" href="project_pub.html" title="project_pub" alt="" coords="618,1881,785,1970">
+<area shape="rect" id="node44" href="protocol.html" title="protocol" alt="" coords="631,1059,772,1149">
+<area shape="rect" id="node45" href="pub_dbxref.html" title="pub_dbxref" alt="" coords="620,5011,783,5101">
+<area shape="rect" id="node46" href="pub_relationship.html" title="pub_relationship" alt="" coords="601,4265,801,4354">
+<area shape="rect" id="node47" href="pubauthor.html" title="pubauthor" alt="" coords="624,2094,779,2183">
+<area shape="rect" id="node48" href="pubprop.html" title="pubprop" alt="" coords="630,4905,773,4994">
+<area shape="rect" id="node49" href="stock_cvterm.html" title="stock_cvterm" alt="" coords="613,739,789,829">
+<area shape="rect" id="node50" href="stock_pub.html" title="stock_pub" alt="" coords="624,2201,779,2290">
+<area shape="rect" id="node51" href="stock_relationship_cvterm.html" title="stock_relationship_cvterm" alt="" coords="568,846,835,935">
+<area shape="rect" id="node52" href="stock_relationship_pub.html" title="stock_relationship_pub" alt="" coords="578,2307,825,2397">
+<area shape="rect" id="node53" href="stockprop_pub.html" title="stockprop_pub" alt="" coords="607,2414,795,2503">
+<area shape="rect" id="node54" href="study.html" title="study" alt="" coords="641,633,762,722">
+</map>
+
+					<a name='diagram'><img id='twodegreesDegreeImg' src='../diagrams/phylotree_pub.2degrees.png' usemap='#twoDegreesRelationshipsDiagram' class='diagram' border='0' alt='' align='left'></a>							
+				</div>
+			  			</div>
+			</div>
+		  </div><!-- /.box-body -->
+		</div>
+	      </section>
+    
+  </div>
+  <!-- /.content-wrapper -->
+  <footer class="main-footer">
+    <div>
+      <div class="pull-right hidden-xs">
+        <a href="https://github.com/schemaspy/schemaspy" title="GitHub for SchemaSpy"><i class="fa fa-github-square fa-2x"></i></a>
+        <a href="http://stackoverflow.com/questions/tagged/schemaspy" title="StackOverflow for SchemaSpy"><i class="fa fa-stack-overflow fa-2x"></i></a>
+      </div>
+      <strong>Generated by <a href="http://schemaspy.org/" class="logo-text"><i class="fa fa-database"></i> SchemaSpy @project.version@</a></strong>
+    </div>
+    <!-- /.container -->
+  </footer>
+</div>
+<!-- ./wrapper -->
+
+<!-- jQuery 2.2.3 -->
+<script src="../bower/admin-lte/plugins/jQuery/jquery-2.2.3.min.js"></script>
+<script src="../bower/admin-lte/plugins/jQueryUI/jquery-ui.min.js"></script>
+<!-- Bootstrap 3.3.5 -->
+<script src="../bower/admin-lte/bootstrap/js/bootstrap.min.js"></script>
+<!-- DataTables -->
+<script src="../bower/datatables.net/jquery.dataTables.min.js"></script>
+<script src="../bower/datatables.net-bs/js/dataTables.bootstrap.min.js"></script>
+<script src="../bower/datatables.net-buttons/dataTables.buttons.min.js"></script>
+<script src="../bower/datatables.net-buttons-bs/js/buttons.bootstrap.min.js"></script>
+<script src="../bower/datatables.net-buttons/buttons.html5.min.js"></script>
+<script src="../bower/datatables.net-buttons/buttons.print.min.js"></script>
+<script src="../bower/datatables.net-buttons/buttons.colVis.min.js"></script>
+
+<!-- SlimScroll -->
+<script src="../bower/admin-lte/plugins/slimScroll/jquery.slimscroll.min.js"></script>
+<!-- FastClick -->
+<script src="../bower/admin-lte/plugins/fastclick/fastclick.js"></script>
+<!-- Salvattore -->
+<script src="../bower/salvattore/salvattore.min.js"></script>
+<!-- AnchorJS -->
+<script src="../bower/anchor-js/anchor.min.js"></script>
+<!-- CodeMirror -->
+<script src="../bower/codemirror/codemirror.js"></script>
+<script src="../bower/codemirror/sql.js"></script>
+<!-- AdminLTE App -->
+<script src="../bower/admin-lte/dist/js/app.min.js"></script>
+<script src="table.js"></script>
+<script src="../schemaSpy.js"></script>
+</body>
+</html>

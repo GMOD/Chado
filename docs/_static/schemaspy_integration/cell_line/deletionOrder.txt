@@ -1,0 +1,11 @@
+cell_line_synonym
+cell_line_relationship
+cell_line_library
+cell_line_feature
+cell_lineprop_pub
+cell_line_pub
+cell_line_dbxref
+cell_line_cvtermprop
+cell_line_cvterm
+cell_lineprop
+cell_line

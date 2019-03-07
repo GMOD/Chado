@@ -1,0 +1,8 @@
+analysis_relationship
+analysisprop
+analysisfeatureprop
+analysis_pub
+analysis_dbxref
+analysis_cvterm
+analysisfeature
+analysis

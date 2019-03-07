@@ -1,0 +1,241 @@
+
+      <!-- Main content -->
+      <section class="content">
+		<div class="row">
+		  <div class="col-md-3 col-sm-6 col-xs-12">
+			  <div class="info-box">
+				  <span class="info-box-icon bg-aqua"><i class="fa fa-table"></i></span>
+				  <div class="info-box-content">
+					  <span class="info-box-text">TABLES</span>
+					  <span class="info-box-number">{{tablesAmount}}</span>
+				  </div>
+				  <!-- /.info-box-content -->
+			  </div>
+			  <!-- /.info-box -->
+		  </div>
+		  <!-- /.col -->
+		  <div class="col-md-3 col-sm-6 col-xs-12">
+			  <div class="info-box">
+				  <span class="info-box-icon bg-red"><i class="fa fa-table"></i></span>
+				  <div class="info-box-content">
+					  <span class="info-box-text">VIEWS</span>
+					  <span class="info-box-number">{{viewsAmount}}</span>
+				  </div>
+				  <!-- /.info-box-content -->
+			  </div>
+			  <!-- /.info-box -->
+		  </div>
+		  <!-- /.col -->
+
+		  <!-- fix for small devices only -->
+		  <div class="clearfix visible-sm-block"></div>
+
+		  <div class="col-md-3 col-sm-6 col-xs-12">
+			  <div class="info-box">
+				  <span class="info-box-icon bg-green"><span class="glyphicon glyphicon-list-alt" aria-hidden="true"></span></span>
+
+				  <div class="info-box-content">
+					  <span class="info-box-text">COLUMNS</span>
+					  <span class="info-box-number">{{columnsAmount}}</span>
+				  </div>
+				  <!-- /.info-box-content -->
+			  </div>
+			  <!-- /.info-box -->
+		  </div>
+		  <!-- /.col -->
+		  <div class="col-md-3 col-sm-6 col-xs-12">
+			  <div class="info-box">
+				  <span class="info-box-icon bg-yellow"><i class="ion ion-key"></i></span>
+
+				  <div class="info-box-content">
+					  <span class="info-box-text">Constraints</span>
+					  <span class="info-box-number">{{constraintsAmount}}</span>
+				  </div>
+				  <!-- /.info-box-content -->
+			  </div>
+			  <!-- /.info-box -->
+		  </div>
+		  <!-- /.col -->
+		</div>
+
+		<div class="box box-primary">
+	       <div class="box-header with-border">
+	         <h3 class="box-title">Chado</h3>
+	         <span class="label label-primary pull-right"><i class="fa fa-cog fa-2x"></i></span>
+	     
+	       </div><!-- /.box-header -->
+	       <div class="box-body">
+	         <p>Chado is a relational database schema that underlies many GMOD installations. It is capable of representing many of the general classes of data frequently encountered in modern biology such as sequence, sequence comparisons, phenotypes, genotypes, ontologies, publications, and phylogeny. It has been designed to handle complex representations of biological knowledge and should be considered one of the most sophisticated relational schemas currently available in molecular biology. The price of this capability is that the new user must spend some time becoming familiar with its fundamentals.</p>
+	       </div><!-- /.box-body -->
+		</div>
+
+		<div class="box box-primary">
+	       <div class="box-header with-border">
+	         <h3 class="box-title">Modules</h3>
+	         <span class="label label-primary pull-right"><i class="fa fa-cog fa-2x"></i></span>
+	     
+	       </div><!-- /.box-header -->
+	       <div class="box-body">
+			<p>Chado is a modular schema for handling all kinds of biological data. It is intended to be used as both a primary datastore schema as well as a warehouse-style schema. The modules currently in chado are:</p>
+			<table id="module-list">
+			<thead>
+				<tr>
+				<th class="name">Module</th>
+				<th class="description">Description</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td class="name">Audit</td>
+					<td class="description">database audits</td>
+				</tr>
+				<tr>
+					<td class="name"><a href="companalysis/index.html">Companalysis</a></td>
+					<td class="description">data from computational analysis</td>
+				</tr>
+				<tr>
+					<td class="name"><a href="contact/index.html">Contact</a></td>
+					<td class="description">people and groups</td>
+				</tr>
+				<tr>
+					<td class="name"><a href="db/index.html">Database (db)</a></td>
+					<td class="description">references to external databases</td>
+				</tr>
+				<tr>
+					<td class="name"><a href="cv/index.html">Controlled Vocabulary (cv)</a></td>
+					<td class="description">controlled vocabularies and ontologies</td>
+				</tr>
+				<tr>
+					<td class="name"><a href="expression/index.html">Expression</a></td>
+					<td class="description">summarized RNA and protein expresssion</td>
+				</tr>
+				<tr>
+					<td class="name"><a href="general/index.html">General</a></td>
+					<td class="description">identifiers</td>
+				</tr>
+				<tr>
+					<td class="name"><a href="genetic/index.html">Genetic</a></td>
+					<td class="description">genetic data and genotypes</td>
+				</tr>
+				<tr>
+					<td class="name"><a href="library/index.html">Library</a></td>
+					<td class="description">descriptions of molecular libraries</td>
+				</tr>
+				<tr>
+					<td class="name"><a href="mage/index.html">Mage</a></td>
+					<td class="description">microarray data</td>
+				</tr>
+				<tr>
+					<td class="name"><a href="map/index.html">Map</a></td>
+					<td class="description">maps without sequence</td>
+				</tr>
+				<tr>
+					<td class="name"><a href="organism/index.html">Organism</a></td>
+					<td class="description">species</td>
+				</tr>
+				<tr>
+					<td class="name"><a href="phenotype/index.html">Phenotype</a></td>
+					<td class="description">phenotypic data</td>
+				</tr>
+				<tr>
+					<td class="name"><a href="phylogeny/index.html">Phylogeny</a></td>
+					<td class="description">phylogenetic trees</td>
+				</tr>
+				<tr>
+					<td class="name"><a href="pub/index.html">Publication (pub)</a></td>
+					<td class="description">publications and references</td>
+				</tr>
+				<tr>
+					<td class="name"><a href="sequence/index.html">Sequence</a></td>
+					<td class="description">sequences and sequence features</td>
+				</tr>
+				<tr>
+					<td class="name"><a href="stock/index.html">Stock</a></td>
+					<td class="description">specimens and biological collections</td>
+				</tr>
+				<tr>
+					<td class="name">WWW</td>
+					<td class="description">generic classes for web interfaces</td>
+				</tr>
+			</tbody></table>
+	       </div><!-- /.box-body -->
+		</div>
+
+		<div class="box box-primary">
+	       <div class="box-header with-border">
+	         <h3 class="box-title">Additional Documentation</h3>
+	         <span class="label label-primary pull-right"><i class="fa fa-cog fa-2x"></i></span>
+	     
+	       </div><!-- /.box-header -->
+	       <div class="box-body">
+	       	<p>Chado is a community-designed database schema and as such, the community has developed a wealth of documentation. If you would like more information, it likely exists within one of the pages below. However, if it doesn't feel free to <a href="https://github.com/GMOD/Chado">contact the community by filing an issue on GitHub</a>.</p>
+			<ul>
+				<li><a href="http://gmod.org/wiki/Chado" target="_blank">
+					Getting Started including Installation
+				</a></li>
+				<li><a href="http://gmod.org/wiki/Introduction_to_Chado" target="_blank">
+					Introduction
+				</a></li>
+				<li><a href="http://bioinformatics.oxfordjournals.org/cgi/content/abstract/23/13/i337?ijkey=QYeUct9uLSzefgk&keytype=ref" target="_blank">
+					Paper in Bioinformatics
+				</a></li>
+				<li><a href="http://gmod.org/wiki/Chado_Tutorial" target="_blank">
+					Tutorial
+				</a></li>
+				<li><a href="http://gmod.org/wiki/Chado_Manual" target="_blank">
+					Manual
+				</a></li>
+				<li><a href="http://gmod.org/wiki/Chado_FAQ" target="_blank">
+					FAQ
+				</a></li>
+				<li><a href="http://gmod.org/wiki/Chado_Best_Practices" target="_blank">
+					Best Practices
+				</a></li>
+				<li><a href="http://gmod.org/wiki/Sample_Chado_SQL" target="_blank">
+					Sample Chado SQL
+				</a></li>
+				<li><a href="http://gmod.org/wiki/PostgreSQL_Performance_Tips" target="_blank">
+					PostgreSQL Performance Tips
+				</a></li>
+			</ul>
+	       </div><!-- /.box-body -->
+		</div>
+
+		<div class="box box-primary">
+            <div class="box-header with-border">
+              <h3 class="box-title">Tables</h3>			  
+			  <span class="label label-primary pull-right"><i class="fa fa-database fa-2x"></i></span>
+            </div><!-- /.box-header -->
+            <div class="box-body">
+            <table id="database_objects" class="table table-bordered table-striped dataTable" role="grid">
+				<thead>
+					<tr>
+					  <th valign="bottom">Table / View</th>
+					  <th align="right" valign="bottom">Referenced</th>
+					  <th align="right" valign="bottom">Foreign Keys</th>
+					  <th align="right" valign="bottom">Columns</th>
+					  <th align="right" valign="bottom">Type</th>
+					  <th class="toggle">Comments</th>
+					</tr>
+				</thead>
+				<tbody>
+				{{#tables}}
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/{{table.name}}.html">{{table.name}}</a></td>
+				  <td class="detail" align="right">{{table.maxChildren}}</td>
+				  <td class="detail" align="right">{{table.maxParents}}</td>
+				  <td class="detail" align="right">{{table.columns.size}}</td>
+				  <td class="detail" align="right">{{table.type}}</td>
+				  <td class="comment detail" style="display: table-cell;">{{{comments}}}</td>
+				  </tr>
+				{{/tables}}				  
+			</table>
+            </div>
+            <!-- /.box-body -->
+          </div>			
+      </section>
+      <!-- /.content -->
+	  <script>
+          var config = {
+	          pagination: {{paginationEnabled}}
+          }
+	  </script>

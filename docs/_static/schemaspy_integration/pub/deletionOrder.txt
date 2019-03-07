@@ -1,0 +1,6 @@
+pub_relationship
+pubprop
+pubauthor_contact
+pub_dbxref
+pubauthor
+pub

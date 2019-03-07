@@ -1,0 +1,11 @@
+cv
+cvterm
+chadoprop
+cvprop
+cvterm_dbxref
+cvtermprop
+cvtermsynonym
+dbprop
+dbxrefprop
+cvterm_relationship
+cvtermpath

@@ -1,0 +1,9 @@
+project_relationship
+projectprop
+project_stock
+project_pub
+project_feature
+project_dbxref
+project_contact
+project_analysis
+project

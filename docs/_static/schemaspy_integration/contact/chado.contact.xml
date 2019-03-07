@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<database name="chado" schema="contact" type="PostgreSQL - 9.3.18">
+   <tables>
+      <table name="contact" remarks="Model persons, institutes, groups, organizations, etc." schema="contact" type="TABLE">
+         <column autoUpdated="false" defaultValue="nextval('contact.contact_contact_id_seq'::regclass)" digits="0" id="0" name="contact_id" nullable="false" remarks="" size="19" type="bigserial">
+            <child column="object_id" foreignKey="contact_relationship_object_id_fkey" implied="false" onDeleteCascade="true" schema="contact" table="contact_relationship"/>
+            <child column="subject_id" foreignKey="contact_relationship_subject_id_fkey" implied="false" onDeleteCascade="true" schema="contact" table="contact_relationship"/>
+            <child column="contact_id" foreignKey="contactprop_contact_id_fkey" implied="false" onDeleteCascade="true" schema="contact" table="contactprop"/>
+            <child column="contact_id" foreignKey="library_contact_contact_id_fkey" implied="false" onDeleteCascade="true" schema="library" table="library_contact"/>
+            <child column="manufacturer_id" foreignKey="arraydesign_manufacturer_id_fkey" implied="false" onDeleteCascade="true" schema="mage" table="arraydesign"/>
+            <child column="operator_id" foreignKey="assay_operator_id_fkey" implied="false" onDeleteCascade="true" schema="mage" table="assay"/>
+            <child column="biosourceprovider_id" foreignKey="biomaterial_biosourceprovider_id_fkey" implied="false" onDeleteCascade="false" schema="mage" table="biomaterial"/>
+            <child column="operator_id" foreignKey="quantification_operator_id_fkey" implied="false" onDeleteCascade="false" schema="mage" table="quantification"/>
+            <child column="contact_id" foreignKey="study_contact_id_fkey" implied="false" onDeleteCascade="true" schema="mage" table="study"/>
+            <child column="contact_id" foreignKey="featuremap_contact_contact_id_fkey" implied="false" onDeleteCascade="true" schema="map" table="featuremap_contact"/>
+            <child column="contact_id" foreignKey="nd_experiment_contact_contact_id_fkey" implied="false" onDeleteCascade="true" schema="natural_diversity" table="nd_experiment_contact"/>
+            <child column="contact_id" foreignKey="project_contact_contact_id_fkey" implied="false" onDeleteCascade="true" schema="project" table="project_contact"/>
+            <child column="contact_id" foreignKey="pubauthor_contact_contact_id_fkey" implied="false" onDeleteCascade="true" schema="pub" table="pubauthor_contact"/>
+            <child column="contact_id" foreignKey="feature_contact_contact_id_fkey" implied="false" onDeleteCascade="true" schema="sequence" table="feature_contact"/>
+            <child column="contact_id" foreignKey="stockcollection_contact_id_fkey" implied="false" onDeleteCascade="false" schema="stock" table="stockcollection"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="1" name="type_id" nullable="true" remarks="What type of contact is this?  E.g. &quot;person&quot;, &quot;lab&quot;." size="19" type="int8">
+            <parent column="cvterm_id" foreignKey="contact_type_id_fkey" implied="false" onDeleteCascade="false" schema="cv" table="cvterm"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="2" name="name" nullable="false" remarks="" size="255" type="varchar"/>
+         <column autoUpdated="false" digits="0" id="3" name="description" nullable="true" remarks="" size="255" type="varchar"/>
+         <primaryKey column="contact_id" sequenceNumberInPK="1"/>
+         <index name="contact_pkey" unique="true">
+            <column ascending="true" name="contact_id"/>
+         </index>
+         <index name="contact_c1" unique="true">
+            <column ascending="true" name="name"/>
+         </index>
+         <index name="library_contact_idx2" unique="false">
+            <column ascending="true" name="contact_id"/>
+         </index>
+         <index name="pubauthor_contact_idx2" unique="false">
+            <column ascending="true" name="contact_id"/>
+         </index>
+      </table>
+      <table name="contact_relationship" remarks="Model relationships between contacts" schema="contact" type="TABLE">
+         <column autoUpdated="false" defaultValue="nextval('contact.contact_relationship_contact_relationship_id_seq'::regclass)" digits="0" id="0" name="contact_relationship_id" nullable="false" remarks="" size="19" type="bigserial"/>
+         <column autoUpdated="false" digits="0" id="1" name="type_id" nullable="false" remarks="Relationship type between subject and object. This is a cvterm, typically from the OBO relationship ontology, although other relationship types are allowed." size="19" type="int8">
+            <parent column="cvterm_id" foreignKey="contact_relationship_type_id_fkey" implied="false" onDeleteCascade="true" schema="cv" table="cvterm"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="2" name="subject_id" nullable="false" remarks="The subject of the subj-predicate-obj sentence. In a DAG, this corresponds to the child node." size="19" type="int8">
+            <parent column="contact_id" foreignKey="contact_relationship_subject_id_fkey" implied="false" onDeleteCascade="true" schema="contact" table="contact"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="3" name="object_id" nullable="false" remarks="The object of the subj-predicate-obj sentence. In a DAG, this corresponds to the parent node." size="19" type="int8">
+            <parent column="contact_id" foreignKey="contact_relationship_object_id_fkey" implied="false" onDeleteCascade="true" schema="contact" table="contact"/>
+         </column>
+         <primaryKey column="contact_relationship_id" sequenceNumberInPK="1"/>
+         <index name="contact_relationship_pkey" unique="true">
+            <column ascending="true" name="contact_relationship_id"/>
+         </index>
+         <index name="contact_relationship_c1" unique="true">
+            <column ascending="true" name="subject_id"/>
+            <column ascending="true" name="object_id"/>
+            <column ascending="true" name="type_id"/>
+         </index>
+         <index name="contact_relationship_idx1" unique="false">
+            <column ascending="true" name="type_id"/>
+         </index>
+         <index name="contact_relationship_idx2" unique="false">
+            <column ascending="true" name="subject_id"/>
+         </index>
+         <index name="contact_relationship_idx3" unique="false">
+            <column ascending="true" name="object_id"/>
+         </index>
+      </table>
+      <table name="contactprop" remarks="A contact can have any number of slot-value property &#10;tags attached to it. This is an alternative to hardcoding a list of columns in the &#10;relational schema, and is completely extensible." schema="contact" type="TABLE">
+         <column autoUpdated="false" defaultValue="nextval('contact.contactprop_contactprop_id_seq'::regclass)" digits="0" id="0" name="contactprop_id" nullable="false" remarks="" size="19" type="bigserial"/>
+         <column autoUpdated="false" digits="0" id="1" name="contact_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="contact_id" foreignKey="contactprop_contact_id_fkey" implied="false" onDeleteCascade="true" schema="contact" table="contact"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="2" name="type_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="cvterm_id" foreignKey="contactprop_type_id_fkey" implied="false" onDeleteCascade="true" schema="cv" table="cvterm"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="3" name="value" nullable="true" remarks="" size="2147483647" type="text"/>
+         <column autoUpdated="false" defaultValue="0" digits="0" id="4" name="rank" nullable="false" remarks="" size="10" type="int4"/>
+         <primaryKey column="contactprop_id" sequenceNumberInPK="1"/>
+         <index name="contactprop_pkey" unique="true">
+            <column ascending="true" name="contactprop_id"/>
+         </index>
+         <index name="contactprop_c1" unique="true">
+            <column ascending="true" name="contact_id"/>
+            <column ascending="true" name="type_id"/>
+            <column ascending="true" name="rank"/>
+         </index>
+         <index name="contactprop_idx1" unique="false">
+            <column ascending="true" name="contact_id"/>
+         </index>
+         <index name="contactprop_idx2" unique="false">
+            <column ascending="true" name="type_id"/>
+         </index>
+      </table>
+   </tables>
+</database>

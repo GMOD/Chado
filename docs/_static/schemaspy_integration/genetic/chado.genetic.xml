@@ -1,0 +1,288 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<database name="chado" schema="genetic" type="PostgreSQL - 9.3.18">
+   <tables>
+      <table name="environment" remarks="The environmental component of a phenotype description." schema="genetic" type="TABLE">
+         <column autoUpdated="false" defaultValue="nextval('genetic.environment_environment_id_seq'::regclass)" digits="0" id="0" name="environment_id" nullable="false" remarks="" size="19" type="bigserial">
+            <child column="environment_id" foreignKey="environment_cvterm_environment_id_fkey" implied="false" onDeleteCascade="true" schema="genetic" table="environment_cvterm"/>
+            <child column="environment_id" foreignKey="phendesc_environment_id_fkey" implied="false" onDeleteCascade="true" schema="genetic" table="phendesc"/>
+            <child column="environment1_id" foreignKey="phenotype_comparison_environment1_id_fkey" implied="false" onDeleteCascade="true" schema="genetic" table="phenotype_comparison"/>
+            <child column="environment2_id" foreignKey="phenotype_comparison_environment2_id_fkey" implied="false" onDeleteCascade="true" schema="genetic" table="phenotype_comparison"/>
+            <child column="environment_id" foreignKey="phenstatement_environment_id_fkey" implied="false" onDeleteCascade="true" schema="genetic" table="phenstatement"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="1" name="uniquename" nullable="false" remarks="" size="2147483647" type="text"/>
+         <column autoUpdated="false" digits="0" id="2" name="description" nullable="true" remarks="" size="2147483647" type="text"/>
+         <primaryKey column="environment_id" sequenceNumberInPK="1"/>
+         <index name="environment_pkey" unique="true">
+            <column ascending="true" name="environment_id"/>
+         </index>
+         <index name="environment_c1" unique="true">
+            <column ascending="true" name="uniquename"/>
+         </index>
+         <index name="environment_idx1" unique="false">
+            <column ascending="true" name="uniquename"/>
+         </index>
+      </table>
+      <table name="environment_cvterm" remarks="" schema="genetic" type="TABLE">
+         <column autoUpdated="false" defaultValue="nextval('genetic.environment_cvterm_environment_cvterm_id_seq'::regclass)" digits="0" id="0" name="environment_cvterm_id" nullable="false" remarks="" size="19" type="bigserial"/>
+         <column autoUpdated="false" digits="0" id="1" name="environment_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="environment_id" foreignKey="environment_cvterm_environment_id_fkey" implied="false" onDeleteCascade="true" schema="genetic" table="environment"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="2" name="cvterm_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="cvterm_id" foreignKey="environment_cvterm_cvterm_id_fkey" implied="false" onDeleteCascade="true" schema="cv" table="cvterm"/>
+         </column>
+         <primaryKey column="environment_cvterm_id" sequenceNumberInPK="1"/>
+         <index name="environment_cvterm_pkey" unique="true">
+            <column ascending="true" name="environment_cvterm_id"/>
+         </index>
+         <index name="environment_cvterm_c1" unique="true">
+            <column ascending="true" name="environment_id"/>
+            <column ascending="true" name="cvterm_id"/>
+         </index>
+         <index name="environment_cvterm_idx1" unique="false">
+            <column ascending="true" name="environment_id"/>
+         </index>
+         <index name="environment_cvterm_idx2" unique="false">
+            <column ascending="true" name="cvterm_id"/>
+         </index>
+      </table>
+      <table name="feature_genotype" remarks="" schema="genetic" type="TABLE">
+         <column autoUpdated="false" defaultValue="nextval('genetic.feature_genotype_feature_genotype_id_seq'::regclass)" digits="0" id="0" name="feature_genotype_id" nullable="false" remarks="" size="19" type="bigserial"/>
+         <column autoUpdated="false" digits="0" id="1" name="feature_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="feature_id" foreignKey="feature_genotype_feature_id_fkey" implied="false" onDeleteCascade="true" schema="sequence" table="feature"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="2" name="genotype_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="genotype_id" foreignKey="feature_genotype_genotype_id_fkey" implied="false" onDeleteCascade="true" schema="genetic" table="genotype"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="3" name="chromosome_id" nullable="true" remarks="A feature of SO type &quot;chromosome&quot;." size="19" type="int8">
+            <parent column="feature_id" foreignKey="feature_genotype_chromosome_id_fkey" implied="false" onDeleteCascade="false" schema="sequence" table="feature"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="4" name="rank" nullable="false" remarks="rank can be used for&#10;n-ploid organisms or to preserve order." size="10" type="int4"/>
+         <column autoUpdated="false" digits="0" id="5" name="cgroup" nullable="false" remarks="Spatially distinguishable&#10;group. group can be used for distinguishing the chromosomal groups,&#10;for example (RNAi products and so on can be treated as different&#10;groups, as they do not fall on a particular chromosome)." size="10" type="int4"/>
+         <column autoUpdated="false" digits="0" id="6" name="cvterm_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="cvterm_id" foreignKey="feature_genotype_cvterm_id_fkey" implied="false" onDeleteCascade="true" schema="cv" table="cvterm"/>
+         </column>
+         <primaryKey column="feature_genotype_id" sequenceNumberInPK="1"/>
+         <index name="feature_genotype_pkey" unique="true">
+            <column ascending="true" name="feature_genotype_id"/>
+         </index>
+         <index name="feature_genotype_c1" unique="true">
+            <column ascending="true" name="feature_id"/>
+            <column ascending="true" name="genotype_id"/>
+            <column ascending="true" name="cvterm_id"/>
+            <column ascending="true" name="chromosome_id"/>
+            <column ascending="true" name="rank"/>
+            <column ascending="true" name="cgroup"/>
+         </index>
+         <index name="feature_genotype_idx1" unique="false">
+            <column ascending="true" name="feature_id"/>
+         </index>
+         <index name="feature_genotype_idx2" unique="false">
+            <column ascending="true" name="genotype_id"/>
+         </index>
+      </table>
+      <table name="genotype" remarks="Genetic context. A genotype is defined by a collection of features, mutations, balancers, deficiencies, haplotype blocks, or engineered constructs." schema="genetic" type="TABLE">
+         <column autoUpdated="false" defaultValue="nextval('genetic.genotype_genotype_id_seq'::regclass)" digits="0" id="0" name="genotype_id" nullable="false" remarks="" size="19" type="bigserial">
+            <child column="genotype_id" foreignKey="feature_genotype_genotype_id_fkey" implied="false" onDeleteCascade="true" schema="genetic" table="feature_genotype"/>
+            <child column="genotype_id" foreignKey="genotypeprop_genotype_id_fkey" implied="false" onDeleteCascade="true" schema="genetic" table="genotypeprop"/>
+            <child column="genotype_id" foreignKey="phendesc_genotype_id_fkey" implied="false" onDeleteCascade="true" schema="genetic" table="phendesc"/>
+            <child column="genotype1_id" foreignKey="phenotype_comparison_genotype1_id_fkey" implied="false" onDeleteCascade="true" schema="genetic" table="phenotype_comparison"/>
+            <child column="genotype2_id" foreignKey="phenotype_comparison_genotype2_id_fkey" implied="false" onDeleteCascade="true" schema="genetic" table="phenotype_comparison"/>
+            <child column="genotype_id" foreignKey="phenstatement_genotype_id_fkey" implied="false" onDeleteCascade="true" schema="genetic" table="phenstatement"/>
+            <child column="genotype_id" foreignKey="nd_experiment_genotype_genotype_id_fkey" implied="false" onDeleteCascade="true" schema="natural_diversity" table="nd_experiment_genotype"/>
+            <child column="genotype_id" foreignKey="stock_genotype_genotype_id_fkey" implied="false" onDeleteCascade="true" schema="stock" table="stock_genotype"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="1" name="name" nullable="true" remarks="Optional alternative name for a genotype, &#10;for display purposes." size="2147483647" type="text"/>
+         <column autoUpdated="false" digits="0" id="2" name="uniquename" nullable="false" remarks="The unique name for a genotype; &#10;typically derived from the features making up the genotype." size="2147483647" type="text"/>
+         <column autoUpdated="false" digits="0" id="3" name="description" nullable="true" remarks="" size="2147483647" type="text"/>
+         <column autoUpdated="false" digits="0" id="4" name="type_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="cvterm_id" foreignKey="genotype_type_id_fkey" implied="false" onDeleteCascade="true" schema="cv" table="cvterm"/>
+         </column>
+         <primaryKey column="genotype_id" sequenceNumberInPK="1"/>
+         <index name="genotype_pkey" unique="true">
+            <column ascending="true" name="genotype_id"/>
+         </index>
+         <index name="genotype_c1" unique="true">
+            <column ascending="true" name="uniquename"/>
+         </index>
+         <index name="genotype_idx1" unique="false">
+            <column ascending="true" name="uniquename"/>
+         </index>
+         <index name="genotype_idx2" unique="false">
+            <column ascending="true" name="name"/>
+         </index>
+      </table>
+      <table name="genotypeprop" remarks="" schema="genetic" type="TABLE">
+         <column autoUpdated="false" defaultValue="nextval('genetic.genotypeprop_genotypeprop_id_seq'::regclass)" digits="0" id="0" name="genotypeprop_id" nullable="false" remarks="" size="19" type="bigserial"/>
+         <column autoUpdated="false" digits="0" id="1" name="genotype_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="genotype_id" foreignKey="genotypeprop_genotype_id_fkey" implied="false" onDeleteCascade="true" schema="genetic" table="genotype"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="2" name="type_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="cvterm_id" foreignKey="genotypeprop_type_id_fkey" implied="false" onDeleteCascade="true" schema="cv" table="cvterm"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="3" name="value" nullable="true" remarks="" size="2147483647" type="text"/>
+         <column autoUpdated="false" defaultValue="0" digits="0" id="4" name="rank" nullable="false" remarks="" size="10" type="int4"/>
+         <primaryKey column="genotypeprop_id" sequenceNumberInPK="1"/>
+         <index name="genotypeprop_pkey" unique="true">
+            <column ascending="true" name="genotypeprop_id"/>
+         </index>
+         <index name="genotypeprop_c1" unique="true">
+            <column ascending="true" name="genotype_id"/>
+            <column ascending="true" name="type_id"/>
+            <column ascending="true" name="rank"/>
+         </index>
+         <index name="genotypeprop_idx1" unique="false">
+            <column ascending="true" name="genotype_id"/>
+         </index>
+         <index name="genotypeprop_idx2" unique="false">
+            <column ascending="true" name="type_id"/>
+         </index>
+      </table>
+      <table name="phendesc" remarks="A summary of a _set_ of phenotypic statements for any one gcontext made in any one publication." schema="genetic" type="TABLE">
+         <column autoUpdated="false" defaultValue="nextval('genetic.phendesc_phendesc_id_seq'::regclass)" digits="0" id="0" name="phendesc_id" nullable="false" remarks="" size="19" type="bigserial"/>
+         <column autoUpdated="false" digits="0" id="1" name="genotype_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="genotype_id" foreignKey="phendesc_genotype_id_fkey" implied="false" onDeleteCascade="true" schema="genetic" table="genotype"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="2" name="environment_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="environment_id" foreignKey="phendesc_environment_id_fkey" implied="false" onDeleteCascade="true" schema="genetic" table="environment"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="3" name="description" nullable="false" remarks="" size="2147483647" type="text"/>
+         <column autoUpdated="false" digits="0" id="4" name="type_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="cvterm_id" foreignKey="phendesc_type_id_fkey" implied="false" onDeleteCascade="true" schema="cv" table="cvterm"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="5" name="pub_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="pub_id" foreignKey="phendesc_pub_id_fkey" implied="false" onDeleteCascade="true" schema="pub" table="pub"/>
+         </column>
+         <primaryKey column="phendesc_id" sequenceNumberInPK="1"/>
+         <index name="phendesc_pkey" unique="true">
+            <column ascending="true" name="phendesc_id"/>
+         </index>
+         <index name="phendesc_c1" unique="true">
+            <column ascending="true" name="genotype_id"/>
+            <column ascending="true" name="environment_id"/>
+            <column ascending="true" name="type_id"/>
+            <column ascending="true" name="pub_id"/>
+         </index>
+         <index name="phendesc_idx1" unique="false">
+            <column ascending="true" name="genotype_id"/>
+         </index>
+         <index name="phendesc_idx2" unique="false">
+            <column ascending="true" name="environment_id"/>
+         </index>
+         <index name="phendesc_idx3" unique="false">
+            <column ascending="true" name="pub_id"/>
+         </index>
+      </table>
+      <table name="phenotype_comparison" remarks="Comparison of phenotypes e.g., genotype1/environment1/phenotype1 &quot;non-suppressible&quot; with respect to genotype2/environment2/phenotype2." schema="genetic" type="TABLE">
+         <column autoUpdated="false" defaultValue="nextval('genetic.phenotype_comparison_phenotype_comparison_id_seq'::regclass)" digits="0" id="0" name="phenotype_comparison_id" nullable="false" remarks="" size="19" type="bigserial">
+            <child column="phenotype_comparison_id" foreignKey="phenotype_comparison_cvterm_phenotype_comparison_id_fkey" implied="false" onDeleteCascade="true" schema="genetic" table="phenotype_comparison_cvterm"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="1" name="genotype1_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="genotype_id" foreignKey="phenotype_comparison_genotype1_id_fkey" implied="false" onDeleteCascade="true" schema="genetic" table="genotype"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="2" name="environment1_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="environment_id" foreignKey="phenotype_comparison_environment1_id_fkey" implied="false" onDeleteCascade="true" schema="genetic" table="environment"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="3" name="genotype2_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="genotype_id" foreignKey="phenotype_comparison_genotype2_id_fkey" implied="false" onDeleteCascade="true" schema="genetic" table="genotype"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="4" name="environment2_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="environment_id" foreignKey="phenotype_comparison_environment2_id_fkey" implied="false" onDeleteCascade="true" schema="genetic" table="environment"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="5" name="phenotype1_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="phenotype_id" foreignKey="phenotype_comparison_phenotype1_id_fkey" implied="false" onDeleteCascade="true" schema="phenotype" table="phenotype"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="6" name="phenotype2_id" nullable="true" remarks="" size="19" type="int8">
+            <parent column="phenotype_id" foreignKey="phenotype_comparison_phenotype2_id_fkey" implied="false" onDeleteCascade="true" schema="phenotype" table="phenotype"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="7" name="pub_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="pub_id" foreignKey="phenotype_comparison_pub_id_fkey" implied="false" onDeleteCascade="true" schema="pub" table="pub"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="8" name="organism_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="organism_id" foreignKey="phenotype_comparison_organism_id_fkey" implied="false" onDeleteCascade="true" schema="organism" table="organism"/>
+         </column>
+         <primaryKey column="phenotype_comparison_id" sequenceNumberInPK="1"/>
+         <index name="phenotype_comparison_pkey" unique="true">
+            <column ascending="true" name="phenotype_comparison_id"/>
+         </index>
+         <index name="phenotype_comparison_c1" unique="true">
+            <column ascending="true" name="genotype1_id"/>
+            <column ascending="true" name="environment1_id"/>
+            <column ascending="true" name="genotype2_id"/>
+            <column ascending="true" name="environment2_id"/>
+            <column ascending="true" name="phenotype1_id"/>
+            <column ascending="true" name="pub_id"/>
+         </index>
+         <index name="phenotype_comparison_idx1" unique="false">
+            <column ascending="true" name="genotype1_id"/>
+         </index>
+         <index name="phenotype_comparison_idx2" unique="false">
+            <column ascending="true" name="genotype2_id"/>
+         </index>
+         <index name="phenotype_comparison_idx4" unique="false">
+            <column ascending="true" name="pub_id"/>
+         </index>
+      </table>
+      <table name="phenotype_comparison_cvterm" remarks="" schema="genetic" type="TABLE">
+         <column autoUpdated="false" defaultValue="nextval('genetic.phenotype_comparison_cvterm_phenotype_comparison_cvterm_id_seq'::regclass)" digits="0" id="0" name="phenotype_comparison_cvterm_id" nullable="false" remarks="" size="19" type="bigserial"/>
+         <column autoUpdated="false" digits="0" id="1" name="phenotype_comparison_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="phenotype_comparison_id" foreignKey="phenotype_comparison_cvterm_phenotype_comparison_id_fkey" implied="false" onDeleteCascade="true" schema="genetic" table="phenotype_comparison"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="2" name="cvterm_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="cvterm_id" foreignKey="phenotype_comparison_cvterm_cvterm_id_fkey" implied="false" onDeleteCascade="true" schema="cv" table="cvterm"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="3" name="pub_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="pub_id" foreignKey="phenotype_comparison_cvterm_pub_id_fkey" implied="false" onDeleteCascade="true" schema="pub" table="pub"/>
+         </column>
+         <column autoUpdated="false" defaultValue="0" digits="0" id="4" name="rank" nullable="false" remarks="" size="10" type="int4"/>
+         <primaryKey column="phenotype_comparison_cvterm_id" sequenceNumberInPK="1"/>
+         <index name="phenotype_comparison_cvterm_pkey" unique="true">
+            <column ascending="true" name="phenotype_comparison_cvterm_id"/>
+         </index>
+         <index name="phenotype_comparison_cvterm_c1" unique="true">
+            <column ascending="true" name="phenotype_comparison_id"/>
+            <column ascending="true" name="cvterm_id"/>
+         </index>
+         <index name="phenotype_comparison_cvterm_idx1" unique="false">
+            <column ascending="true" name="phenotype_comparison_id"/>
+         </index>
+         <index name="phenotype_comparison_cvterm_idx2" unique="false">
+            <column ascending="true" name="cvterm_id"/>
+         </index>
+      </table>
+      <table name="phenstatement" remarks="Phenotypes are things like &quot;larval lethal&quot;.  Phenstatements are things like &quot;dpp-1 is recessive larval lethal&quot;. So essentially phenstatement is a linking table expressing the relationship between genotype, environment, and phenotype." schema="genetic" type="TABLE">
+         <column autoUpdated="false" defaultValue="nextval('genetic.phenstatement_phenstatement_id_seq'::regclass)" digits="0" id="0" name="phenstatement_id" nullable="false" remarks="" size="19" type="bigserial"/>
+         <column autoUpdated="false" digits="0" id="1" name="genotype_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="genotype_id" foreignKey="phenstatement_genotype_id_fkey" implied="false" onDeleteCascade="true" schema="genetic" table="genotype"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="2" name="environment_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="environment_id" foreignKey="phenstatement_environment_id_fkey" implied="false" onDeleteCascade="true" schema="genetic" table="environment"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="3" name="phenotype_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="phenotype_id" foreignKey="phenstatement_phenotype_id_fkey" implied="false" onDeleteCascade="true" schema="phenotype" table="phenotype"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="4" name="type_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="cvterm_id" foreignKey="phenstatement_type_id_fkey" implied="false" onDeleteCascade="true" schema="cv" table="cvterm"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="5" name="pub_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="pub_id" foreignKey="phenstatement_pub_id_fkey" implied="false" onDeleteCascade="true" schema="pub" table="pub"/>
+         </column>
+         <primaryKey column="phenstatement_id" sequenceNumberInPK="1"/>
+         <index name="phenstatement_pkey" unique="true">
+            <column ascending="true" name="phenstatement_id"/>
+         </index>
+         <index name="phenstatement_c1" unique="true">
+            <column ascending="true" name="genotype_id"/>
+            <column ascending="true" name="phenotype_id"/>
+            <column ascending="true" name="environment_id"/>
+            <column ascending="true" name="type_id"/>
+            <column ascending="true" name="pub_id"/>
+         </index>
+         <index name="phenstatement_idx1" unique="false">
+            <column ascending="true" name="genotype_id"/>
+         </index>
+         <index name="phenstatement_idx2" unique="false">
+            <column ascending="true" name="phenotype_id"/>
+         </index>
+      </table>
+   </tables>
+</database>

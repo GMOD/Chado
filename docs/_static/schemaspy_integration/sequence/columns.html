@@ -1,0 +1,1145 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>chado Module</title>
+  <!-- Tell the browser to be responsive to screen width -->
+  <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+  <link rel="icon" type="image/png" sizes="16x16" href="../favicon.ico">
+  <!-- Bootstrap 3.3.5 -->
+  <link rel="stylesheet" href="bower/admin-lte/bootstrap/css/bootstrap.min.css">
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="bower/font-awesome/css/font-awesome.min.css">
+  <!-- Ionicons -->
+  <link rel="stylesheet" href="bower/ionicons/css/ionicons.min.css">
+  <!-- DataTables -->
+  <link rel="stylesheet" href="bower/datatables.net-bs/css/dataTables.bootstrap.min.css">
+  <link rel="stylesheet" href="bower/datatables.net-buttons-bs/css/buttons.bootstrap.min.css">
+  <!-- Code Mirror -->
+  <link rel="stylesheet" href="bower/codemirror/codemirror.css">
+  <!-- Fonts -->
+  <link href='fonts/indieflower/indie-flower.css' rel='stylesheet' type='text/css'>
+  <link href='fonts/source-sans-pro/source-sans-pro.css' rel='stylesheet' type='text/css'>
+
+  <!-- Theme style -->
+  <link rel="stylesheet" href="bower/admin-lte/dist/css/AdminLTE.min.css">
+  <!-- Salvattore -->
+  <link rel="stylesheet" href="bower/salvattore/salvattore.css">
+  <!-- AdminLTE Skins. Choose a skin from the css/skins
+       folder instead of downloading all of them to reduce the load. -->
+  <link rel="stylesheet" href="bower/admin-lte/dist/css/skins/_all-skins.min.css">
+  <!-- SchemaSpy -->
+  <link rel="stylesheet" href="schemaSpy.css">
+  <!-- GMOD Chado Specific CSS -->
+  <link rel="stylesheet" href="../main.css">
+  
+  <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+  <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+  <!--[if lt IE 9]>
+  <script src="bower/html5shiv/html5shiv.min.js"></script>
+  <script src="bower/respond/respond.min.js"></script>
+  <![endif]-->
+</head>
+<!-- ADD THE CLASS layout-top-nav TO REMOVE THE SIDEBAR. -->
+<!-- Skins: skin-black, black-light, green-light, red-light, yellow-light, purple-light, blue-light -->
+<body class="hold-transition skin-black layout-top-nav">
+<div class="wrapper">
+  <header class="main-header">
+    <nav class="navbar navbar-static-top">
+      <div class="container">
+        <div class="navbar-header">
+          <a href="../index.html" class="navbar-brand" style="padding:0;">
+            <img src="../GMOD-cogs.png" class="gmod-logo" />
+            <span class="gmod-title">Chado</span>
+          </a>
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar-collapse">
+            <i class="fa fa-bars"></i>
+          </button>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-collapse pull-left" id="navbar-collapse">
+          <ul class="nav navbar-nav">
+            <li>
+              <a href="../index.html" title="All Chado Tables.">
+                All Tables</span>
+              </a>
+            </li>
+            <li>
+              <a href="../constraints.html" title="All Constraints in Chado.">
+                All Constraints
+              </a>
+            </li>
+            <li>
+              <a href="index.html" title="Tables in this module.">
+                Module Tables <span class="sr-only">(current)</span>
+              </a>
+            </li>            
+            <li>
+              <a href="columns.html" title="Columns in this module.">
+                Module Columns
+              </a>
+            </li>
+            <li>
+              <a href="constraints.html" title="Constraints defined by this module.">
+                Module Constraints
+              </a>
+            </li>
+            <li>
+              <a href="relationships.html" title="Diagram of table relationships">
+                Module Relationships
+              </a>
+            </li>
+          </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+        <!-- Navbar Right Menu -->
+
+      </div>
+      <!-- /.container-fluid -->
+    </nav>
+  </header>
+  <!-- Main content -->
+  <!-- Full Width Column -->
+  <div class="content-wrapper">
+    
+    <div class="box box-solid">
+      <div class="box-body">
+        <p><span class="version-label">Schema Version:</span> 1.3 
+          <span class="version-label">Module</span>: chado</p>
+      </div>
+    </div>
+		
+          <!-- Content Header (Page header) -->
+      <section class="content-header">
+        <h1>Columns</h1>
+      </section>
+      <!-- Main content -->
+      <section class="content">
+		<div class="box box-primary">
+			<div class="box-header with-border">
+			  <span class="glyphicon glyphicon-list-alt" aria-hidden="true"></span>
+              <h3 class="box-title">Columns</h3>
+            </div>	
+            <div class="box-body">
+				<table id="column_table" class="table table-bordered table-striped dataTable" role="grid">
+				<thead align='left'>
+				<tr>
+				  <th>Table</th>
+				  <th>Type</th>
+				  <th>Column</th>				  
+				  <th>Type</th>
+				  <th>Size</th>
+				  <th title='Are nulls allowed?'>Nulls</th>
+				  <th title='Default value'>Default</th>
+				  <th title='Comments' class="toggle"><span>Comments</span></th>
+				</tr>
+				</thead>
+				<tbody>
+				<tr>
+				 <td>feature_cvterm_dbxref</td>
+				 <td>Table</td>
+				 <td class='primaryKey' title='Primary Key'><i class='icon ion-key iconkey' style='padding-left: 5px;'></i>feature_cvterm_dbxref_id</td>
+				 <td>bigserial</td>
+				 <td>19</td>
+				 <td title=''></td>
+				 <td>nextval(&#39;sequence.feature_cvterm_dbxref_feature_cvterm_dbxref_id_seq&#39;::regclass)</td>
+				 <td></td>
+				</tr>
+				<tr>
+				 <td>featureloc</td>
+				 <td>Table</td>
+				 <td>phase</td>
+				 <td>int4</td>
+				 <td>10</td>
+				 <td title='nullable'>√</td>
+				 <td>null</td>
+				 <td><p>Phase of translation with respect to srcfeature_id. Values are 0, 1, 2. It may not be possible to manifest this column for some features such as exons, because the phase is dependant on the spliceform (the same exon can appear in multiple spliceforms). This column is mostly useful for predicted exons and CDSs.</p></td>
+				</tr>
+				<tr>
+				 <td>feature</td>
+				 <td>Table</td>
+				 <td class='foreignKey' title='Foreign Key'><i class='icon ion-key iconkey' style='padding-left: 5px;'></i>type_id</td>
+				 <td>int8</td>
+				 <td>19</td>
+				 <td title=''></td>
+				 <td>null</td>
+				 <td><p>A required reference to a table:cvterm giving the feature type. This will typically be a Sequence Ontology identifier. This column is thus used to subclass the feature table.</p></td>
+				</tr>
+				<tr>
+				 <td>feature_dbxref</td>
+				 <td>Table</td>
+				 <td class='foreignKey' title='Foreign Key'><i class='icon ion-key iconkey' style='padding-left: 5px;'></i>dbxref_id</td>
+				 <td>int8</td>
+				 <td>19</td>
+				 <td title=''></td>
+				 <td>null</td>
+				 <td></td>
+				</tr>
+				<tr>
+				 <td>feature_cvtermprop</td>
+				 <td>Table</td>
+				 <td class='foreignKey' title='Foreign Key'><i class='icon ion-key iconkey' style='padding-left: 5px;'></i>feature_cvterm_id</td>
+				 <td>int8</td>
+				 <td>19</td>
+				 <td title=''></td>
+				 <td>null</td>
+				 <td></td>
+				</tr>
+				<tr>
+				 <td>feature_cvtermprop</td>
+				 <td>Table</td>
+				 <td class='indexedColumn' title='Indexed'><i class='fa fa-sitemap fa-rotate-120' style='padding-right: 5px;'></i>rank</td>
+				 <td>int4</td>
+				 <td>10</td>
+				 <td title=''></td>
+				 <td>0</td>
+				 <td><p>Property-Value ordering. Any feature_cvterm can have multiple values for any particular property type - these are ordered in a list using rank, counting from zero. For properties that are single-valued rather than multi-valued, the default 0 value should be used.</p></td>
+				</tr>
+				<tr>
+				 <td>feature_relationshipprop_pub</td>
+				 <td>Table</td>
+				 <td class='foreignKey' title='Foreign Key'><i class='icon ion-key iconkey' style='padding-left: 5px;'></i>pub_id</td>
+				 <td>int8</td>
+				 <td>19</td>
+				 <td title=''></td>
+				 <td>null</td>
+				 <td></td>
+				</tr>
+				<tr>
+				 <td>featureloc</td>
+				 <td>Table</td>
+				 <td class='indexedColumn' title='Indexed'><i class='fa fa-sitemap fa-rotate-120' style='padding-right: 5px;'></i>fmax</td>
+				 <td>int8</td>
+				 <td>19</td>
+				 <td title='nullable'>√</td>
+				 <td>null</td>
+				 <td><p>The rightmost/maximal boundary in the linear range represented by the featureloc. Sometimes (e.g. in bioperl) this is called -end- although this is confusing because it does not necessarily represent the 3-prime coordinate. Important: This is space-based (interbase) coordinates, counting from zero. No conversion is required to go from fmax to the rightmost coordinate in a base-oriented system that counts from 1 (e.g. GFF, Bioperl).</p></td>
+				</tr>
+				<tr>
+				 <td>synonym</td>
+				 <td>Table</td>
+				 <td class='foreignKey' title='Foreign Key'><i class='icon ion-key iconkey' style='padding-left: 5px;'></i>type_id</td>
+				 <td>int8</td>
+				 <td>19</td>
+				 <td title=''></td>
+				 <td>null</td>
+				 <td><p>Types would be symbol and fullname for now.</p></td>
+				</tr>
+				<tr>
+				 <td>synonym</td>
+				 <td>Table</td>
+				 <td class='indexedColumn' title='Indexed'><i class='fa fa-sitemap fa-rotate-120' style='padding-right: 5px;'></i>name</td>
+				 <td>varchar</td>
+				 <td>255</td>
+				 <td title=''></td>
+				 <td>null</td>
+				 <td><p>The synonym itself. Should be human-readable machine-searchable ascii text.</p></td>
+				</tr>
+				<tr>
+				 <td>feature_relationship</td>
+				 <td>Table</td>
+				 <td class='indexedColumn' title='Indexed'><i class='fa fa-sitemap fa-rotate-120' style='padding-right: 5px;'></i>rank</td>
+				 <td>int4</td>
+				 <td>10</td>
+				 <td title=''></td>
+				 <td>0</td>
+				 <td><p>The ordering of subject features with respect to the object feature may be important (for example, exon ordering on a transcript - not always derivable if you take trans spliced genes into consideration). Rank is used to order these; starts from zero.</p></td>
+				</tr>
+				<tr>
+				 <td>featureloc</td>
+				 <td>Table</td>
+				 <td class='indexedColumn' title='Indexed'><i class='fa fa-sitemap fa-rotate-120' style='padding-right: 5px;'></i>locgroup</td>
+				 <td>int4</td>
+				 <td>10</td>
+				 <td title=''></td>
+				 <td>0</td>
+				 <td><p>This is used to manifest redundant, derivable extra locations for a feature. The default locgroup=0 is used for the DIRECT location of a feature. Important: most Chado users may never use featurelocs WITH logroup &gt; 0. Transitively derived locations are indicated with locgroup &gt; 0. For example, the position of an exon on a BAC and in global chromosome coordinates. This column is used to differentiate these groupings of locations. The default locgroup 0 is used for the main or primary location, from which the others can be derived via coordinate transformations. Another example of redundant locations is storing ORF coordinates relative to both transcript and genome. Redundant locations open the possibility of the database getting into inconsistent states; this schema gives us the flexibility of both warehouse instantiations with redundant locations (easier for querying) and management instantiations with no redundant locations. An example of using both locgroup and rank: imagine a feature indicating a conserved region between the chromosomes of two different species. We may want to keep redundant locations on both contigs and chromosomes. We would thus have 4 locations for the single conserved region feature - two distinct locgroups (contig level and chromosome level) and two distinct ranks (for the two species).</p></td>
+				</tr>
+				<tr>
+				 <td>feature</td>
+				 <td>Table</td>
+				 <td class='indexedColumn' title='Indexed'><i class='fa fa-sitemap fa-rotate-120' style='padding-right: 5px;'></i>name</td>
+				 <td>varchar</td>
+				 <td>255</td>
+				 <td title='nullable'>√</td>
+				 <td>null</td>
+				 <td><p>The optional human-readable common name for a feature, for display purposes.</p></td>
+				</tr>
+				<tr>
+				 <td>feature_cvterm</td>
+				 <td>Table</td>
+				 <td class='foreignKey' title='Foreign Key'><i class='icon ion-key iconkey' style='padding-left: 5px;'></i>pub_id</td>
+				 <td>int8</td>
+				 <td>19</td>
+				 <td title=''></td>
+				 <td>null</td>
+				 <td><p>Provenance for the annotation. Each annotation should have a single primary publication (which may be of the appropriate type for computational analyses) where more details can be found. Additional provenance dbxrefs can be attached using feature_cvterm_dbxref.</p></td>
+				</tr>
+				<tr>
+				 <td>feature</td>
+				 <td>Table</td>
+				 <td>md5checksum</td>
+				 <td>bpchar</td>
+				 <td>32</td>
+				 <td title='nullable'>√</td>
+				 <td>null</td>
+				 <td><p>The 32-character checksum of the sequence, calculated using the MD5 algorithm. This is practically guaranteed to be unique for any feature. This column thus acts as a unique identifier on the mathematical sequence.</p></td>
+				</tr>
+				<tr>
+				 <td>featureloc</td>
+				 <td>Table</td>
+				 <td class='foreignKey' title='Foreign Key'><i class='icon ion-key iconkey' style='padding-left: 5px;'></i>srcfeature_id</td>
+				 <td>int8</td>
+				 <td>19</td>
+				 <td title='nullable'>√</td>
+				 <td>null</td>
+				 <td><p>The source feature which this location is relative to. Every location is relative to another feature (however, this column is nullable, because the srcfeature may not be known). All locations are -proper- that is, nothing should be located relative to itself. No cycles are allowed in the featureloc graph.</p></td>
+				</tr>
+				<tr>
+				 <td>feature_pubprop</td>
+				 <td>Table</td>
+				 <td>value</td>
+				 <td>text</td>
+				 <td>2147483647</td>
+				 <td title='nullable'>√</td>
+				 <td>null</td>
+				 <td></td>
+				</tr>
+				<tr>
+				 <td>feature_relationshipprop</td>
+				 <td>Table</td>
+				 <td class='primaryKey' title='Primary Key'><i class='icon ion-key iconkey' style='padding-left: 5px;'></i>feature_relationshipprop_id</td>
+				 <td>bigserial</td>
+				 <td>19</td>
+				 <td title=''></td>
+				 <td>nextval(&#39;sequence.feature_relationshipprop_feature_relationshipprop_id_seq&#39;::regclass)</td>
+				 <td></td>
+				</tr>
+				<tr>
+				 <td>feature_cvterm</td>
+				 <td>Table</td>
+				 <td>is_not</td>
+				 <td>bool</td>
+				 <td>1</td>
+				 <td title=''></td>
+				 <td>false</td>
+				 <td><p>If this is set to true, then this annotation is interpreted as a NEGATIVE annotation - i.e. the feature does NOT have the specified function, process, component, part, etc. See GO docs for more details.</p></td>
+				</tr>
+				<tr>
+				 <td>featureprop_pub</td>
+				 <td>Table</td>
+				 <td class='foreignKey' title='Foreign Key'><i class='icon ion-key iconkey' style='padding-left: 5px;'></i>featureprop_id</td>
+				 <td>int8</td>
+				 <td>19</td>
+				 <td title=''></td>
+				 <td>null</td>
+				 <td></td>
+				</tr>
+				<tr>
+				 <td>feature_cvterm_dbxref</td>
+				 <td>Table</td>
+				 <td class='foreignKey' title='Foreign Key'><i class='icon ion-key iconkey' style='padding-left: 5px;'></i>dbxref_id</td>
+				 <td>int8</td>
+				 <td>19</td>
+				 <td title=''></td>
+				 <td>null</td>
+				 <td></td>
+				</tr>
+				<tr>
+				 <td>featureloc</td>
+				 <td>Table</td>
+				 <td>strand</td>
+				 <td>int2</td>
+				 <td>5</td>
+				 <td title='nullable'>√</td>
+				 <td>null</td>
+				 <td><p>The orientation/directionality of the location. Should be 0, -1 or +1.</p></td>
+				</tr>
+				<tr>
+				 <td>feature_synonym</td>
+				 <td>Table</td>
+				 <td class='foreignKey' title='Foreign Key'><i class='icon ion-key iconkey' style='padding-left: 5px;'></i>pub_id</td>
+				 <td>int8</td>
+				 <td>19</td>
+				 <td title=''></td>
+				 <td>null</td>
+				 <td><p>The pub_id link is for relating the usage of a given synonym to the publication in which it was used.</p></td>
+				</tr>
+				<tr>
+				 <td>feature_relationshipprop</td>
+				 <td>Table</td>
+				 <td>value</td>
+				 <td>text</td>
+				 <td>2147483647</td>
+				 <td title='nullable'>√</td>
+				 <td>null</td>
+				 <td><p>The value of the property, represented as text. Numeric values are converted to their text representation. This is less efficient than using native database types, but is easier to query.</p></td>
+				</tr>
+				<tr>
+				 <td>feature</td>
+				 <td>Table</td>
+				 <td>seqlen</td>
+				 <td>int8</td>
+				 <td>19</td>
+				 <td title='nullable'>√</td>
+				 <td>null</td>
+				 <td><p>The length of the residue feature. See column:residues. This column is partially redundant with the residues column, and also with featureloc. This column is required because the location may be unknown and the residue sequence may not be manifested, yet it may be desirable to store and query the length of the feature. The seqlen should always be manifested where the length of the sequence is known.</p></td>
+				</tr>
+				<tr>
+				 <td>feature_synonym</td>
+				 <td>Table</td>
+				 <td>is_current</td>
+				 <td>bool</td>
+				 <td>1</td>
+				 <td title=''></td>
+				 <td>false</td>
+				 <td><p>The is_current boolean indicates whether the linked synonym is the current -official- symbol for the linked feature.</p></td>
+				</tr>
+				<tr>
+				 <td>feature</td>
+				 <td>Table</td>
+				 <td class='primaryKey' title='Primary Key'><i class='icon ion-key iconkey' style='padding-left: 5px;'></i>feature_id</td>
+				 <td>bigserial</td>
+				 <td>19</td>
+				 <td title=''></td>
+				 <td>nextval(&#39;sequence.feature_feature_id_seq&#39;::regclass)</td>
+				 <td></td>
+				</tr>
+				<tr>
+				 <td>feature_synonym</td>
+				 <td>Table</td>
+				 <td class='foreignKey' title='Foreign Key'><i class='icon ion-key iconkey' style='padding-left: 5px;'></i>synonym_id</td>
+				 <td>int8</td>
+				 <td>19</td>
+				 <td title=''></td>
+				 <td>null</td>
+				 <td></td>
+				</tr>
+				<tr>
+				 <td>feature_synonym</td>
+				 <td>Table</td>
+				 <td>is_internal</td>
+				 <td>bool</td>
+				 <td>1</td>
+				 <td title=''></td>
+				 <td>false</td>
+				 <td><p>Typically a synonym exists so that somebody querying the db with an obsolete name can find the object theyre looking for (under its current name. If the synonym has been used publicly and deliberately (e.g. in a paper), it may also be listed in reports as a synonym. If the synonym was not used deliberately (e.g. there was a typo which went public), then the is_internal boolean may be set to -true- so that it is known that the synonym is -internal- and should be queryable but should not be listed in reports as a valid synonym.</p></td>
+				</tr>
+				<tr>
+				 <td>featureloc_pub</td>
+				 <td>Table</td>
+				 <td class='foreignKey' title='Foreign Key'><i class='icon ion-key iconkey' style='padding-left: 5px;'></i>featureloc_id</td>
+				 <td>int8</td>
+				 <td>19</td>
+				 <td title=''></td>
+				 <td>null</td>
+				 <td></td>
+				</tr>
+				<tr>
+				 <td>feature_cvterm_pub</td>
+				 <td>Table</td>
+				 <td class='foreignKey' title='Foreign Key'><i class='icon ion-key iconkey' style='padding-left: 5px;'></i>pub_id</td>
+				 <td>int8</td>
+				 <td>19</td>
+				 <td title=''></td>
+				 <td>null</td>
+				 <td></td>
+				</tr>
+				<tr>
+				 <td>featureloc</td>
+				 <td>Table</td>
+				 <td class='indexedColumn' title='Indexed'><i class='fa fa-sitemap fa-rotate-120' style='padding-right: 5px;'></i>rank</td>
+				 <td>int4</td>
+				 <td>10</td>
+				 <td title=''></td>
+				 <td>0</td>
+				 <td><p>Used when a feature has &gt;1 location, otherwise the default rank 0 is used. Some features (e.g. blast hits and HSPs) have two locations - one on the query and one on the subject. Rank is used to differentiate these. Rank=0 is always used for the query, Rank=1 for the subject. For multiple alignments, assignment of rank is arbitrary. Rank is also used for sequence_variant features, such as SNPs. Rank=0 indicates the wildtype (or baseline) feature, Rank=1 indicates the mutant (or compared) feature.</p></td>
+				</tr>
+				<tr>
+				 <td>feature_pubprop</td>
+				 <td>Table</td>
+				 <td class='foreignKey' title='Foreign Key'><i class='icon ion-key iconkey' style='padding-left: 5px;'></i>feature_pub_id</td>
+				 <td>int8</td>
+				 <td>19</td>
+				 <td title=''></td>
+				 <td>null</td>
+				 <td></td>
+				</tr>
+				<tr>
+				 <td>featureprop</td>
+				 <td>Table</td>
+				 <td class='indexedColumn' title='Indexed'><i class='fa fa-sitemap fa-rotate-120' style='padding-right: 5px;'></i>rank</td>
+				 <td>int4</td>
+				 <td>10</td>
+				 <td title=''></td>
+				 <td>0</td>
+				 <td><p>Property-Value ordering. Any feature can have multiple values for any particular property type - these are ordered in a list using rank, counting from zero. For properties that are single-valued rather than multi-valued, the default 0 value should be used</p></td>
+				</tr>
+				<tr>
+				 <td>feature_pub</td>
+				 <td>Table</td>
+				 <td class='foreignKey' title='Foreign Key'><i class='icon ion-key iconkey' style='padding-left: 5px;'></i>feature_id</td>
+				 <td>int8</td>
+				 <td>19</td>
+				 <td title=''></td>
+				 <td>null</td>
+				 <td></td>
+				</tr>
+				<tr>
+				 <td>feature_synonym</td>
+				 <td>Table</td>
+				 <td class='primaryKey' title='Primary Key'><i class='icon ion-key iconkey' style='padding-left: 5px;'></i>feature_synonym_id</td>
+				 <td>bigserial</td>
+				 <td>19</td>
+				 <td title=''></td>
+				 <td>nextval(&#39;sequence.feature_synonym_feature_synonym_id_seq&#39;::regclass)</td>
+				 <td></td>
+				</tr>
+				<tr>
+				 <td>feature_relationship</td>
+				 <td>Table</td>
+				 <td class='primaryKey' title='Primary Key'><i class='icon ion-key iconkey' style='padding-left: 5px;'></i>feature_relationship_id</td>
+				 <td>bigserial</td>
+				 <td>19</td>
+				 <td title=''></td>
+				 <td>nextval(&#39;sequence.feature_relationship_feature_relationship_id_seq&#39;::regclass)</td>
+				 <td></td>
+				</tr>
+				<tr>
+				 <td>feature_contact</td>
+				 <td>Table</td>
+				 <td class='primaryKey' title='Primary Key'><i class='icon ion-key iconkey' style='padding-left: 5px;'></i>feature_contact_id</td>
+				 <td>bigserial</td>
+				 <td>19</td>
+				 <td title=''></td>
+				 <td>nextval(&#39;sequence.feature_contact_feature_contact_id_seq&#39;::regclass)</td>
+				 <td></td>
+				</tr>
+				<tr>
+				 <td>feature_relationshipprop_pub</td>
+				 <td>Table</td>
+				 <td class='foreignKey' title='Foreign Key'><i class='icon ion-key iconkey' style='padding-left: 5px;'></i>feature_relationshipprop_id</td>
+				 <td>int8</td>
+				 <td>19</td>
+				 <td title=''></td>
+				 <td>null</td>
+				 <td></td>
+				</tr>
+				<tr>
+				 <td>featureprop_pub</td>
+				 <td>Table</td>
+				 <td class='foreignKey' title='Foreign Key'><i class='icon ion-key iconkey' style='padding-left: 5px;'></i>pub_id</td>
+				 <td>int8</td>
+				 <td>19</td>
+				 <td title=''></td>
+				 <td>null</td>
+				 <td></td>
+				</tr>
+				<tr>
+				 <td>feature_contact</td>
+				 <td>Table</td>
+				 <td class='foreignKey' title='Foreign Key'><i class='icon ion-key iconkey' style='padding-left: 5px;'></i>contact_id</td>
+				 <td>int8</td>
+				 <td>19</td>
+				 <td title=''></td>
+				 <td>null</td>
+				 <td></td>
+				</tr>
+				<tr>
+				 <td>feature_relationshipprop</td>
+				 <td>Table</td>
+				 <td class='foreignKey' title='Foreign Key'><i class='icon ion-key iconkey' style='padding-left: 5px;'></i>feature_relationship_id</td>
+				 <td>int8</td>
+				 <td>19</td>
+				 <td title=''></td>
+				 <td>null</td>
+				 <td></td>
+				</tr>
+				<tr>
+				 <td>featureprop</td>
+				 <td>Table</td>
+				 <td class='primaryKey' title='Primary Key'><i class='icon ion-key iconkey' style='padding-left: 5px;'></i>featureprop_id</td>
+				 <td>bigserial</td>
+				 <td>19</td>
+				 <td title=''></td>
+				 <td>nextval(&#39;sequence.featureprop_featureprop_id_seq&#39;::regclass)</td>
+				 <td></td>
+				</tr>
+				<tr>
+				 <td>feature</td>
+				 <td>Table</td>
+				 <td class='indexedColumn' title='Indexed'><i class='fa fa-sitemap fa-rotate-120' style='padding-right: 5px;'></i>uniquename</td>
+				 <td>text</td>
+				 <td>2147483647</td>
+				 <td title=''></td>
+				 <td>null</td>
+				 <td><p>The unique name for a feature; may not be necessarily be particularly human-readable, although this is preferred. This name must be unique for this type of feature within this organism.</p></td>
+				</tr>
+				<tr>
+				 <td>feature_relationshipprop_pub</td>
+				 <td>Table</td>
+				 <td class='primaryKey' title='Primary Key'><i class='icon ion-key iconkey' style='padding-left: 5px;'></i>feature_relationshipprop_pub_id</td>
+				 <td>bigserial</td>
+				 <td>19</td>
+				 <td title=''></td>
+				 <td>nextval(&#39;sequence.feature_relationshipprop_pub_feature_relationshipprop_pub_i_seq&#39;::regclass)</td>
+				 <td></td>
+				</tr>
+				<tr>
+				 <td>feature_dbxref</td>
+				 <td>Table</td>
+				 <td>is_current</td>
+				 <td>bool</td>
+				 <td>1</td>
+				 <td title=''></td>
+				 <td>true</td>
+				 <td><p>True if this secondary dbxref is the most up to date accession in the corresponding db. Retired accessions should set this field to false</p></td>
+				</tr>
+				<tr>
+				 <td>feature_dbxref</td>
+				 <td>Table</td>
+				 <td class='primaryKey' title='Primary Key'><i class='icon ion-key iconkey' style='padding-left: 5px;'></i>feature_dbxref_id</td>
+				 <td>bigserial</td>
+				 <td>19</td>
+				 <td title=''></td>
+				 <td>nextval(&#39;sequence.feature_dbxref_feature_dbxref_id_seq&#39;::regclass)</td>
+				 <td></td>
+				</tr>
+				<tr>
+				 <td>featureprop</td>
+				 <td>Table</td>
+				 <td class='foreignKey' title='Foreign Key'><i class='icon ion-key iconkey' style='padding-left: 5px;'></i>feature_id</td>
+				 <td>int8</td>
+				 <td>19</td>
+				 <td title=''></td>
+				 <td>null</td>
+				 <td></td>
+				</tr>
+				<tr>
+				 <td>feature</td>
+				 <td>Table</td>
+				 <td>timeaccessioned</td>
+				 <td>timestamp</td>
+				 <td>29</td>
+				 <td title=''></td>
+				 <td>now()</td>
+				 <td><p>For handling object accession or modification timestamps (as opposed to database auditing data, handled elsewhere). The expectation is that these fields would be available to software interacting with chado.</p></td>
+				</tr>
+				<tr>
+				 <td>feature_pubprop</td>
+				 <td>Table</td>
+				 <td class='primaryKey' title='Primary Key'><i class='icon ion-key iconkey' style='padding-left: 5px;'></i>feature_pubprop_id</td>
+				 <td>bigserial</td>
+				 <td>19</td>
+				 <td title=''></td>
+				 <td>nextval(&#39;sequence.feature_pubprop_feature_pubprop_id_seq&#39;::regclass)</td>
+				 <td></td>
+				</tr>
+				<tr>
+				 <td>feature_relationship</td>
+				 <td>Table</td>
+				 <td>value</td>
+				 <td>text</td>
+				 <td>2147483647</td>
+				 <td title='nullable'>√</td>
+				 <td>null</td>
+				 <td><p>Additional notes or comments.</p></td>
+				</tr>
+				<tr>
+				 <td>feature_cvterm_pub</td>
+				 <td>Table</td>
+				 <td class='primaryKey' title='Primary Key'><i class='icon ion-key iconkey' style='padding-left: 5px;'></i>feature_cvterm_pub_id</td>
+				 <td>bigserial</td>
+				 <td>19</td>
+				 <td title=''></td>
+				 <td>nextval(&#39;sequence.feature_cvterm_pub_feature_cvterm_pub_id_seq&#39;::regclass)</td>
+				 <td></td>
+				</tr>
+				<tr>
+				 <td>feature_relationshipprop</td>
+				 <td>Table</td>
+				 <td class='foreignKey' title='Foreign Key'><i class='icon ion-key iconkey' style='padding-left: 5px;'></i>type_id</td>
+				 <td>int8</td>
+				 <td>19</td>
+				 <td title=''></td>
+				 <td>null</td>
+				 <td><p>The name of the property/slot is a cvterm. The meaning of the property is defined in that cvterm. Currently there is no standard ontology for feature_relationship property types.</p></td>
+				</tr>
+				<tr>
+				 <td>featureprop_pub</td>
+				 <td>Table</td>
+				 <td class='primaryKey' title='Primary Key'><i class='icon ion-key iconkey' style='padding-left: 5px;'></i>featureprop_pub_id</td>
+				 <td>bigserial</td>
+				 <td>19</td>
+				 <td title=''></td>
+				 <td>nextval(&#39;sequence.featureprop_pub_featureprop_pub_id_seq&#39;::regclass)</td>
+				 <td></td>
+				</tr>
+				<tr>
+				 <td>feature_cvterm_dbxref</td>
+				 <td>Table</td>
+				 <td class='foreignKey' title='Foreign Key'><i class='icon ion-key iconkey' style='padding-left: 5px;'></i>feature_cvterm_id</td>
+				 <td>int8</td>
+				 <td>19</td>
+				 <td title=''></td>
+				 <td>null</td>
+				 <td></td>
+				</tr>
+				<tr>
+				 <td>featureloc</td>
+				 <td>Table</td>
+				 <td>is_fmax_partial</td>
+				 <td>bool</td>
+				 <td>1</td>
+				 <td title=''></td>
+				 <td>false</td>
+				 <td><p>This is typically false, but may be true if the value for column:fmax is inaccurate or the rightmost part of the range is unknown/unbounded.</p></td>
+				</tr>
+				<tr>
+				 <td>feature_cvterm_pub</td>
+				 <td>Table</td>
+				 <td class='foreignKey' title='Foreign Key'><i class='icon ion-key iconkey' style='padding-left: 5px;'></i>feature_cvterm_id</td>
+				 <td>int8</td>
+				 <td>19</td>
+				 <td title=''></td>
+				 <td>null</td>
+				 <td></td>
+				</tr>
+				<tr>
+				 <td>feature_contact</td>
+				 <td>Table</td>
+				 <td class='foreignKey' title='Foreign Key'><i class='icon ion-key iconkey' style='padding-left: 5px;'></i>feature_id</td>
+				 <td>int8</td>
+				 <td>19</td>
+				 <td title=''></td>
+				 <td>null</td>
+				 <td></td>
+				</tr>
+				<tr>
+				 <td>synonym</td>
+				 <td>Table</td>
+				 <td class='primaryKey' title='Primary Key'><i class='icon ion-key iconkey' style='padding-left: 5px;'></i>synonym_id</td>
+				 <td>bigserial</td>
+				 <td>19</td>
+				 <td title=''></td>
+				 <td>nextval(&#39;sequence.synonym_synonym_id_seq&#39;::regclass)</td>
+				 <td></td>
+				</tr>
+				<tr>
+				 <td>feature</td>
+				 <td>Table</td>
+				 <td>timelastmodified</td>
+				 <td>timestamp</td>
+				 <td>29</td>
+				 <td title=''></td>
+				 <td>now()</td>
+				 <td><p>For handling object accession or modification timestamps (as opposed to database auditing data, handled elsewhere). The expectation is that these fields would be available to software interacting with chado.</p></td>
+				</tr>
+				<tr>
+				 <td>feature_cvterm</td>
+				 <td>Table</td>
+				 <td class='primaryKey' title='Primary Key'><i class='icon ion-key iconkey' style='padding-left: 5px;'></i>feature_cvterm_id</td>
+				 <td>bigserial</td>
+				 <td>19</td>
+				 <td title=''></td>
+				 <td>nextval(&#39;sequence.feature_cvterm_feature_cvterm_id_seq&#39;::regclass)</td>
+				 <td></td>
+				</tr>
+				<tr>
+				 <td>feature_cvterm</td>
+				 <td>Table</td>
+				 <td class='foreignKey' title='Foreign Key'><i class='icon ion-key iconkey' style='padding-left: 5px;'></i>feature_id</td>
+				 <td>int8</td>
+				 <td>19</td>
+				 <td title=''></td>
+				 <td>null</td>
+				 <td></td>
+				</tr>
+				<tr>
+				 <td>feature</td>
+				 <td>Table</td>
+				 <td>is_analysis</td>
+				 <td>bool</td>
+				 <td>1</td>
+				 <td title=''></td>
+				 <td>false</td>
+				 <td><p>Boolean indicating whether this feature is annotated or the result of an automated analysis. Analysis results also use the companalysis module. Note that the dividing line between analysis and annotation may be fuzzy, this should be determined on a per-project basis in a consistent manner. One requirement is that there should only be one non-analysis version of each wild-type gene feature in a genome, whereas the same gene feature can be predicted multiple times in different analyses.</p></td>
+				</tr>
+				<tr>
+				 <td>feature_pub</td>
+				 <td>Table</td>
+				 <td class='primaryKey' title='Primary Key'><i class='icon ion-key iconkey' style='padding-left: 5px;'></i>feature_pub_id</td>
+				 <td>bigserial</td>
+				 <td>19</td>
+				 <td title=''></td>
+				 <td>nextval(&#39;sequence.feature_pub_feature_pub_id_seq&#39;::regclass)</td>
+				 <td></td>
+				</tr>
+				<tr>
+				 <td>feature_pubprop</td>
+				 <td>Table</td>
+				 <td class='foreignKey' title='Foreign Key'><i class='icon ion-key iconkey' style='padding-left: 5px;'></i>type_id</td>
+				 <td>int8</td>
+				 <td>19</td>
+				 <td title=''></td>
+				 <td>null</td>
+				 <td></td>
+				</tr>
+				<tr>
+				 <td>featureloc</td>
+				 <td>Table</td>
+				 <td class='foreignKey' title='Foreign Key'><i class='icon ion-key iconkey' style='padding-left: 5px;'></i>feature_id</td>
+				 <td>int8</td>
+				 <td>19</td>
+				 <td title=''></td>
+				 <td>null</td>
+				 <td><p>The feature that is being located. Any feature can have zero or more featurelocs.</p></td>
+				</tr>
+				<tr>
+				 <td>feature_cvterm</td>
+				 <td>Table</td>
+				 <td class='foreignKey' title='Foreign Key'><i class='icon ion-key iconkey' style='padding-left: 5px;'></i>cvterm_id</td>
+				 <td>int8</td>
+				 <td>19</td>
+				 <td title=''></td>
+				 <td>null</td>
+				 <td></td>
+				</tr>
+				<tr>
+				 <td>feature_cvtermprop</td>
+				 <td>Table</td>
+				 <td class='foreignKey' title='Foreign Key'><i class='icon ion-key iconkey' style='padding-left: 5px;'></i>type_id</td>
+				 <td>int8</td>
+				 <td>19</td>
+				 <td title=''></td>
+				 <td>null</td>
+				 <td><p>The name of the property/slot is a cvterm. The meaning of the property is defined in that cvterm. cvterms may come from the OBO evidence code cv.</p></td>
+				</tr>
+				<tr>
+				 <td>featureprop</td>
+				 <td>Table</td>
+				 <td class='foreignKey' title='Foreign Key'><i class='icon ion-key iconkey' style='padding-left: 5px;'></i>type_id</td>
+				 <td>int8</td>
+				 <td>19</td>
+				 <td title=''></td>
+				 <td>null</td>
+				 <td><p>The name of the property/slot is a cvterm. The meaning of the property is defined in that cvterm. Certain property types will only apply to certain feature types (e.g. the anticodon property will only apply to tRNA features) ; the types here come from the sequence feature property ontology.</p></td>
+				</tr>
+				<tr>
+				 <td>featureloc</td>
+				 <td>Table</td>
+				 <td class='indexedColumn' title='Indexed'><i class='fa fa-sitemap fa-rotate-120' style='padding-right: 5px;'></i>fmin</td>
+				 <td>int8</td>
+				 <td>19</td>
+				 <td title='nullable'>√</td>
+				 <td>null</td>
+				 <td><p>The leftmost/minimal boundary in the linear range represented by the featureloc. Sometimes (e.g. in Bioperl) this is called -start- although this is confusing because it does not necessarily represent the 5-prime coordinate. Important: This is space-based (interbase) coordinates, counting from zero. To convert this to the leftmost position in a base-oriented system (eg GFF, Bioperl), add 1 to fmin.</p></td>
+				</tr>
+				<tr>
+				 <td>featureloc</td>
+				 <td>Table</td>
+				 <td>residue_info</td>
+				 <td>text</td>
+				 <td>2147483647</td>
+				 <td title='nullable'>√</td>
+				 <td>null</td>
+				 <td><p>Alternative residues, when these differ from feature.residues. For instance, a SNP feature located on a wild and mutant protein would have different alternative residues. for alignment/similarity features, the alternative residues is used to represent the alignment string (CIGAR format). Note on variation features; even if we do not want to instantiate a mutant chromosome/contig feature, we can still represent a SNP etc with 2 locations, one (rank 0) on the genome, the other (rank 1) would have most fields null, except for alternative residues.</p></td>
+				</tr>
+				<tr>
+				 <td>feature_relationship_pub</td>
+				 <td>Table</td>
+				 <td class='foreignKey' title='Foreign Key'><i class='icon ion-key iconkey' style='padding-left: 5px;'></i>pub_id</td>
+				 <td>int8</td>
+				 <td>19</td>
+				 <td title=''></td>
+				 <td>null</td>
+				 <td></td>
+				</tr>
+				<tr>
+				 <td>synonym</td>
+				 <td>Table</td>
+				 <td>synonym_sgml</td>
+				 <td>varchar</td>
+				 <td>255</td>
+				 <td title=''></td>
+				 <td>null</td>
+				 <td><p>The fully specified synonym, with any non-ascii characters encoded in SGML.</p></td>
+				</tr>
+				<tr>
+				 <td>featureloc</td>
+				 <td>Table</td>
+				 <td class='primaryKey' title='Primary Key'><i class='icon ion-key iconkey' style='padding-left: 5px;'></i>featureloc_id</td>
+				 <td>bigserial</td>
+				 <td>19</td>
+				 <td title=''></td>
+				 <td>nextval(&#39;sequence.featureloc_featureloc_id_seq&#39;::regclass)</td>
+				 <td></td>
+				</tr>
+				<tr>
+				 <td>feature_cvtermprop</td>
+				 <td>Table</td>
+				 <td>value</td>
+				 <td>text</td>
+				 <td>2147483647</td>
+				 <td title='nullable'>√</td>
+				 <td>null</td>
+				 <td><p>The value of the property, represented as text. Numeric values are converted to their text representation. This is less efficient than using native database types, but is easier to query.</p></td>
+				</tr>
+				<tr>
+				 <td>feature_dbxref</td>
+				 <td>Table</td>
+				 <td class='foreignKey' title='Foreign Key'><i class='icon ion-key iconkey' style='padding-left: 5px;'></i>feature_id</td>
+				 <td>int8</td>
+				 <td>19</td>
+				 <td title=''></td>
+				 <td>null</td>
+				 <td></td>
+				</tr>
+				<tr>
+				 <td>feature_pub</td>
+				 <td>Table</td>
+				 <td class='foreignKey' title='Foreign Key'><i class='icon ion-key iconkey' style='padding-left: 5px;'></i>pub_id</td>
+				 <td>int8</td>
+				 <td>19</td>
+				 <td title=''></td>
+				 <td>null</td>
+				 <td></td>
+				</tr>
+				<tr>
+				 <td>feature_pubprop</td>
+				 <td>Table</td>
+				 <td class='indexedColumn' title='Indexed'><i class='fa fa-sitemap fa-rotate-120' style='padding-right: 5px;'></i>rank</td>
+				 <td>int4</td>
+				 <td>10</td>
+				 <td title=''></td>
+				 <td>0</td>
+				 <td></td>
+				</tr>
+				<tr>
+				 <td>feature_relationship</td>
+				 <td>Table</td>
+				 <td class='foreignKey' title='Foreign Key'><i class='icon ion-key iconkey' style='padding-left: 5px;'></i>object_id</td>
+				 <td>int8</td>
+				 <td>19</td>
+				 <td title=''></td>
+				 <td>null</td>
+				 <td><p>The object of the subj-predicate-obj sentence. This is typically the container feature.</p></td>
+				</tr>
+				<tr>
+				 <td>feature_relationship</td>
+				 <td>Table</td>
+				 <td class='foreignKey' title='Foreign Key'><i class='icon ion-key iconkey' style='padding-left: 5px;'></i>type_id</td>
+				 <td>int8</td>
+				 <td>19</td>
+				 <td title=''></td>
+				 <td>null</td>
+				 <td><p>Relationship type between subject and object. This is a cvterm, typically from the OBO relationship ontology, although other relationship types are allowed. The most common relationship type is OBO_REL:part_of. Valid relationship types are constrained by the Sequence Ontology.</p></td>
+				</tr>
+				<tr>
+				 <td>feature_cvterm</td>
+				 <td>Table</td>
+				 <td class='indexedColumn' title='Indexed'><i class='fa fa-sitemap fa-rotate-120' style='padding-right: 5px;'></i>rank</td>
+				 <td>int4</td>
+				 <td>10</td>
+				 <td title=''></td>
+				 <td>0</td>
+				 <td></td>
+				</tr>
+				<tr>
+				 <td>feature_relationshipprop</td>
+				 <td>Table</td>
+				 <td class='indexedColumn' title='Indexed'><i class='fa fa-sitemap fa-rotate-120' style='padding-right: 5px;'></i>rank</td>
+				 <td>int4</td>
+				 <td>10</td>
+				 <td title=''></td>
+				 <td>0</td>
+				 <td><p>Property-Value ordering. Any feature_relationship can have multiple values for any particular property type - these are ordered in a list using rank, counting from zero. For properties that are single-valued rather than multi-valued, the default 0 value should be used.</p></td>
+				</tr>
+				<tr>
+				 <td>feature_relationship_pub</td>
+				 <td>Table</td>
+				 <td class='foreignKey' title='Foreign Key'><i class='icon ion-key iconkey' style='padding-left: 5px;'></i>feature_relationship_id</td>
+				 <td>int8</td>
+				 <td>19</td>
+				 <td title=''></td>
+				 <td>null</td>
+				 <td></td>
+				</tr>
+				<tr>
+				 <td>feature_synonym</td>
+				 <td>Table</td>
+				 <td class='foreignKey' title='Foreign Key'><i class='icon ion-key iconkey' style='padding-left: 5px;'></i>feature_id</td>
+				 <td>int8</td>
+				 <td>19</td>
+				 <td title=''></td>
+				 <td>null</td>
+				 <td></td>
+				</tr>
+				<tr>
+				 <td>feature_relationship_pub</td>
+				 <td>Table</td>
+				 <td class='primaryKey' title='Primary Key'><i class='icon ion-key iconkey' style='padding-left: 5px;'></i>feature_relationship_pub_id</td>
+				 <td>bigserial</td>
+				 <td>19</td>
+				 <td title=''></td>
+				 <td>nextval(&#39;sequence.feature_relationship_pub_feature_relationship_pub_id_seq&#39;::regclass)</td>
+				 <td></td>
+				</tr>
+				<tr>
+				 <td>feature_relationship</td>
+				 <td>Table</td>
+				 <td class='foreignKey' title='Foreign Key'><i class='icon ion-key iconkey' style='padding-left: 5px;'></i>subject_id</td>
+				 <td>int8</td>
+				 <td>19</td>
+				 <td title=''></td>
+				 <td>null</td>
+				 <td><p>The subject of the subj-predicate-obj sentence. This is typically the subfeature.</p></td>
+				</tr>
+				<tr>
+				 <td>feature</td>
+				 <td>Table</td>
+				 <td>residues</td>
+				 <td>text</td>
+				 <td>2147483647</td>
+				 <td title='nullable'>√</td>
+				 <td>null</td>
+				 <td><p>A sequence of alphabetic characters representing biological residues (nucleic acids, amino acids). This column does not need to be manifested for all features; it is optional for features such as exons where the residues can be derived from the featureloc. It is recommended that the value for this column be manifested for features which may may non-contiguous sublocations (e.g. transcripts), since derivation at query time is non-trivial. For expressed sequence, the DNA sequence should be used rather than the RNA sequence. The default storage method for the residues column is EXTERNAL, which will store it uncompressed to make substring operations faster.</p></td>
+				</tr>
+				<tr>
+				 <td>featureprop</td>
+				 <td>Table</td>
+				 <td>value</td>
+				 <td>text</td>
+				 <td>2147483647</td>
+				 <td title='nullable'>√</td>
+				 <td>null</td>
+				 <td><p>The value of the property, represented as text. Numeric values are converted to their text representation. This is less efficient than using native database types, but is easier to query.</p></td>
+				</tr>
+				<tr>
+				 <td>featureloc_pub</td>
+				 <td>Table</td>
+				 <td class='primaryKey' title='Primary Key'><i class='icon ion-key iconkey' style='padding-left: 5px;'></i>featureloc_pub_id</td>
+				 <td>bigserial</td>
+				 <td>19</td>
+				 <td title=''></td>
+				 <td>nextval(&#39;sequence.featureloc_pub_featureloc_pub_id_seq&#39;::regclass)</td>
+				 <td></td>
+				</tr>
+				<tr>
+				 <td>feature</td>
+				 <td>Table</td>
+				 <td>is_obsolete</td>
+				 <td>bool</td>
+				 <td>1</td>
+				 <td title=''></td>
+				 <td>false</td>
+				 <td><p>Boolean indicating whether this feature has been obsoleted. Some chado instances may choose to simply remove the feature altogether, others may choose to keep an obsolete row in the table.</p></td>
+				</tr>
+				<tr>
+				 <td>feature</td>
+				 <td>Table</td>
+				 <td class='foreignKey' title='Foreign Key'><i class='icon ion-key iconkey' style='padding-left: 5px;'></i>organism_id</td>
+				 <td>int8</td>
+				 <td>19</td>
+				 <td title=''></td>
+				 <td>null</td>
+				 <td><p>The organism to which this feature belongs. This column is mandatory.</p></td>
+				</tr>
+				<tr>
+				 <td>featureloc</td>
+				 <td>Table</td>
+				 <td>is_fmin_partial</td>
+				 <td>bool</td>
+				 <td>1</td>
+				 <td title=''></td>
+				 <td>false</td>
+				 <td><p>This is typically false, but may be true if the value for column:fmin is inaccurate or the leftmost part of the range is unknown/unbounded.</p></td>
+				</tr>
+				<tr>
+				 <td>feature_cvtermprop</td>
+				 <td>Table</td>
+				 <td class='primaryKey' title='Primary Key'><i class='icon ion-key iconkey' style='padding-left: 5px;'></i>feature_cvtermprop_id</td>
+				 <td>bigserial</td>
+				 <td>19</td>
+				 <td title=''></td>
+				 <td>nextval(&#39;sequence.feature_cvtermprop_feature_cvtermprop_id_seq&#39;::regclass)</td>
+				 <td></td>
+				</tr>
+				<tr>
+				 <td>feature</td>
+				 <td>Table</td>
+				 <td class='foreignKey' title='Foreign Key'><i class='icon ion-key iconkey' style='padding-left: 5px;'></i>dbxref_id</td>
+				 <td>int8</td>
+				 <td>19</td>
+				 <td title='nullable'>√</td>
+				 <td>null</td>
+				 <td><p>An optional primary public stable identifier for this feature. Secondary identifiers and external dbxrefs go in the table feature_dbxref.</p></td>
+				</tr>
+				<tr>
+				 <td>featureloc_pub</td>
+				 <td>Table</td>
+				 <td class='foreignKey' title='Foreign Key'><i class='icon ion-key iconkey' style='padding-left: 5px;'></i>pub_id</td>
+				 <td>int8</td>
+				 <td>19</td>
+				 <td title=''></td>
+				 <td>null</td>
+				 <td></td>
+				</tr>
+								</tbody>
+				</table>				
+			</div>
+		</div>	
+      </section>
+	  <script>
+          var config = {
+	          pagination: 
+          }
+	  </script>    
+  </div>
+  <!-- /.content-wrapper -->
+  <footer class="main-footer">
+    <div>
+      <div class="pull-right hidden-xs">
+        <a href="https://github.com/schemaspy/schemaspy" title="GitHub for SchemaSpy"><i class="fa fa-github-square fa-2x"></i></a>
+        <a href="http://stackoverflow.com/questions/tagged/schemaspy" title="StackOverflow for SchemaSpy"><i class="fa fa-stack-overflow fa-2x"></i></a>
+      </div>
+      <strong>Generated by <a href="http://schemaspy.org/" class="logo-text"><i class="fa fa-database"></i> SchemaSpy @project.version@</a></strong>
+    </div>
+    <!-- /.container -->
+  </footer>
+</div>
+<!-- ./wrapper -->
+
+<!-- jQuery 2.2.3 -->
+<script src="bower/admin-lte/plugins/jQuery/jquery-2.2.3.min.js"></script>
+<script src="bower/admin-lte/plugins/jQueryUI/jquery-ui.min.js"></script>
+<!-- Bootstrap 3.3.5 -->
+<script src="bower/admin-lte/bootstrap/js/bootstrap.min.js"></script>
+<!-- DataTables -->
+<script src="bower/datatables.net/jquery.dataTables.min.js"></script>
+<script src="bower/datatables.net-bs/js/dataTables.bootstrap.min.js"></script>
+<script src="bower/datatables.net-buttons/dataTables.buttons.min.js"></script>
+<script src="bower/datatables.net-buttons-bs/js/buttons.bootstrap.min.js"></script>
+<script src="bower/datatables.net-buttons/buttons.html5.min.js"></script>
+<script src="bower/datatables.net-buttons/buttons.print.min.js"></script>
+<script src="bower/datatables.net-buttons/buttons.colVis.min.js"></script>
+
+<!-- SlimScroll -->
+<script src="bower/admin-lte/plugins/slimScroll/jquery.slimscroll.min.js"></script>
+<!-- FastClick -->
+<script src="bower/admin-lte/plugins/fastclick/fastclick.js"></script>
+<!-- Salvattore -->
+<script src="bower/salvattore/salvattore.min.js"></script>
+<!-- AnchorJS -->
+<script src="bower/anchor-js/anchor.min.js"></script>
+<!-- CodeMirror -->
+<script src="bower/codemirror/codemirror.js"></script>
+<script src="bower/codemirror/sql.js"></script>
+<!-- AdminLTE App -->
+<script src="bower/admin-lte/dist/js/app.min.js"></script>
+<script src="column.js"></script>
+<script src="schemaSpy.js"></script>
+</body>
+</html>

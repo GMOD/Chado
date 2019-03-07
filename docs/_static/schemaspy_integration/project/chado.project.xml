@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<database name="chado" schema="project" type="PostgreSQL - 9.3.18">
+   <tables>
+      <table name="project" remarks="Standard Chado flexible property table for projects." schema="project" type="TABLE">
+         <column autoUpdated="false" defaultValue="nextval('project.project_project_id_seq'::regclass)" digits="0" id="0" name="project_id" nullable="false" remarks="" size="19" type="bigserial">
+            <child column="project_id" foreignKey="assay_project_project_id_fkey" implied="false" onDeleteCascade="false" schema="mage" table="assay_project"/>
+            <child column="project_id" foreignKey="nd_experiment_project_project_id_fkey" implied="false" onDeleteCascade="true" schema="natural_diversity" table="nd_experiment_project"/>
+            <child column="project_id" foreignKey="project_analysis_project_id_fkey" implied="false" onDeleteCascade="true" schema="project" table="project_analysis"/>
+            <child column="project_id" foreignKey="project_contact_project_id_fkey" implied="false" onDeleteCascade="true" schema="project" table="project_contact"/>
+            <child column="project_id" foreignKey="project_dbxref_project_id_fkey" implied="false" onDeleteCascade="true" schema="project" table="project_dbxref"/>
+            <child column="project_id" foreignKey="project_feature_project_id_fkey" implied="false" onDeleteCascade="true" schema="project" table="project_feature"/>
+            <child column="project_id" foreignKey="project_pub_project_id_fkey" implied="false" onDeleteCascade="true" schema="project" table="project_pub"/>
+            <child column="object_project_id" foreignKey="project_relationship_object_project_id_fkey" implied="false" onDeleteCascade="true" schema="project" table="project_relationship"/>
+            <child column="subject_project_id" foreignKey="project_relationship_subject_project_id_fkey" implied="false" onDeleteCascade="true" schema="project" table="project_relationship"/>
+            <child column="project_id" foreignKey="project_stock_project_id_fkey" implied="false" onDeleteCascade="true" schema="project" table="project_stock"/>
+            <child column="project_id" foreignKey="projectprop_project_id_fkey" implied="false" onDeleteCascade="true" schema="project" table="projectprop"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="1" name="name" nullable="false" remarks="" size="255" type="varchar"/>
+         <column autoUpdated="false" digits="0" id="2" name="description" nullable="true" remarks="" size="2147483647" type="text"/>
+         <primaryKey column="project_id" sequenceNumberInPK="1"/>
+         <index name="project_pkey" unique="true">
+            <column ascending="true" name="project_id"/>
+         </index>
+         <index name="project_c1" unique="true">
+            <column ascending="true" name="name"/>
+         </index>
+      </table>
+      <table name="project_analysis" remarks="Links an analysis to a project that may contain multiple analyses. &#10;The rank column can be used to specify a simple ordering in which analyses were executed." schema="project" type="TABLE">
+         <column autoUpdated="false" defaultValue="nextval('project.project_analysis_project_analysis_id_seq'::regclass)" digits="0" id="0" name="project_analysis_id" nullable="false" remarks="" size="19" type="bigserial"/>
+         <column autoUpdated="false" digits="0" id="1" name="project_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="project_id" foreignKey="project_analysis_project_id_fkey" implied="false" onDeleteCascade="true" schema="project" table="project"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="2" name="analysis_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="analysis_id" foreignKey="project_analysis_analysis_id_fkey" implied="false" onDeleteCascade="true" schema="companalysis" table="analysis"/>
+         </column>
+         <column autoUpdated="false" defaultValue="0" digits="0" id="3" name="rank" nullable="false" remarks="" size="10" type="int4"/>
+         <primaryKey column="project_analysis_id" sequenceNumberInPK="1"/>
+         <index name="project_analysis_pkey" unique="true">
+            <column ascending="true" name="project_analysis_id"/>
+         </index>
+         <index name="project_analysis_c1" unique="true">
+            <column ascending="true" name="project_id"/>
+            <column ascending="true" name="analysis_id"/>
+         </index>
+         <index name="project_analysis_idx1" unique="false">
+            <column ascending="true" name="project_id"/>
+         </index>
+         <index name="project_analysis_idx2" unique="false">
+            <column ascending="true" name="analysis_id"/>
+         </index>
+      </table>
+      <table name="project_contact" remarks="Linking table for associating projects and contacts." schema="project" type="TABLE">
+         <column autoUpdated="false" defaultValue="nextval('project.project_contact_project_contact_id_seq'::regclass)" digits="0" id="0" name="project_contact_id" nullable="false" remarks="" size="19" type="bigserial"/>
+         <column autoUpdated="false" digits="0" id="1" name="project_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="project_id" foreignKey="project_contact_project_id_fkey" implied="false" onDeleteCascade="true" schema="project" table="project"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="2" name="contact_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="contact_id" foreignKey="project_contact_contact_id_fkey" implied="false" onDeleteCascade="true" schema="contact" table="contact"/>
+         </column>
+         <primaryKey column="project_contact_id" sequenceNumberInPK="1"/>
+         <index name="project_contact_pkey" unique="true">
+            <column ascending="true" name="project_contact_id"/>
+         </index>
+         <index name="project_contact_c1" unique="true">
+            <column ascending="true" name="project_id"/>
+            <column ascending="true" name="contact_id"/>
+         </index>
+         <index name="project_contact_idx1" unique="false">
+            <column ascending="true" name="project_id"/>
+         </index>
+         <index name="project_contact_idx2" unique="false">
+            <column ascending="true" name="contact_id"/>
+         </index>
+      </table>
+      <table name="project_dbxref" remarks="project_dbxref links a project to dbxrefs." schema="project" type="TABLE">
+         <column autoUpdated="false" defaultValue="nextval('project.project_dbxref_project_dbxref_id_seq'::regclass)" digits="0" id="0" name="project_dbxref_id" nullable="false" remarks="" size="19" type="bigserial"/>
+         <column autoUpdated="false" digits="0" id="1" name="project_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="project_id" foreignKey="project_dbxref_project_id_fkey" implied="false" onDeleteCascade="true" schema="project" table="project"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="2" name="dbxref_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="dbxref_id" foreignKey="project_dbxref_dbxref_id_fkey" implied="false" onDeleteCascade="true" schema="db" table="dbxref"/>
+         </column>
+         <column autoUpdated="false" defaultValue="true" digits="0" id="3" name="is_current" nullable="false" remarks="The is_current boolean indicates whether the linked dbxref is the current -official- dbxref for the linked project." size="1" type="bool"/>
+         <primaryKey column="project_dbxref_id" sequenceNumberInPK="1"/>
+         <index name="project_dbxref_pkey" unique="true">
+            <column ascending="true" name="project_dbxref_id"/>
+         </index>
+         <index name="project_dbxref_c1" unique="true">
+            <column ascending="true" name="project_id"/>
+            <column ascending="true" name="dbxref_id"/>
+         </index>
+         <index name="project_dbxref_idx1" unique="false">
+            <column ascending="true" name="project_id"/>
+         </index>
+         <index name="project_dbxref_idx2" unique="false">
+            <column ascending="true" name="dbxref_id"/>
+         </index>
+      </table>
+      <table name="project_feature" remarks="This table is intended associate records in the feature table with a project." schema="project" type="TABLE">
+         <column autoUpdated="false" defaultValue="nextval('project.project_feature_project_feature_id_seq'::regclass)" digits="0" id="0" name="project_feature_id" nullable="false" remarks="" size="19" type="bigserial"/>
+         <column autoUpdated="false" digits="0" id="1" name="feature_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="feature_id" foreignKey="project_feature_feature_id_fkey" implied="false" onDeleteCascade="true" schema="sequence" table="feature"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="2" name="project_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="project_id" foreignKey="project_feature_project_id_fkey" implied="false" onDeleteCascade="true" schema="project" table="project"/>
+         </column>
+         <primaryKey column="project_feature_id" sequenceNumberInPK="1"/>
+         <index name="project_feature_pkey" unique="true">
+            <column ascending="true" name="project_feature_id"/>
+         </index>
+         <index name="project_feature_c1" unique="true">
+            <column ascending="true" name="feature_id"/>
+            <column ascending="true" name="project_id"/>
+         </index>
+         <index name="project_feature_idx1" unique="false">
+            <column ascending="true" name="feature_id"/>
+         </index>
+         <index name="project_feature_idx2" unique="false">
+            <column ascending="true" name="project_id"/>
+         </index>
+      </table>
+      <table name="project_pub" remarks="Linking table for associating projects and publications." schema="project" type="TABLE">
+         <column autoUpdated="false" defaultValue="nextval('project.project_pub_project_pub_id_seq'::regclass)" digits="0" id="0" name="project_pub_id" nullable="false" remarks="" size="19" type="bigserial"/>
+         <column autoUpdated="false" digits="0" id="1" name="project_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="project_id" foreignKey="project_pub_project_id_fkey" implied="false" onDeleteCascade="true" schema="project" table="project"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="2" name="pub_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="pub_id" foreignKey="project_pub_pub_id_fkey" implied="false" onDeleteCascade="true" schema="pub" table="pub"/>
+         </column>
+         <primaryKey column="project_pub_id" sequenceNumberInPK="1"/>
+         <index name="project_pub_pkey" unique="true">
+            <column ascending="true" name="project_pub_id"/>
+         </index>
+         <index name="project_pub_c1" unique="true">
+            <column ascending="true" name="project_id"/>
+            <column ascending="true" name="pub_id"/>
+         </index>
+         <index name="project_pub_idx1" unique="false">
+            <column ascending="true" name="project_id"/>
+         </index>
+         <index name="project_pub_idx2" unique="false">
+            <column ascending="true" name="pub_id"/>
+         </index>
+      </table>
+      <table name="project_relationship" remarks="Linking table for relating projects to each other.  For example, a&#10;given project could be composed of several smaller subprojects" schema="project" type="TABLE">
+         <column autoUpdated="false" defaultValue="nextval('project.project_relationship_project_relationship_id_seq'::regclass)" digits="0" id="0" name="project_relationship_id" nullable="false" remarks="" size="19" type="bigserial"/>
+         <column autoUpdated="false" digits="0" id="1" name="subject_project_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="project_id" foreignKey="project_relationship_subject_project_id_fkey" implied="false" onDeleteCascade="true" schema="project" table="project"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="2" name="object_project_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="project_id" foreignKey="project_relationship_object_project_id_fkey" implied="false" onDeleteCascade="true" schema="project" table="project"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="3" name="type_id" nullable="false" remarks="The cvterm type of the relationship being stated, such as &quot;part of&quot;." size="19" type="int8">
+            <parent column="cvterm_id" foreignKey="project_relationship_type_id_fkey" implied="false" onDeleteCascade="false" schema="cv" table="cvterm"/>
+         </column>
+         <primaryKey column="project_relationship_id" sequenceNumberInPK="1"/>
+         <index name="project_relationship_pkey" unique="true">
+            <column ascending="true" name="project_relationship_id"/>
+         </index>
+         <index name="project_relationship_c1" unique="true">
+            <column ascending="true" name="subject_project_id"/>
+            <column ascending="true" name="object_project_id"/>
+            <column ascending="true" name="type_id"/>
+         </index>
+      </table>
+      <table name="project_stock" remarks="This table is intended associate records in the stock table with a project." schema="project" type="TABLE">
+         <column autoUpdated="false" defaultValue="nextval('project.project_stock_project_stock_id_seq'::regclass)" digits="0" id="0" name="project_stock_id" nullable="false" remarks="" size="19" type="bigserial"/>
+         <column autoUpdated="false" digits="0" id="1" name="stock_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="stock_id" foreignKey="project_stock_stock_id_fkey" implied="false" onDeleteCascade="true" schema="stock" table="stock"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="2" name="project_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="project_id" foreignKey="project_stock_project_id_fkey" implied="false" onDeleteCascade="true" schema="project" table="project"/>
+         </column>
+         <primaryKey column="project_stock_id" sequenceNumberInPK="1"/>
+         <index name="project_stock_pkey" unique="true">
+            <column ascending="true" name="project_stock_id"/>
+         </index>
+         <index name="project_stock_c1" unique="true">
+            <column ascending="true" name="stock_id"/>
+            <column ascending="true" name="project_id"/>
+         </index>
+         <index name="project_stock_idx1" unique="false">
+            <column ascending="true" name="stock_id"/>
+         </index>
+         <index name="project_stock_idx2" unique="false">
+            <column ascending="true" name="project_id"/>
+         </index>
+      </table>
+      <table name="projectprop" remarks="" schema="project" type="TABLE">
+         <column autoUpdated="false" defaultValue="nextval('project.projectprop_projectprop_id_seq'::regclass)" digits="0" id="0" name="projectprop_id" nullable="false" remarks="" size="19" type="bigserial"/>
+         <column autoUpdated="false" digits="0" id="1" name="project_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="project_id" foreignKey="projectprop_project_id_fkey" implied="false" onDeleteCascade="true" schema="project" table="project"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="2" name="type_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="cvterm_id" foreignKey="projectprop_type_id_fkey" implied="false" onDeleteCascade="true" schema="cv" table="cvterm"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="3" name="value" nullable="true" remarks="" size="2147483647" type="text"/>
+         <column autoUpdated="false" defaultValue="0" digits="0" id="4" name="rank" nullable="false" remarks="" size="10" type="int4"/>
+         <primaryKey column="projectprop_id" sequenceNumberInPK="1"/>
+         <index name="projectprop_pkey" unique="true">
+            <column ascending="true" name="projectprop_id"/>
+         </index>
+         <index name="projectprop_c1" unique="true">
+            <column ascending="true" name="project_id"/>
+            <column ascending="true" name="type_id"/>
+            <column ascending="true" name="rank"/>
+         </index>
+      </table>
+   </tables>
+</database>

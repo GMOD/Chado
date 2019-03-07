@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<database name="chado" schema="phenotype" type="PostgreSQL - 9.3.18">
+   <tables>
+      <table name="feature_phenotype" remarks="Linking table between features and phenotypes." schema="phenotype" type="TABLE">
+         <column autoUpdated="false" defaultValue="nextval('phenotype.feature_phenotype_feature_phenotype_id_seq'::regclass)" digits="0" id="0" name="feature_phenotype_id" nullable="false" remarks="" size="19" type="bigserial"/>
+         <column autoUpdated="false" digits="0" id="1" name="feature_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="feature_id" foreignKey="feature_phenotype_feature_id_fkey" implied="false" onDeleteCascade="true" schema="sequence" table="feature"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="2" name="phenotype_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="phenotype_id" foreignKey="feature_phenotype_phenotype_id_fkey" implied="false" onDeleteCascade="true" schema="phenotype" table="phenotype"/>
+         </column>
+         <primaryKey column="feature_phenotype_id" sequenceNumberInPK="1"/>
+         <index name="feature_phenotype_pkey" unique="true">
+            <column ascending="true" name="feature_phenotype_id"/>
+         </index>
+         <index name="feature_phenotype_c1" unique="true">
+            <column ascending="true" name="feature_id"/>
+            <column ascending="true" name="phenotype_id"/>
+         </index>
+         <index name="feature_phenotype_idx1" unique="false">
+            <column ascending="true" name="feature_id"/>
+         </index>
+         <index name="feature_phenotype_idx2" unique="false">
+            <column ascending="true" name="phenotype_id"/>
+         </index>
+      </table>
+      <table name="phenotype" remarks="A phenotypic statement, or a single&#10;atomic phenotypic observation, is a controlled sentence describing&#10;observable effects of non-wild type function. E.g. Obs=eye, attribute=color, cvalue=red." schema="phenotype" type="TABLE">
+         <column autoUpdated="false" defaultValue="nextval('phenotype.phenotype_phenotype_id_seq'::regclass)" digits="0" id="0" name="phenotype_id" nullable="false" remarks="" size="19" type="bigserial">
+            <child column="phenotype1_id" foreignKey="phenotype_comparison_phenotype1_id_fkey" implied="false" onDeleteCascade="true" schema="genetic" table="phenotype_comparison"/>
+            <child column="phenotype2_id" foreignKey="phenotype_comparison_phenotype2_id_fkey" implied="false" onDeleteCascade="true" schema="genetic" table="phenotype_comparison"/>
+            <child column="phenotype_id" foreignKey="phenstatement_phenotype_id_fkey" implied="false" onDeleteCascade="true" schema="genetic" table="phenstatement"/>
+            <child column="phenotype_id" foreignKey="nd_experiment_phenotype_phenotype_id_fkey" implied="false" onDeleteCascade="true" schema="natural_diversity" table="nd_experiment_phenotype"/>
+            <child column="phenotype_id" foreignKey="feature_phenotype_phenotype_id_fkey" implied="false" onDeleteCascade="true" schema="phenotype" table="feature_phenotype"/>
+            <child column="phenotype_id" foreignKey="phenotype_cvterm_phenotype_id_fkey" implied="false" onDeleteCascade="true" schema="phenotype" table="phenotype_cvterm"/>
+            <child column="phenotype_id" foreignKey="phenotypeprop_phenotype_id_fkey" implied="false" onDeleteCascade="true" schema="phenotype" table="phenotypeprop"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="1" name="uniquename" nullable="false" remarks="" size="2147483647" type="text"/>
+         <column autoUpdated="false" digits="0" id="2" name="name" nullable="true" remarks="" size="2147483647" type="text"/>
+         <column autoUpdated="false" digits="0" id="3" name="observable_id" nullable="true" remarks="The entity: e.g. anatomy_part, biological_process." size="19" type="int8">
+            <parent column="cvterm_id" foreignKey="phenotype_observable_id_fkey" implied="false" onDeleteCascade="true" schema="cv" table="cvterm"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="4" name="attr_id" nullable="true" remarks="Phenotypic attribute (quality, property, attribute, character) - drawn from PATO." size="19" type="int8">
+            <parent column="cvterm_id" foreignKey="phenotype_attr_id_fkey" implied="false" onDeleteCascade="false" schema="cv" table="cvterm"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="5" name="value" nullable="true" remarks="Value of attribute - unconstrained free text. Used only if cvalue_id is not appropriate." size="2147483647" type="text"/>
+         <column autoUpdated="false" digits="0" id="6" name="cvalue_id" nullable="true" remarks="Phenotype attribute value (state)." size="19" type="int8">
+            <parent column="cvterm_id" foreignKey="phenotype_cvalue_id_fkey" implied="false" onDeleteCascade="false" schema="cv" table="cvterm"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="7" name="assay_id" nullable="true" remarks="Evidence type." size="19" type="int8">
+            <parent column="cvterm_id" foreignKey="phenotype_assay_id_fkey" implied="false" onDeleteCascade="false" schema="cv" table="cvterm"/>
+         </column>
+         <primaryKey column="phenotype_id" sequenceNumberInPK="1"/>
+         <index name="phenotype_pkey" unique="true">
+            <column ascending="true" name="phenotype_id"/>
+         </index>
+         <index name="phenotype_c1" unique="true">
+            <column ascending="true" name="uniquename"/>
+         </index>
+         <index name="phenotype_idx1" unique="false">
+            <column ascending="true" name="cvalue_id"/>
+         </index>
+         <index name="phenotype_idx2" unique="false">
+            <column ascending="true" name="observable_id"/>
+         </index>
+         <index name="phenotype_idx3" unique="false">
+            <column ascending="true" name="attr_id"/>
+         </index>
+      </table>
+      <table name="phenotype_cvterm" remarks="phenotype to cvterm associations." schema="phenotype" type="TABLE">
+         <column autoUpdated="false" defaultValue="nextval('phenotype.phenotype_cvterm_phenotype_cvterm_id_seq'::regclass)" digits="0" id="0" name="phenotype_cvterm_id" nullable="false" remarks="" size="19" type="bigserial"/>
+         <column autoUpdated="false" digits="0" id="1" name="phenotype_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="phenotype_id" foreignKey="phenotype_cvterm_phenotype_id_fkey" implied="false" onDeleteCascade="true" schema="phenotype" table="phenotype"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="2" name="cvterm_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="cvterm_id" foreignKey="phenotype_cvterm_cvterm_id_fkey" implied="false" onDeleteCascade="true" schema="cv" table="cvterm"/>
+         </column>
+         <column autoUpdated="false" defaultValue="0" digits="0" id="3" name="rank" nullable="false" remarks="" size="10" type="int4"/>
+         <primaryKey column="phenotype_cvterm_id" sequenceNumberInPK="1"/>
+         <index name="phenotype_cvterm_pkey" unique="true">
+            <column ascending="true" name="phenotype_cvterm_id"/>
+         </index>
+         <index name="phenotype_cvterm_c1" unique="true">
+            <column ascending="true" name="phenotype_id"/>
+            <column ascending="true" name="cvterm_id"/>
+            <column ascending="true" name="rank"/>
+         </index>
+         <index name="phenotype_cvterm_idx1" unique="false">
+            <column ascending="true" name="phenotype_id"/>
+         </index>
+         <index name="phenotype_cvterm_idx2" unique="false">
+            <column ascending="true" name="cvterm_id"/>
+         </index>
+      </table>
+      <table name="phenotypeprop" remarks="A phenotype can have any number of slot-value property tags attached to it. This is an alternative to hardcoding a list of columns in the relational schema, and is completely extensible. There is a unique constraint, phenotypeprop_c1, for the combination of phenotype_id, rank, and type_id. Multivalued property-value pairs must be differentiated by rank." schema="phenotype" type="TABLE">
+         <column autoUpdated="false" defaultValue="nextval('phenotype.phenotypeprop_phenotypeprop_id_seq'::regclass)" digits="0" id="0" name="phenotypeprop_id" nullable="false" remarks="" size="19" type="bigserial"/>
+         <column autoUpdated="false" digits="0" id="1" name="phenotype_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="phenotype_id" foreignKey="phenotypeprop_phenotype_id_fkey" implied="false" onDeleteCascade="true" schema="phenotype" table="phenotype"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="2" name="type_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="cvterm_id" foreignKey="phenotypeprop_type_id_fkey" implied="false" onDeleteCascade="true" schema="cv" table="cvterm"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="3" name="value" nullable="true" remarks="" size="2147483647" type="text"/>
+         <column autoUpdated="false" defaultValue="0" digits="0" id="4" name="rank" nullable="false" remarks="" size="10" type="int4"/>
+         <primaryKey column="phenotypeprop_id" sequenceNumberInPK="1"/>
+         <index name="phenotypeprop_pkey" unique="true">
+            <column ascending="true" name="phenotypeprop_id"/>
+         </index>
+         <index name="phenotypeprop_c1" unique="true">
+            <column ascending="true" name="phenotype_id"/>
+            <column ascending="true" name="type_id"/>
+            <column ascending="true" name="rank"/>
+         </index>
+         <index name="phenotypeprop_idx1" unique="false">
+            <column ascending="true" name="phenotype_id"/>
+         </index>
+         <index name="phenotypeprop_idx2" unique="false">
+            <column ascending="true" name="type_id"/>
+         </index>
+      </table>
+   </tables>
+</database>

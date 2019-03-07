@@ -1,0 +1,251 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<database name="chado" schema="phylogeny" type="PostgreSQL - 9.3.18">
+   <tables>
+      <table name="phylonode" remarks="This is the most pervasive&#10;       element in the phylogeny module, cataloging the &quot;phylonodes&quot; of&#10;       tree graphs. Edges are implied by the parent_phylonode_id&#10;       reflexive closure. For all nodes in a nested set implementation the left and right index will be *between* the parents left and right indexes." schema="phylogeny" type="TABLE">
+         <column autoUpdated="false" defaultValue="nextval('phylogeny.phylonode_phylonode_id_seq'::regclass)" digits="0" id="0" name="phylonode_id" nullable="false" remarks="" size="19" type="bigserial">
+            <child column="parent_phylonode_id" foreignKey="phylonode_parent_phylonode_id_fkey" implied="false" onDeleteCascade="true" schema="phylogeny" table="phylonode"/>
+            <child column="phylonode_id" foreignKey="phylonode_dbxref_phylonode_id_fkey" implied="false" onDeleteCascade="true" schema="phylogeny" table="phylonode_dbxref"/>
+            <child column="phylonode_id" foreignKey="phylonode_organism_phylonode_id_fkey" implied="false" onDeleteCascade="true" schema="phylogeny" table="phylonode_organism"/>
+            <child column="phylonode_id" foreignKey="phylonode_pub_phylonode_id_fkey" implied="false" onDeleteCascade="true" schema="phylogeny" table="phylonode_pub"/>
+            <child column="object_id" foreignKey="phylonode_relationship_object_id_fkey" implied="false" onDeleteCascade="true" schema="phylogeny" table="phylonode_relationship"/>
+            <child column="subject_id" foreignKey="phylonode_relationship_subject_id_fkey" implied="false" onDeleteCascade="true" schema="phylogeny" table="phylonode_relationship"/>
+            <child column="phylonode_id" foreignKey="phylonodeprop_phylonode_id_fkey" implied="false" onDeleteCascade="true" schema="phylogeny" table="phylonodeprop"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="1" name="phylotree_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="phylotree_id" foreignKey="phylonode_phylotree_id_fkey" implied="false" onDeleteCascade="true" schema="phylogeny" table="phylotree"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="2" name="parent_phylonode_id" nullable="true" remarks="Root phylonode can have null parent_phylonode_id value." size="19" type="int8">
+            <parent column="phylonode_id" foreignKey="phylonode_parent_phylonode_id_fkey" implied="false" onDeleteCascade="true" schema="phylogeny" table="phylonode"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="3" name="left_idx" nullable="false" remarks="" size="10" type="int4"/>
+         <column autoUpdated="false" digits="0" id="4" name="right_idx" nullable="false" remarks="" size="10" type="int4"/>
+         <column autoUpdated="false" digits="0" id="5" name="type_id" nullable="true" remarks="Type: e.g. root, interior, leaf." size="19" type="int8">
+            <parent column="cvterm_id" foreignKey="phylonode_type_id_fkey" implied="false" onDeleteCascade="true" schema="cv" table="cvterm"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="6" name="feature_id" nullable="true" remarks="Phylonodes can have optional features attached to them e.g. a protein or nucleotide sequence usually attached to a leaf of the phylotree for non-leaf nodes, the feature may be a feature that is an instance of SO:match; this feature is the alignment of all leaf features beneath it." size="19" type="int8">
+            <parent column="feature_id" foreignKey="phylonode_feature_id_fkey" implied="false" onDeleteCascade="true" schema="sequence" table="feature"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="7" name="label" nullable="true" remarks="" size="255" type="varchar"/>
+         <column autoUpdated="false" digits="17" id="8" name="distance" nullable="true" remarks="" size="17" type="float8"/>
+         <primaryKey column="phylonode_id" sequenceNumberInPK="1"/>
+         <index name="phylonode_pkey" unique="true">
+            <column ascending="true" name="phylonode_id"/>
+         </index>
+         <index name="phylonode_parent_phylonode_id_idx" unique="false">
+            <column ascending="true" name="parent_phylonode_id"/>
+         </index>
+         <index name="phylonode_phylotree_id_left_idx_key" unique="true">
+            <column ascending="true" name="phylotree_id"/>
+            <column ascending="true" name="left_idx"/>
+         </index>
+         <index name="phylonode_phylotree_id_right_idx_key" unique="true">
+            <column ascending="true" name="phylotree_id"/>
+            <column ascending="true" name="right_idx"/>
+         </index>
+      </table>
+      <table name="phylonode_dbxref" remarks="For example, for orthology, paralogy group identifiers; could also be used for NCBI taxonomy; for sequences, refer to phylonode_feature, feature associated dbxrefs." schema="phylogeny" type="TABLE">
+         <column autoUpdated="false" defaultValue="nextval('phylogeny.phylonode_dbxref_phylonode_dbxref_id_seq'::regclass)" digits="0" id="0" name="phylonode_dbxref_id" nullable="false" remarks="" size="19" type="bigserial"/>
+         <column autoUpdated="false" digits="0" id="1" name="phylonode_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="phylonode_id" foreignKey="phylonode_dbxref_phylonode_id_fkey" implied="false" onDeleteCascade="true" schema="phylogeny" table="phylonode"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="2" name="dbxref_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="dbxref_id" foreignKey="phylonode_dbxref_dbxref_id_fkey" implied="false" onDeleteCascade="true" schema="db" table="dbxref"/>
+         </column>
+         <primaryKey column="phylonode_dbxref_id" sequenceNumberInPK="1"/>
+         <index name="phylonode_dbxref_pkey" unique="true">
+            <column ascending="true" name="phylonode_dbxref_id"/>
+         </index>
+         <index name="phylonode_dbxref_idx1" unique="false">
+            <column ascending="true" name="phylonode_id"/>
+         </index>
+         <index name="phylonode_dbxref_idx2" unique="false">
+            <column ascending="true" name="dbxref_id"/>
+         </index>
+         <index name="phylonode_dbxref_phylonode_id_dbxref_id_key" unique="true">
+            <column ascending="true" name="phylonode_id"/>
+            <column ascending="true" name="dbxref_id"/>
+         </index>
+      </table>
+      <table name="phylonode_organism" remarks="This linking table should only be used for nodes in taxonomy trees; it provides a mapping between the node and an organism. One node can have zero or one organisms, one organism can have zero or more nodes (although typically it should only have one in the standard NCBI taxonomy tree)." schema="phylogeny" type="TABLE">
+         <column autoUpdated="false" defaultValue="nextval('phylogeny.phylonode_organism_phylonode_organism_id_seq'::regclass)" digits="0" id="0" name="phylonode_organism_id" nullable="false" remarks="" size="19" type="bigserial"/>
+         <column autoUpdated="false" digits="0" id="1" name="phylonode_id" nullable="false" remarks="One phylonode cannot refer to &gt;1 organism." size="19" type="int8">
+            <parent column="phylonode_id" foreignKey="phylonode_organism_phylonode_id_fkey" implied="false" onDeleteCascade="true" schema="phylogeny" table="phylonode"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="2" name="organism_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="organism_id" foreignKey="phylonode_organism_organism_id_fkey" implied="false" onDeleteCascade="true" schema="organism" table="organism"/>
+         </column>
+         <primaryKey column="phylonode_organism_id" sequenceNumberInPK="1"/>
+         <index name="phylonode_organism_pkey" unique="true">
+            <column ascending="true" name="phylonode_organism_id"/>
+         </index>
+         <index name="phylonode_organism_idx1" unique="false">
+            <column ascending="true" name="phylonode_id"/>
+         </index>
+         <index name="phylonode_organism_idx2" unique="false">
+            <column ascending="true" name="organism_id"/>
+         </index>
+         <index name="phylonode_organism_phylonode_id_key" unique="true">
+            <column ascending="true" name="phylonode_id"/>
+         </index>
+      </table>
+      <table name="phylonode_pub" remarks="" schema="phylogeny" type="TABLE">
+         <column autoUpdated="false" defaultValue="nextval('phylogeny.phylonode_pub_phylonode_pub_id_seq'::regclass)" digits="0" id="0" name="phylonode_pub_id" nullable="false" remarks="" size="19" type="bigserial"/>
+         <column autoUpdated="false" digits="0" id="1" name="phylonode_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="phylonode_id" foreignKey="phylonode_pub_phylonode_id_fkey" implied="false" onDeleteCascade="true" schema="phylogeny" table="phylonode"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="2" name="pub_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="pub_id" foreignKey="phylonode_pub_pub_id_fkey" implied="false" onDeleteCascade="true" schema="pub" table="pub"/>
+         </column>
+         <primaryKey column="phylonode_pub_id" sequenceNumberInPK="1"/>
+         <index name="phylonode_pub_pkey" unique="true">
+            <column ascending="true" name="phylonode_pub_id"/>
+         </index>
+         <index name="phylonode_pub_idx1" unique="false">
+            <column ascending="true" name="phylonode_id"/>
+         </index>
+         <index name="phylonode_pub_idx2" unique="false">
+            <column ascending="true" name="pub_id"/>
+         </index>
+         <index name="phylonode_pub_phylonode_id_pub_id_key" unique="true">
+            <column ascending="true" name="phylonode_id"/>
+            <column ascending="true" name="pub_id"/>
+         </index>
+      </table>
+      <table name="phylonode_relationship" remarks="This is for &#10;relationships that are not strictly hierarchical; for example,&#10;horizontal gene transfer. Most phylogenetic trees are strictly&#10;hierarchical, nevertheless it is here for completeness." schema="phylogeny" type="TABLE">
+         <column autoUpdated="false" defaultValue="nextval('phylogeny.phylonode_relationship_phylonode_relationship_id_seq'::regclass)" digits="0" id="0" name="phylonode_relationship_id" nullable="false" remarks="" size="19" type="bigserial"/>
+         <column autoUpdated="false" digits="0" id="1" name="subject_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="phylonode_id" foreignKey="phylonode_relationship_subject_id_fkey" implied="false" onDeleteCascade="true" schema="phylogeny" table="phylonode"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="2" name="object_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="phylonode_id" foreignKey="phylonode_relationship_object_id_fkey" implied="false" onDeleteCascade="true" schema="phylogeny" table="phylonode"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="3" name="type_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="cvterm_id" foreignKey="phylonode_relationship_type_id_fkey" implied="false" onDeleteCascade="true" schema="cv" table="cvterm"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="4" name="rank" nullable="true" remarks="" size="10" type="int4"/>
+         <column autoUpdated="false" digits="0" id="5" name="phylotree_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="phylotree_id" foreignKey="phylonode_relationship_phylotree_id_fkey" implied="false" onDeleteCascade="true" schema="phylogeny" table="phylotree"/>
+         </column>
+         <primaryKey column="phylonode_relationship_id" sequenceNumberInPK="1"/>
+         <index name="phylonode_relationship_pkey" unique="true">
+            <column ascending="true" name="phylonode_relationship_id"/>
+         </index>
+         <index name="phylonode_relationship_idx1" unique="false">
+            <column ascending="true" name="subject_id"/>
+         </index>
+         <index name="phylonode_relationship_idx2" unique="false">
+            <column ascending="true" name="object_id"/>
+         </index>
+         <index name="phylonode_relationship_idx3" unique="false">
+            <column ascending="true" name="type_id"/>
+         </index>
+         <index name="phylonode_relationship_subject_id_object_id_type_id_key" unique="true">
+            <column ascending="true" name="subject_id"/>
+            <column ascending="true" name="object_id"/>
+            <column ascending="true" name="type_id"/>
+         </index>
+      </table>
+      <table name="phylonodeprop" remarks="" schema="phylogeny" type="TABLE">
+         <column autoUpdated="false" defaultValue="nextval('phylogeny.phylonodeprop_phylonodeprop_id_seq'::regclass)" digits="0" id="0" name="phylonodeprop_id" nullable="false" remarks="" size="19" type="bigserial"/>
+         <column autoUpdated="false" digits="0" id="1" name="phylonode_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="phylonode_id" foreignKey="phylonodeprop_phylonode_id_fkey" implied="false" onDeleteCascade="true" schema="phylogeny" table="phylonode"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="2" name="type_id" nullable="false" remarks="type_id could designate phylonode hierarchy relationships, for example: species taxonomy (kingdom, order, family, genus, species), &quot;ortholog/paralog&quot;, &quot;fold/superfold&quot;, etc." size="19" type="int8">
+            <parent column="cvterm_id" foreignKey="phylonodeprop_type_id_fkey" implied="false" onDeleteCascade="true" schema="cv" table="cvterm"/>
+         </column>
+         <column autoUpdated="false" defaultValue="''::text" digits="0" id="3" name="value" nullable="false" remarks="" size="2147483647" type="text"/>
+         <column autoUpdated="false" defaultValue="0" digits="0" id="4" name="rank" nullable="false" remarks="" size="10" type="int4"/>
+         <primaryKey column="phylonodeprop_id" sequenceNumberInPK="1"/>
+         <index name="phylonodeprop_pkey" unique="true">
+            <column ascending="true" name="phylonodeprop_id"/>
+         </index>
+         <index name="phylonodeprop_idx1" unique="false">
+            <column ascending="true" name="phylonode_id"/>
+         </index>
+         <index name="phylonodeprop_idx2" unique="false">
+            <column ascending="true" name="type_id"/>
+         </index>
+         <index name="phylonodeprop_phylonode_id_type_id_value_rank_key" unique="true">
+            <column ascending="true" name="phylonode_id"/>
+            <column ascending="true" name="type_id"/>
+            <column ascending="true" name="value"/>
+            <column ascending="true" name="rank"/>
+         </index>
+      </table>
+      <table name="phylotree" remarks="Global anchor for phylogenetic tree." schema="phylogeny" type="TABLE">
+         <column autoUpdated="false" defaultValue="nextval('phylogeny.phylotree_phylotree_id_seq'::regclass)" digits="0" id="0" name="phylotree_id" nullable="false" remarks="" size="19" type="bigserial">
+            <child column="phylotree_id" foreignKey="phylonode_phylotree_id_fkey" implied="false" onDeleteCascade="true" schema="phylogeny" table="phylonode"/>
+            <child column="phylotree_id" foreignKey="phylonode_relationship_phylotree_id_fkey" implied="false" onDeleteCascade="true" schema="phylogeny" table="phylonode_relationship"/>
+            <child column="phylotree_id" foreignKey="phylotree_pub_phylotree_id_fkey" implied="false" onDeleteCascade="true" schema="phylogeny" table="phylotree_pub"/>
+            <child column="phylotree_id" foreignKey="phylotreeprop_phylotree_id_fkey" implied="false" onDeleteCascade="true" schema="phylogeny" table="phylotreeprop"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="1" name="dbxref_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="dbxref_id" foreignKey="phylotree_dbxref_id_fkey" implied="false" onDeleteCascade="true" schema="db" table="dbxref"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="2" name="name" nullable="true" remarks="" size="255" type="varchar"/>
+         <column autoUpdated="false" digits="0" id="3" name="type_id" nullable="true" remarks="Type: protein, nucleotide, taxonomy, for example. The type should be any SO type, or &quot;taxonomy&quot;." size="19" type="int8">
+            <parent column="cvterm_id" foreignKey="phylotree_type_id_fkey" implied="false" onDeleteCascade="true" schema="cv" table="cvterm"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="4" name="analysis_id" nullable="true" remarks="" size="19" type="int8">
+            <parent column="analysis_id" foreignKey="phylotree_analysis_id_fkey" implied="false" onDeleteCascade="true" schema="companalysis" table="analysis"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="5" name="comment" nullable="true" remarks="" size="2147483647" type="text"/>
+         <primaryKey column="phylotree_id" sequenceNumberInPK="1"/>
+         <index name="phylotree_pkey" unique="true">
+            <column ascending="true" name="phylotree_id"/>
+         </index>
+         <index name="phylotree_idx1" unique="false">
+            <column ascending="true" name="phylotree_id"/>
+         </index>
+      </table>
+      <table name="phylotree_pub" remarks="Tracks citations global to the tree e.g. multiple sequence alignment supporting tree construction." schema="phylogeny" type="TABLE">
+         <column autoUpdated="false" defaultValue="nextval('phylogeny.phylotree_pub_phylotree_pub_id_seq'::regclass)" digits="0" id="0" name="phylotree_pub_id" nullable="false" remarks="" size="19" type="bigserial"/>
+         <column autoUpdated="false" digits="0" id="1" name="phylotree_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="phylotree_id" foreignKey="phylotree_pub_phylotree_id_fkey" implied="false" onDeleteCascade="true" schema="phylogeny" table="phylotree"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="2" name="pub_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="pub_id" foreignKey="phylotree_pub_pub_id_fkey" implied="false" onDeleteCascade="true" schema="pub" table="pub"/>
+         </column>
+         <primaryKey column="phylotree_pub_id" sequenceNumberInPK="1"/>
+         <index name="phylotree_pub_pkey" unique="true">
+            <column ascending="true" name="phylotree_pub_id"/>
+         </index>
+         <index name="phylotree_pub_idx1" unique="false">
+            <column ascending="true" name="phylotree_id"/>
+         </index>
+         <index name="phylotree_pub_idx2" unique="false">
+            <column ascending="true" name="pub_id"/>
+         </index>
+         <index name="phylotree_pub_phylotree_id_pub_id_key" unique="true">
+            <column ascending="true" name="phylotree_id"/>
+            <column ascending="true" name="pub_id"/>
+         </index>
+      </table>
+      <table name="phylotreeprop" remarks="A phylotree can have any number of slot-value property &#10;tags attached to it. This is an alternative to hardcoding a list of columns in the &#10;relational schema, and is completely extensible." schema="phylogeny" type="TABLE">
+         <column autoUpdated="false" defaultValue="nextval('phylogeny.phylotreeprop_phylotreeprop_id_seq'::regclass)" digits="0" id="0" name="phylotreeprop_id" nullable="false" remarks="" size="19" type="bigserial"/>
+         <column autoUpdated="false" digits="0" id="1" name="phylotree_id" nullable="false" remarks="" size="19" type="int8">
+            <parent column="phylotree_id" foreignKey="phylotreeprop_phylotree_id_fkey" implied="false" onDeleteCascade="true" schema="phylogeny" table="phylotree"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="2" name="type_id" nullable="false" remarks="The name of the property/slot is a cvterm. &#10;The meaning of the property is defined in that cvterm." size="19" type="int8">
+            <parent column="cvterm_id" foreignKey="phylotreeprop_type_id_fkey" implied="false" onDeleteCascade="true" schema="cv" table="cvterm"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="3" name="value" nullable="true" remarks="The value of the property, represented as text. &#10;Numeric values are converted to their text representation. This is less efficient than &#10;using native database types, but is easier to query." size="2147483647" type="text"/>
+         <column autoUpdated="false" defaultValue="0" digits="0" id="4" name="rank" nullable="false" remarks="Property-Value ordering. Any&#10;phylotree can have multiple values for any particular property type &#10;these are ordered in a list using rank, counting from zero. For&#10;properties that are single-valued rather than multi-valued, the&#10;default 0 value should be used" size="10" type="int4"/>
+         <primaryKey column="phylotreeprop_id" sequenceNumberInPK="1"/>
+         <index name="phylotreeprop_pkey" unique="true">
+            <column ascending="true" name="phylotreeprop_id"/>
+         </index>
+         <index name="phylotreeprop_c1" unique="true">
+            <column ascending="true" name="phylotree_id"/>
+            <column ascending="true" name="type_id"/>
+            <column ascending="true" name="rank"/>
+         </index>
+         <index name="phylotreeprop_idx1" unique="false">
+            <column ascending="true" name="phylotree_id"/>
+         </index>
+         <index name="phylotreeprop_idx2" unique="false">
+            <column ascending="true" name="type_id"/>
+         </index>
+      </table>
+   </tables>
+</database>

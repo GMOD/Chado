@@ -1,0 +1,33 @@
+language: java
+
+jdk:
+  - oraclejdk8
+
+services:
+  - postgresql
+
+addons:
+  postgresql: "9.6"
+
+script:
+  - psql -U postgres -d postgres -q -a -f ./chado/schemas/1.31/default_schema.sql > log.txt
+  - export HOST_IP_ADDRESS="$(/sbin/ip route|awk '/default/ { print $3 }')"
+  - gradle build
+  - gradle flywayBaseline
+  - gradle flywayInfo
+  - gradle flywayMigrate
+  - gradle flywayInfo
+
+
+deploy:
+#something liek this instead?
+# deploy develop to the staging environment
+# - provider: script#
+#   script: bash scripts/deploy.sh staging
+  provider: pages
+  skip-cleanup: true
+  github-token: $GITHUB_TOKEN  # Set in the settings page of your repository, as a secure variable
+  keep-history: true
+  on:
+    branch: integrate_schemaspy
+  target-branch: rtd

@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>feature - chado Module</title>
+  <!-- Tell the browser to be responsive to screen width -->
+  <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+  <link rel="icon" type="image/png" sizes="16x16" href="../../favicon.ico">
+  <!-- Bootstrap 3.3.5 -->
+  <link rel="stylesheet" href="../bower/admin-lte/bootstrap/css/bootstrap.min.css">
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="../bower/font-awesome/css/font-awesome.min.css">
+  <!-- Ionicons -->
+  <link rel="stylesheet" href="../bower/ionicons/css/ionicons.min.css">
+  <!-- DataTables -->
+  <link rel="stylesheet" href="../bower/datatables.net-bs/css/dataTables.bootstrap.min.css">
+  <link rel="stylesheet" href="../bower/datatables.net-buttons-bs/css/buttons.bootstrap.min.css">
+  <!-- Code Mirror -->
+  <link rel="stylesheet" href="../bower/codemirror/codemirror.css">
+  <!-- Fonts -->
+  <link href='../fonts/indieflower/indie-flower.css' rel='stylesheet' type='text/css'>
+  <link href='../fonts/source-sans-pro/source-sans-pro.css' rel='stylesheet' type='text/css'>
+
+  <!-- Theme style -->
+  <link rel="stylesheet" href="../bower/admin-lte/dist/css/AdminLTE.min.css">
+  <!-- Salvattore -->
+  <link rel="stylesheet" href="../bower/salvattore/salvattore.css">
+  <!-- AdminLTE Skins. Choose a skin from the css/skins
+       folder instead of downloading all of them to reduce the load. -->
+  <link rel="stylesheet" href="../bower/admin-lte/dist/css/skins/_all-skins.min.css">
+  <!-- SchemaSpy -->
+  <link rel="stylesheet" href="../schemaSpy.css">
+  <!-- GMOD Chado Specific CSS -->
+  <link rel="stylesheet" href="../../main.css">
+  
+  <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+  <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+  <!--[if lt IE 9]>
+  <script src="../bower/html5shiv/html5shiv.min.js"></script>
+  <script src="../bower/respond/respond.min.js"></script>
+  <![endif]-->
+</head>
+<!-- ADD THE CLASS layout-top-nav TO REMOVE THE SIDEBAR. -->
+<!-- Skins: skin-black, black-light, green-light, red-light, yellow-light, purple-light, blue-light -->
+<body class="hold-transition skin-black layout-top-nav">
+<div class="wrapper">
+  <header class="main-header">
+    <nav class="navbar navbar-static-top">
+      <div class="container">
+        <div class="navbar-header">
+          <a href="../../index.html" class="navbar-brand" style="padding:0;">
+            <img src="../../GMOD-cogs.png" class="gmod-logo" />
+            <span class="gmod-title">Chado</span>
+          </a>
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar-collapse">
+            <i class="fa fa-bars"></i>
+          </button>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-collapse pull-left" id="navbar-collapse">
+          <ul class="nav navbar-nav">
+            <li>
+              <a href="../../index.html" title="All Chado Tables.">
+                All Tables</span>
+              </a>
+            </li>
+            <li>
+              <a href="../../constraints.html" title="All Constraints in Chado.">
+                All Constraints
+              </a>
+            </li>
+            <li>
+              <a href="../index.html" title="Tables in this module.">
+                Module Tables <span class="sr-only">(current)</span>
+              </a>
+            </li>            
+            <li>
+              <a href="../columns.html" title="Columns in this module.">
+                Module Columns
+              </a>
+            </li>
+            <li>
+              <a href="../constraints.html" title="Constraints defined by this module.">
+                Module Constraints
+              </a>
+            </li>
+            <li>
+              <a href="../relationships.html" title="Diagram of table relationships">
+                Module Relationships
+              </a>
+            </li>
+          </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+        <!-- Navbar Right Menu -->
+
+      </div>
+      <!-- /.container-fluid -->
+    </nav>
+  </header>
+  <!-- Main content -->
+  <!-- Full Width Column -->
+  <div class="content-wrapper">
+    
+    <div class="box box-solid">
+      <div class="box-body">
+        <p><span class="version-label">Schema Version:</span> 1.3 
+          <span class="version-label">Module</span>: chado</p>
+      </div>
+    </div>
+		
+          <!-- Content Header (Page header) -->
+      <section class="content-header">
+        <h1>feature</h1></br>
+		<div class="box box-primary">
+            <div class="box-header with-border">
+              <i class="fa fa-file-text-o"></i>
+              <h3 id="Description" class="box-title">Description</h3>
+              <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
+                </button>
+                <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
+              </div>			  
+            </div>
+            <!-- /.box-header -->
+            <div class="box-body clearfix">
+				<p><p>A feature is a biological sequence or a section of a biological sequence, or a collection of such sections. Examples include genes, exons, transcripts, regulatory regions, polypeptides, protein domains, chromosome sequences, sequence variations, cross-genome match regions such as hits and HSPs and so on; see the Sequence Ontology for more. The combination of organism_id, uniquename and type_id should be unique.</p></p>              
+            </div>
+            <!-- /.box-body -->
+		</div>
+		      </section>
+      <!-- Main content -->
+      <section class="content">
+		<div class="box box-primary">
+			<div class="box-header with-border">
+			  <span class="glyphicon glyphicon-list-alt" aria-hidden="true"></span>
+              <h3 id="Columns" class="box-title">Columns</h3>
+              <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
+                </button>
+                <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
+              </div>
+            </div>	
+            <div class="box-body">
+				<table id="standard_table" class="table table-bordered table-striped dataTable" role="grid">
+				<thead align='left'>
+				<tr>
+				  <th>Column</th>
+				  <th>Type</th>
+				  <th>Size</th>
+				  <th title='Columns in tables that are referenced by this column'>Foreign Key</th>
+				  <th title='Are nulls allowed?'>Nullable</th>
+				  <th title='Default value'>Default</th>
+				  <th title='Comments' class="toggle"><span>Comments</span></th>
+				</tr>
+				</thead>
+				<tbody>
+				<tr>
+				 <td class='primaryKey' title='Primary Key'><i class='icon ion-key iconkey' style='padding-left: 5px;'></i><span id="feature_id">feature_id</span></td>
+				 <td>bigserial</td>
+				 <td>19</td>
+				 <td>
+				  <table border='0' cellspacing='0' cellpadding='0'>
+				  </table>					 
+				 </td>
+				 <td title=''></td>
+				 <td>nextval(&#39;sequence.feature_feature_id_seq&#39;::regclass)</td>
+				 <td></td>
+				</tr>
+				<tr>
+				 <td class='foreignKey' title='Foreign Key'><i class='icon ion-key iconkey' style='padding-left: 5px;'></i><span id="dbxref_id">dbxref_id</span></td>
+				 <td>int8</td>
+				 <td>19</td>
+				 <td>
+				  <table border='0' cellspacing='0' cellpadding='0'>
+				   <tr>
+					<td title="feature.dbxref_id references db.dbxref.dbxref_id via feature_dbxref_id_fkey">
+						<a href='../../db/tables/dbxref.html'>dbxref</a><span class='relatedKey'>.dbxref_id</span>
+					</td>
+					<td class="constraint detail">
+						feature_dbxref_id_fkey <span title='Null on delete:&#10;Foreign key to parent set to NULL when parent deleted'>N</span>
+					</td>
+				   </tr>
+				  </table>					 
+				 </td>
+				 <td title='nullable'>√</td>
+				 <td>null</td>
+				 <td><p>An optional primary public stable identifier for this feature. Secondary identifiers and external dbxrefs go in the table feature_dbxref.</p></td>
+				</tr>
+				<tr>
+				 <td class='foreignKey' title='Foreign Key'><i class='icon ion-key iconkey' style='padding-left: 5px;'></i><span id="organism_id">organism_id</span></td>
+				 <td>int8</td>
+				 <td>19</td>
+				 <td>
+				  <table border='0' cellspacing='0' cellpadding='0'>
+				   <tr>
+					<td title="feature.organism_id references organism.organism.organism_id via feature_organism_id_fkey">
+						<a href='../../organism/tables/organism.html'>organism</a><span class='relatedKey'>.organism_id</span>
+					</td>
+					<td class="constraint detail">
+						feature_organism_id_fkey <span title='Cascade on delete:&#10;Deletion of parent deletes child'>C</span>
+					</td>
+				   </tr>
+				  </table>					 
+				 </td>
+				 <td title=''></td>
+				 <td>null</td>
+				 <td><p>The organism to which this feature belongs. This column is mandatory.</p></td>
+				</tr>
+				<tr>
+				 <td class='indexedColumn' title='Indexed'><i class='fa fa-sitemap fa-rotate-120' style='padding-right: 5px;'></i><span id="name">name</span></td>
+				 <td>varchar</td>
+				 <td>255</td>
+				 <td>
+				  <table border='0' cellspacing='0' cellpadding='0'>
+				  </table>					 
+				 </td>
+				 <td title='nullable'>√</td>
+				 <td>null</td>
+				 <td><p>The optional human-readable common name for a feature, for display purposes.</p></td>
+				</tr>
+				<tr>
+				 <td class='indexedColumn' title='Indexed'><i class='fa fa-sitemap fa-rotate-120' style='padding-right: 5px;'></i><span id="uniquename">uniquename</span></td>
+				 <td>text</td>
+				 <td>2147483647</td>
+				 <td>
+				  <table border='0' cellspacing='0' cellpadding='0'>
+				  </table>					 
+				 </td>
+				 <td title=''></td>
+				 <td>null</td>
+				 <td><p>The unique name for a feature; may not be necessarily be particularly human-readable, although this is preferred. This name must be unique for this type of feature within this organism.</p></td>
+				</tr>
+				<tr>
+				 <td><span id="residues">residues</span></td>
+				 <td>text</td>
+				 <td>2147483647</td>
+				 <td>
+				  <table border='0' cellspacing='0' cellpadding='0'>
+				  </table>					 
+				 </td>
+				 <td title='nullable'>√</td>
+				 <td>null</td>
+				 <td><p>A sequence of alphabetic characters representing biological residues (nucleic acids, amino acids). This column does not need to be manifested for all features; it is optional for features such as exons where the residues can be derived from the featureloc. It is recommended that the value for this column be manifested for features which may may non-contiguous sublocations (e.g. transcripts), since derivation at query time is non-trivial. For expressed sequence, the DNA sequence should be used rather than the RNA sequence. The default storage method for the residues column is EXTERNAL, which will store it uncompressed to make substring operations faster.</p></td>
+				</tr>
+				<tr>
+				 <td><span id="seqlen">seqlen</span></td>
+				 <td>int8</td>
+				 <td>19</td>
+				 <td>
+				  <table border='0' cellspacing='0' cellpadding='0'>
+				  </table>					 
+				 </td>
+				 <td title='nullable'>√</td>
+				 <td>null</td>
+				 <td><p>The length of the residue feature. See column:residues. This column is partially redundant with the residues column, and also with featureloc. This column is required because the location may be unknown and the residue sequence may not be manifested, yet it may be desirable to store and query the length of the feature. The seqlen should always be manifested where the length of the sequence is known.</p></td>
+				</tr>
+				<tr>
+				 <td><span id="md5checksum">md5checksum</span></td>
+				 <td>bpchar</td>
+				 <td>32</td>
+				 <td>
+				  <table border='0' cellspacing='0' cellpadding='0'>
+				  </table>					 
+				 </td>
+				 <td title='nullable'>√</td>
+				 <td>null</td>
+				 <td><p>The 32-character checksum of the sequence, calculated using the MD5 algorithm. This is practically guaranteed to be unique for any feature. This column thus acts as a unique identifier on the mathematical sequence.</p></td>
+				</tr>
+				<tr>
+				 <td class='foreignKey' title='Foreign Key'><i class='icon ion-key iconkey' style='padding-left: 5px;'></i><span id="type_id">type_id</span></td>
+				 <td>int8</td>
+				 <td>19</td>
+				 <td>
+				  <table border='0' cellspacing='0' cellpadding='0'>
+				   <tr>
+					<td title="feature.type_id references cv.cvterm.cvterm_id via feature_type_id_fkey">
+						<a href='../../cv/tables/cvterm.html'>cvterm</a><span class='relatedKey'>.cvterm_id</span>
+					</td>
+					<td class="constraint detail">
+						feature_type_id_fkey <span title='Cascade on delete:&#10;Deletion of parent deletes child'>C</span>
+					</td>
+				   </tr>
+				  </table>					 
+				 </td>
+				 <td title=''></td>
+				 <td>null</td>
+				 <td><p>A required reference to a table:cvterm giving the feature type. This will typically be a Sequence Ontology identifier. This column is thus used to subclass the feature table.</p></td>
+				</tr>
+				<tr>
+				 <td><span id="is_analysis">is_analysis</span></td>
+				 <td>bool</td>
+				 <td>1</td>
+				 <td>
+				  <table border='0' cellspacing='0' cellpadding='0'>
+				  </table>					 
+				 </td>
+				 <td title=''></td>
+				 <td>false</td>
+				 <td><p>Boolean indicating whether this feature is annotated or the result of an automated analysis. Analysis results also use the companalysis module. Note that the dividing line between analysis and annotation may be fuzzy, this should be determined on a per-project basis in a consistent manner. One requirement is that there should only be one non-analysis version of each wild-type gene feature in a genome, whereas the same gene feature can be predicted multiple times in different analyses.</p></td>
+				</tr>
+				<tr>
+				 <td><span id="is_obsolete">is_obsolete</span></td>
+				 <td>bool</td>
+				 <td>1</td>
+				 <td>
+				  <table border='0' cellspacing='0' cellpadding='0'>
+				  </table>					 
+				 </td>
+				 <td title=''></td>
+				 <td>false</td>
+				 <td><p>Boolean indicating whether this feature has been obsoleted. Some chado instances may choose to simply remove the feature altogether, others may choose to keep an obsolete row in the table.</p></td>
+				</tr>
+				<tr>
+				 <td><span id="timeaccessioned">timeaccessioned</span></td>
+				 <td>timestamp</td>
+				 <td>29,6</td>
+				 <td>
+				  <table border='0' cellspacing='0' cellpadding='0'>
+				  </table>					 
+				 </td>
+				 <td title=''></td>
+				 <td>now()</td>
+				 <td><p>For handling object accession or modification timestamps (as opposed to database auditing data, handled elsewhere). The expectation is that these fields would be available to software interacting with chado.</p></td>
+				</tr>
+				<tr>
+				 <td><span id="timelastmodified">timelastmodified</span></td>
+				 <td>timestamp</td>
+				 <td>29,6</td>
+				 <td>
+				  <table border='0' cellspacing='0' cellpadding='0'>
+				  </table>					 
+				 </td>
+				 <td title=''></td>
+				 <td>now()</td>
+				 <td><p>For handling object accession or modification timestamps (as opposed to database auditing data, handled elsewhere). The expectation is that these fields would be available to software interacting with chado.</p></td>
+				</tr>
+								</tbody>
+				</table>
+				<p title='13 columns'>Table contained <span id="recordNumber">-1</span> rows<p/>
+			</div>
+		</div>
+		<div class="box box-primary">		
+			<div class="box-header with-border">
+              <i class="fa fa-sitemap"></i>
+
+              <h3 id="Indexes" class="box-title">Indexes</h3>
+
+              <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
+                </button>
+                <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
+              </div>
+            </div>	
+			<div class="box-body">
+				<table id="indexes_table" class="table table-bordered table-striped dataTable" role="grid">
+				<thead>
+				 <tr>
+				  <th>Constraint Name</th>
+				  <th>Type</th>
+				  <th>Sort</th>
+				  <th>Column(s)</th>
+				 </tr>
+				</thead>
+				<tbody>
+				 <tr>
+				  <td class='primaryKey' title='Primary Key'><i class='icon ion-key iconkey'></i> feature_pkey</td>
+				  <td>Primary key</td>
+				  <td><span title='Ascending'>Asc</span></td>
+				  <td>feature_id</td>
+				 </tr>				 
+				 <tr>
+				  <td class='uniqueKey' title='Unique Key'><i class='icon ion-key iconkey'></i> feature_c1</td>
+				  <td>Must be unique</td>
+				  <td><span title='Ascending'>Asc</span>/<span title='Ascending'>Asc</span>/<span title='Ascending'>Asc</span></td>
+				  <td>organism_id + uniquename + type_id</td>
+				 </tr>				 
+				 <tr>
+				  <td title='Indexed'>feature_idx1</td>
+				  <td>Performance</td>
+				  <td><span title='Ascending'>Asc</span></td>
+				  <td>dbxref_id</td>
+				 </tr>				 
+				 <tr>
+				  <td title='Indexed'>feature_idx2</td>
+				  <td>Performance</td>
+				  <td><span title='Ascending'>Asc</span></td>
+				  <td>organism_id</td>
+				 </tr>				 
+				 <tr>
+				  <td title='Indexed'>feature_idx3</td>
+				  <td>Performance</td>
+				  <td><span title='Ascending'>Asc</span></td>
+				  <td>type_id</td>
+				 </tr>				 
+				 <tr>
+				  <td title='Indexed'>feature_idx4</td>
+				  <td>Performance</td>
+				  <td><span title='Ascending'>Asc</span></td>
+				  <td>uniquename</td>
+				 </tr>				 
+				 <tr>
+				  <td title='Indexed'>feature_idx5</td>
+				  <td>Performance</td>
+				  <td></td>
+				  <td></td>
+				 </tr>				 
+				 <tr>
+				  <td title='Indexed'>feature_name_ind1</td>
+				  <td>Performance</td>
+				  <td><span title='Ascending'>Asc</span></td>
+				  <td>name</td>
+				 </tr>				 
+				</tbody>
+				</table>   			  
+			</div><!-- /.box-body -->
+		</div>
+				<div class="box box-primary">		
+			<div class="box-header with-border">
+              <i class="fa fa-code-fork"></i>
+
+              <h3 id="Relationships" class="box-title">Relationships</h3>
+
+              <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
+                </button>
+                <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
+              </div>
+            </div>	
+			<div class="box-body">	
+			<div class="nav-tabs-custom" style="cursor: move;">
+				<p>The following entity relationship (ER) diagram shows the relationships involving the feature table. </p>
+				<p class="messages warning">These relationships often cross chado module boundries, in which case <strong>the table name will be prefixed with the module</strong> it is in. When querying these tables do not include the module name, as all chado tables are contained within the same schema.</p>
+            <!-- Tabs within a box -->
+			<h4>Show relationships within degrees of separation</h4>
+            <ul class="nav nav-tabs pull-left ui-sortable-handle">
+			  			              <li class="active"><a href="#oneDegreeImg-chart" data-toggle="tab" aria-expanded="true">One</a></li>			  			 
+			  			              <li class=""><a href="#twodegreesDegreeImg-chart" data-toggle="tab" aria-expanded="true">Two degrees</a></li>			  			 
+            </ul>
+            <div class="tab-content no-padding">            
+				<div class="chart tab-pane active" id="oneDegreeImg-chart" style="position: relative; overflow-x:auto;">					
+					<map id="oneDegreeRelationshipsDiagram" name="oneDegreeRelationshipsDiagram">
+<area shape="rect" id="node1" title="cell_line.cell_line_feature" alt="" coords="650,1738,907,1857">
+<area shape="rect" id="node2" href="feature.html" title="feature" alt="" coords="269,2158,585,2610">
+<area shape="rect" id="node15" title="db.dbxref" alt="" coords="40,1361,189,1450">
+<area shape="rect" id="node16" title="organism.organism" alt="" coords="5,2226,224,2315">
+<area shape="rect" id="node17" title="cv.cvterm" alt="" coords="39,2714,190,2803">
+<area shape="rect" id="node3" title="companalysis.analysisfeature" alt="" coords="635,1874,923,1993">
+<area shape="rect" id="node4" title="expression.feature_expression" alt="" coords="630,2010,927,2129">
+<area shape="rect" id="node5" title="genetic.feature_genotype" alt="" coords="649,2146,908,2294">
+<area shape="rect" id="node6" title="library.library_feature" alt="" coords="662,2311,895,2430">
+<area shape="rect" id="node7" title="mage.element" alt="" coords="689,2447,868,2566">
+<area shape="rect" id="node8" title="mage.studyprop_feature" alt="" coords="652,2583,905,2702">
+<area shape="rect" id="node9" title="map.featurepos" alt="" coords="683,2719,874,2867">
+<area shape="rect" id="node10" title="map.featurerange" alt="" coords="676,2885,881,3121">
+<area shape="rect" id="node11" title="natural_diversity.nd_reagent" alt="" coords="637,3138,920,3257">
+<area shape="rect" id="node12" title="phenotype.feature_phenotype" alt="" coords="633,3274,924,3393">
+<area shape="rect" id="node13" title="phylogeny.phylonode" alt="" coords="662,453,895,571">
+<area shape="rect" id="node14" title="project.project_feature" alt="" coords="658,589,899,707">
+<area shape="rect" id="node18" href="feature_contact.html" title="feature_contact" alt="" coords="678,725,879,878">
+<area shape="rect" id="node19" href="feature_cvterm.html" title="feature_cvterm" alt="" coords="680,3634,877,3870">
+<area shape="rect" id="node20" href="feature_dbxref.html" title="feature_dbxref" alt="" coords="681,5,876,182">
+<area shape="rect" id="node21" href="feature_pub.html" title="feature_pub" alt="" coords="693,895,865,1049">
+<area shape="rect" id="node22" href="feature_relationship.html" title="feature_relationship" alt="" coords="659,199,899,435">
+<area shape="rect" id="node23" href="feature_synonym.html" title="feature_synonym" alt="" coords="671,1066,886,1273">
+<area shape="rect" id="node24" href="featureloc.html" title="featureloc" alt="" coords="691,1290,866,1585">
+<area shape="rect" id="node25" href="featureprop.html" title="featureprop" alt="" coords="693,3410,865,3617">
+<area shape="rect" id="node26" title="stock.stock_feature" alt="" coords="669,1602,888,1721">
+</map>
+
+					<a name='diagram'><img id='oneDegreeImg' src='../diagrams/feature.1degree.png' usemap='#oneDegreeRelationshipsDiagram' class='diagram' border='0' alt='' align='left'></a>							
+				</div>
+				<div class="chart tab-pane " id="twodegreesDegreeImg-chart" style="position: relative; overflow-x:auto;">					
+					<map id="twoDegreesRelationshipsDiagram" name="twoDegreesRelationshipsDiagram">
+<area shape="rect" id="node1" title="cell_line.cell_line_feature" alt="" coords="650,1239,907,1358">
+<area shape="rect" id="node2" href="feature.html" title="feature" alt="" coords="269,1577,585,2029">
+<area shape="rect" id="node15" title="db.dbxref" alt="" coords="40,2462,189,2551">
+<area shape="rect" id="node16" title="organism.organism" alt="" coords="5,1645,224,1734">
+<area shape="rect" id="node17" title="cv.cvterm" alt="" coords="39,3422,190,3511">
+<area shape="rect" id="node3" title="companalysis.analysisfeature" alt="" coords="635,1375,923,1494">
+<area shape="rect" id="node4" title="expression.feature_expression" alt="" coords="630,1511,927,1630">
+<area shape="rect" id="node5" title="genetic.feature_genotype" alt="" coords="649,1647,908,1795">
+<area shape="rect" id="node6" title="library.library_feature" alt="" coords="662,2125,895,2243">
+<area shape="rect" id="node7" title="mage.element" alt="" coords="689,2261,868,2379">
+<area shape="rect" id="node8" title="mage.studyprop_feature" alt="" coords="652,5,905,123">
+<area shape="rect" id="node9" title="map.featurepos" alt="" coords="683,141,874,289">
+<area shape="rect" id="node10" title="map.featurerange" alt="" coords="676,306,881,542">
+<area shape="rect" id="node11" title="natural_diversity.nd_reagent" alt="" coords="637,559,920,678">
+<area shape="rect" id="node12" title="phenotype.feature_phenotype" alt="" coords="633,695,924,814">
+<area shape="rect" id="node13" title="phylogeny.phylonode" alt="" coords="662,831,895,950">
+<area shape="rect" id="node14" title="project.project_feature" alt="" coords="658,967,899,1086">
+<area shape="rect" id="node18" href="feature_contact.html" title="feature_contact" alt="" coords="678,2845,879,2998">
+<area shape="rect" id="node19" title="contact.contact" alt="" coords="331,2906,522,2995">
+<area shape="rect" id="node20" href="feature_cvterm.html" title="feature_cvterm" alt="" coords="680,3817,877,4053">
+<area shape="rect" id="node21" title="pub.pub" alt="" coords="357,3706,497,3795">
+<area shape="rect" id="node22" href="feature_cvterm_dbxref.html" title="feature_cvterm_dbxref" alt="" coords="981,3465,1221,3554">
+<area shape="rect" id="node23" href="feature_cvterm_pub.html" title="feature_cvterm_pub" alt="" coords="990,3827,1213,3917">
+<area shape="rect" id="node24" href="feature_cvtermprop.html" title="feature_cvtermprop" alt="" coords="991,4093,1211,4182">
+<area shape="rect" id="node25" href="feature_dbxref.html" title="feature_dbxref" alt="" coords="681,2397,876,2574">
+<area shape="rect" id="node26" href="feature_pub.html" title="feature_pub" alt="" coords="693,3574,865,3727">
+<area shape="rect" id="node27" href="feature_pubprop.html" title="feature_pubprop" alt="" coords="1002,3951,1201,4041">
+<area shape="rect" id="node28" href="feature_relationship.html" title="feature_relationship" alt="" coords="659,2591,899,2827">
+<area shape="rect" id="node29" href="feature_relationship_pub.html" title="feature_relationship_pub" alt="" coords="973,2951,1230,3041">
+<area shape="rect" id="node30" href="feature_relationshipprop.html" title="feature_relationshipprop" alt="" coords="974,2637,1229,2726">
+<area shape="rect" id="node31" href="feature_synonym.html" title="feature_synonym" alt="" coords="671,3277,886,3483">
+<area shape="rect" id="node32" href="synonym.html" title="synonym" alt="" coords="353,3374,500,3463">
+<area shape="rect" id="node33" href="featureloc.html" title="featureloc" alt="" coords="691,1813,866,2107">
+<area shape="rect" id="node34" href="featureloc_pub.html" title="featureloc_pub" alt="" coords="1008,2777,1195,2866">
+<area shape="rect" id="node35" href="featureprop.html" title="featureprop" alt="" coords="693,3015,865,3222">
+<area shape="rect" id="node36" href="featureprop_pub.html" title="featureprop_pub" alt="" coords="1002,3193,1201,3282">
+<area shape="rect" id="node37" title="stock.stock_feature" alt="" coords="669,1103,888,1222">
+</map>
+
+					<a name='diagram'><img id='twodegreesDegreeImg' src='../diagrams/feature.2degrees.png' usemap='#twoDegreesRelationshipsDiagram' class='diagram' border='0' alt='' align='left'></a>							
+				</div>
+			  			</div>
+			</div>
+		  </div><!-- /.box-body -->
+		</div>
+	      </section>
+    
+  </div>
+  <!-- /.content-wrapper -->
+  <footer class="main-footer">
+    <div>
+      <div class="pull-right hidden-xs">
+        <a href="https://github.com/schemaspy/schemaspy" title="GitHub for SchemaSpy"><i class="fa fa-github-square fa-2x"></i></a>
+        <a href="http://stackoverflow.com/questions/tagged/schemaspy" title="StackOverflow for SchemaSpy"><i class="fa fa-stack-overflow fa-2x"></i></a>
+      </div>
+      <strong>Generated by <a href="http://schemaspy.org/" class="logo-text"><i class="fa fa-database"></i> SchemaSpy @project.version@</a></strong>
+    </div>
+    <!-- /.container -->
+  </footer>
+</div>
+<!-- ./wrapper -->
+
+<!-- jQuery 2.2.3 -->
+<script src="../bower/admin-lte/plugins/jQuery/jquery-2.2.3.min.js"></script>
+<script src="../bower/admin-lte/plugins/jQueryUI/jquery-ui.min.js"></script>
+<!-- Bootstrap 3.3.5 -->
+<script src="../bower/admin-lte/bootstrap/js/bootstrap.min.js"></script>
+<!-- DataTables -->
+<script src="../bower/datatables.net/jquery.dataTables.min.js"></script>
+<script src="../bower/datatables.net-bs/js/dataTables.bootstrap.min.js"></script>
+<script src="../bower/datatables.net-buttons/dataTables.buttons.min.js"></script>
+<script src="../bower/datatables.net-buttons-bs/js/buttons.bootstrap.min.js"></script>
+<script src="../bower/datatables.net-buttons/buttons.html5.min.js"></script>
+<script src="../bower/datatables.net-buttons/buttons.print.min.js"></script>
+<script src="../bower/datatables.net-buttons/buttons.colVis.min.js"></script>
+
+<!-- SlimScroll -->
+<script src="../bower/admin-lte/plugins/slimScroll/jquery.slimscroll.min.js"></script>
+<!-- FastClick -->
+<script src="../bower/admin-lte/plugins/fastclick/fastclick.js"></script>
+<!-- Salvattore -->
+<script src="../bower/salvattore/salvattore.min.js"></script>
+<!-- AnchorJS -->
+<script src="../bower/anchor-js/anchor.min.js"></script>
+<!-- CodeMirror -->
+<script src="../bower/codemirror/codemirror.js"></script>
+<script src="../bower/codemirror/sql.js"></script>
+<!-- AdminLTE App -->
+<script src="../bower/admin-lte/dist/js/app.min.js"></script>
+<script src="table.js"></script>
+<script src="../schemaSpy.js"></script>
+</body>
+</html>

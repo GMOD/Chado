@@ -1,0 +1,1831 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title> Chado</title>
+  <!-- Tell the browser to be responsive to screen width -->
+  <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+  <link rel="icon" type="image/png" sizes="16x16" href="favicon.ico">
+  <!-- Bootstrap 3.3.5 -->
+  <link rel="stylesheet" href="bower/admin-lte/bootstrap/css/bootstrap.min.css">
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="bower/font-awesome/css/font-awesome.min.css">
+  <!-- Ionicons -->
+  <link rel="stylesheet" href="bower/ionicons/css/ionicons.min.css">
+  <!-- DataTables -->
+  <link rel="stylesheet" href="bower/datatables.net-bs/css/dataTables.bootstrap.min.css">
+  <link rel="stylesheet" href="bower/datatables.net-buttons-bs/css/buttons.bootstrap.min.css">
+  <!-- Code Mirror -->
+  <link rel="stylesheet" href="bower/codemirror/codemirror.css">
+  <!-- Fonts -->
+  <link href='fonts/indieflower/indie-flower.css' rel='stylesheet' type='text/css'>
+  <link href='fonts/source-sans-pro/source-sans-pro.css' rel='stylesheet' type='text/css'>
+
+  <!-- Theme style -->
+  <link rel="stylesheet" href="bower/admin-lte/dist/css/AdminLTE.min.css">
+  <!-- Salvattore -->
+  <link rel="stylesheet" href="bower/salvattore/salvattore.css">
+  <!-- AdminLTE Skins. Choose a skin from the css/skins
+       folder instead of downloading all of them to reduce the load. -->
+  <link rel="stylesheet" href="bower/admin-lte/dist/css/skins/_all-skins.min.css">
+  <!-- SchemaSpy -->
+  <link rel="stylesheet" href="schemaSpy.css">
+  <!-- GMOD Chado Specific CSS -->
+  <link rel="stylesheet" href="main.css">
+  
+  <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+  <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+  <!--[if lt IE 9]>
+  <script src="bower/html5shiv/html5shiv.min.js"></script>
+  <script src="bower/respond/respond.min.js"></script>
+  <![endif]-->
+</head>
+<!-- ADD THE CLASS layout-top-nav TO REMOVE THE SIDEBAR. -->
+<!-- Skins: skin-black, black-light, green-light, red-light, yellow-light, purple-light, blue-light -->
+<body class="hold-transition skin-black layout-top-nav">
+<div class="wrapper">
+  <header class="main-header">
+    <nav class="navbar navbar-static-top">
+      <div class="container">
+        <div class="navbar-header">
+          <a href="index.html" class="navbar-brand" style="padding:0;">
+            <img src="GMOD-cogs.png" class="gmod-logo" />
+            <span class="gmod-title">Chado</span>
+          </a>
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar-collapse">
+            <i class="fa fa-bars"></i>
+          </button>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-collapse pull-left" id="navbar-collapse">
+          <ul class="nav navbar-nav">
+            <li>
+              <a href="index.html" title="All Chado Tables.">
+                Home</span>
+              </a>
+            </li>
+            <li>
+              <a href="index.html" title="All Chado Tables.">
+                All Tables</span>
+              </a>
+            </li>
+            <li>
+              <a href="constraints.html" title="All Constraints in Chado.">
+                All Constraints
+              </a>
+            </li>
+          </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+        <!-- Navbar Right Menu -->
+
+      </div>
+      <!-- /.container-fluid -->
+    </nav>
+  </header>
+  <!-- Main content -->
+  <!-- Full Width Column -->
+  <div class="content-wrapper">
+    
+    <div class="box box-solid">
+      <div class="box-body">
+        <p><span class="version-label">Schema Version:</span> 1.3</p>
+      </div>
+    </div>
+		
+    
+      <!-- Main content -->
+      <section class="content">
+		<div class="row">
+		  <div class="col-md-3 col-sm-6 col-xs-12">
+			  <div class="info-box">
+				  <span class="info-box-icon bg-aqua"><i class="fa fa-table"></i></span>
+				  <div class="info-box-content">
+					  <span class="info-box-text">TABLES</span>
+					  <span class="info-box-number">208</span>
+				  </div>
+				  <!-- /.info-box-content -->
+			  </div>
+			  <!-- /.info-box -->
+		  </div>
+		  <!-- /.col -->
+		  <div class="col-md-3 col-sm-6 col-xs-12">
+			  <div class="info-box">
+				  <span class="info-box-icon bg-red"><i class="fa fa-table"></i></span>
+				  <div class="info-box-content">
+					  <span class="info-box-text">VIEWS</span>
+					  <span class="info-box-number">0</span>
+				  </div>
+				  <!-- /.info-box-content -->
+			  </div>
+			  <!-- /.info-box -->
+		  </div>
+		  <!-- /.col -->
+
+		  <!-- fix for small devices only -->
+		  <div class="clearfix visible-sm-block"></div>
+
+		  <div class="col-md-3 col-sm-6 col-xs-12">
+			  <div class="info-box">
+				  <span class="info-box-icon bg-green"><span class="glyphicon glyphicon-list-alt" aria-hidden="true"></span></span>
+
+				  <div class="info-box-content">
+					  <span class="info-box-text">COLUMNS</span>
+					  <span class="info-box-number">998</span>
+				  </div>
+				  <!-- /.info-box-content -->
+			  </div>
+			  <!-- /.info-box -->
+		  </div>
+		  <!-- /.col -->
+		  <div class="col-md-3 col-sm-6 col-xs-12">
+			  <div class="info-box">
+				  <span class="info-box-icon bg-yellow"><i class="ion ion-key"></i></span>
+
+				  <div class="info-box-content">
+					  <span class="info-box-text">Constraints</span>
+					  <span class="info-box-number">466</span>
+				  </div>
+				  <!-- /.info-box-content -->
+			  </div>
+			  <!-- /.info-box -->
+		  </div>
+		  <!-- /.col -->
+		</div>
+
+		<div class="box box-primary">
+	       <div class="box-header with-border">
+	         <h3 class="box-title">Chado</h3>
+	         <span class="label label-primary pull-right"><i class="fa fa-cog fa-2x"></i></span>
+	     
+	       </div><!-- /.box-header -->
+	       <div class="box-body">
+	         <p>Chado is a relational database schema that underlies many GMOD installations. It is capable of representing many of the general classes of data frequently encountered in modern biology such as sequence, sequence comparisons, phenotypes, genotypes, ontologies, publications, and phylogeny. It has been designed to handle complex representations of biological knowledge and should be considered one of the most sophisticated relational schemas currently available in molecular biology. The price of this capability is that the new user must spend some time becoming familiar with its fundamentals.</p>
+	       </div><!-- /.box-body -->
+		</div>
+
+		<div class="box box-primary">
+	       <div class="box-header with-border">
+	         <h3 class="box-title">Modules</h3>
+	         <span class="label label-primary pull-right"><i class="fa fa-cog fa-2x"></i></span>
+	     
+	       </div><!-- /.box-header -->
+	       <div class="box-body">
+			<p>Chado is a modular schema for handling all kinds of biological data. It is intended to be used as both a primary datastore schema as well as a warehouse-style schema. The modules currently in chado are:</p>
+			<table id="module-list">
+			<thead>
+				<tr>
+				<th class="name">Module</th>
+				<th class="description">Description</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td class="name">Audit</td>
+					<td class="description">database audits</td>
+				</tr>
+				<tr>
+					<td class="name"><a href="companalysis/index.html">Companalysis</a></td>
+					<td class="description">data from computational analysis</td>
+				</tr>
+				<tr>
+					<td class="name"><a href="contact/index.html">Contact</a></td>
+					<td class="description">people and groups</td>
+				</tr>
+				<tr>
+					<td class="name"><a href="db/index.html">Database (db)</a></td>
+					<td class="description">references to external databases</td>
+				</tr>
+				<tr>
+					<td class="name"><a href="cv/index.html">Controlled Vocabulary (cv)</a></td>
+					<td class="description">controlled vocabularies and ontologies</td>
+				</tr>
+				<tr>
+					<td class="name"><a href="expression/index.html">Expression</a></td>
+					<td class="description">summarized RNA and protein expresssion</td>
+				</tr>
+				<tr>
+					<td class="name"><a href="general/index.html">General</a></td>
+					<td class="description">identifiers</td>
+				</tr>
+				<tr>
+					<td class="name"><a href="genetic/index.html">Genetic</a></td>
+					<td class="description">genetic data and genotypes</td>
+				</tr>
+				<tr>
+					<td class="name"><a href="library/index.html">Library</a></td>
+					<td class="description">descriptions of molecular libraries</td>
+				</tr>
+				<tr>
+					<td class="name"><a href="mage/index.html">Mage</a></td>
+					<td class="description">microarray data</td>
+				</tr>
+				<tr>
+					<td class="name"><a href="map/index.html">Map</a></td>
+					<td class="description">maps without sequence</td>
+				</tr>
+				<tr>
+					<td class="name"><a href="organism/index.html">Organism</a></td>
+					<td class="description">species</td>
+				</tr>
+				<tr>
+					<td class="name"><a href="phenotype/index.html">Phenotype</a></td>
+					<td class="description">phenotypic data</td>
+				</tr>
+				<tr>
+					<td class="name"><a href="phylogeny/index.html">Phylogeny</a></td>
+					<td class="description">phylogenetic trees</td>
+				</tr>
+				<tr>
+					<td class="name"><a href="pub/index.html">Publication (pub)</a></td>
+					<td class="description">publications and references</td>
+				</tr>
+				<tr>
+					<td class="name"><a href="sequence/index.html">Sequence</a></td>
+					<td class="description">sequences and sequence features</td>
+				</tr>
+				<tr>
+					<td class="name"><a href="stock/index.html">Stock</a></td>
+					<td class="description">specimens and biological collections</td>
+				</tr>
+				<tr>
+					<td class="name">WWW</td>
+					<td class="description">generic classes for web interfaces</td>
+				</tr>
+			</tbody></table>
+	       </div><!-- /.box-body -->
+		</div>
+
+		<div class="box box-primary">
+	       <div class="box-header with-border">
+	         <h3 class="box-title">Additional Documentation</h3>
+	         <span class="label label-primary pull-right"><i class="fa fa-cog fa-2x"></i></span>
+	     
+	       </div><!-- /.box-header -->
+	       <div class="box-body">
+	       	<p>Chado is a community-designed database schema and as such, the community has developed a wealth of documentation. If you would like more information, it likely exists within one of the pages below. However, if it doesn't feel free to <a href="https://github.com/GMOD/Chado">contact the community by filing an issue on GitHub</a>.</p>
+			<ul>
+				<li><a href="http://gmod.org/wiki/Chado" target="_blank">
+					Getting Started including Installation
+				</a></li>
+				<li><a href="http://gmod.org/wiki/Introduction_to_Chado" target="_blank">
+					Introduction
+				</a></li>
+				<li><a href="http://bioinformatics.oxfordjournals.org/cgi/content/abstract/23/13/i337?ijkey=QYeUct9uLSzefgk&keytype=ref" target="_blank">
+					Paper in Bioinformatics
+				</a></li>
+				<li><a href="http://gmod.org/wiki/Chado_Tutorial" target="_blank">
+					Tutorial
+				</a></li>
+				<li><a href="http://gmod.org/wiki/Chado_Manual" target="_blank">
+					Manual
+				</a></li>
+				<li><a href="http://gmod.org/wiki/Chado_FAQ" target="_blank">
+					FAQ
+				</a></li>
+				<li><a href="http://gmod.org/wiki/Chado_Best_Practices" target="_blank">
+					Best Practices
+				</a></li>
+				<li><a href="http://gmod.org/wiki/Sample_Chado_SQL" target="_blank">
+					Sample Chado SQL
+				</a></li>
+				<li><a href="http://gmod.org/wiki/PostgreSQL_Performance_Tips" target="_blank">
+					PostgreSQL Performance Tips
+				</a></li>
+			</ul>
+	       </div><!-- /.box-body -->
+		</div>
+
+		<div class="box box-primary">
+            <div class="box-header with-border">
+              <h3 class="box-title">Tables</h3>			  
+			  <span class="label label-primary pull-right"><i class="fa fa-database fa-2x"></i></span>
+            </div><!-- /.box-header -->
+            <div class="box-body">
+            <table id="database_objects" class="table table-bordered table-striped dataTable" role="grid">
+				<thead>
+					<tr>
+					  <th valign="bottom">Table / View</th>
+					  <th align="right" valign="bottom">Referenced</th>
+					  <th align="right" valign="bottom">Foreign Keys</th>
+					  <th align="right" valign="bottom">Columns</th>
+					  <th align="right" valign="bottom">Type</th>
+					  <th class="toggle">Comments</th>
+					</tr>
+				</thead>
+				<tbody>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/acquisition.html">acquisition</a></td>
+				  <td class="detail" align="right">4</td>
+				  <td class="detail" align="right">3</td>
+				  <td class="detail" align="right">7</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"><p>This represents the scanning of hybridized material. The output of this process is typically a digital image of an array.</p></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/acquisition_relationship.html">acquisition_relationship</a></td>
+				  <td class="detail" align="right">0</td>
+				  <td class="detail" align="right">3</td>
+				  <td class="detail" align="right">6</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"><p>Multiple monochrome images may be merged to form a multi-color image. Red-green images of 2-channel hybridizations are an example of this.</p></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/acquisitionprop.html">acquisitionprop</a></td>
+				  <td class="detail" align="right">0</td>
+				  <td class="detail" align="right">2</td>
+				  <td class="detail" align="right">5</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"><p>Parameters associated with image acquisition.</p></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/analysis.html">analysis</a></td>
+				  <td class="detail" align="right">11</td>
+				  <td class="detail" align="right">0</td>
+				  <td class="detail" align="right">10</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"><p>An analysis is a particular type of a  computational analysis; it may be a blast of one sequence against  another, or an all by all blast, or a different kind of analysis  altogether. It is a single unit of computation.</p></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/analysis_cvterm.html">analysis_cvterm</a></td>
+				  <td class="detail" align="right">0</td>
+				  <td class="detail" align="right">2</td>
+				  <td class="detail" align="right">5</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"><p>Associate a term from a cv with an analysis.</p></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/analysis_dbxref.html">analysis_dbxref</a></td>
+				  <td class="detail" align="right">0</td>
+				  <td class="detail" align="right">2</td>
+				  <td class="detail" align="right">4</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"><p>Links an analysis to dbxrefs.</p></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/analysis_pub.html">analysis_pub</a></td>
+				  <td class="detail" align="right">0</td>
+				  <td class="detail" align="right">2</td>
+				  <td class="detail" align="right">3</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"><p>Provenance. Linking table between analyses and the publications that mention them.</p></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/analysis_relationship.html">analysis_relationship</a></td>
+				  <td class="detail" align="right">0</td>
+				  <td class="detail" align="right">3</td>
+				  <td class="detail" align="right">6</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/analysisfeature.html">analysisfeature</a></td>
+				  <td class="detail" align="right">1</td>
+				  <td class="detail" align="right">2</td>
+				  <td class="detail" align="right">7</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"><p>Computational analyses generate features (e.g. Genscan generates transcripts and exons; sim4 alignments generate similarity/match features). analysisfeatures are stored using the feature table from the sequence module. The analysisfeature table is used to decorate these features, with analysis specific attributes. A feature is an analysisfeature if and only if there is a corresponding entry in the analysisfeature table. analysisfeatures will have two or more featureloc entries,  with rank indicating query/subject</p></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/analysisfeatureprop.html">analysisfeatureprop</a></td>
+				  <td class="detail" align="right">0</td>
+				  <td class="detail" align="right">2</td>
+				  <td class="detail" align="right">5</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/analysisprop.html">analysisprop</a></td>
+				  <td class="detail" align="right">0</td>
+				  <td class="detail" align="right">2</td>
+				  <td class="detail" align="right">5</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/arraydesign.html">arraydesign</a></td>
+				  <td class="detail" align="right">3</td>
+				  <td class="detail" align="right">5</td>
+				  <td class="detail" align="right">18</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"><p>General properties about an array. An array is a template used to generate physical slides, etc. It contains layout information, as well as global array properties, such as material (glass, nylon) and spot dimensions (in rows/columns).</p></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/arraydesignprop.html">arraydesignprop</a></td>
+				  <td class="detail" align="right">0</td>
+				  <td class="detail" align="right">2</td>
+				  <td class="detail" align="right">5</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"><p>Extra array design properties that are not accounted for in arraydesign.</p></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/assay.html">assay</a></td>
+				  <td class="detail" align="right">7</td>
+				  <td class="detail" align="right">4</td>
+				  <td class="detail" align="right">10</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"><p>An assay consists of a physical instance of an array, combined with the conditions used to create the array (protocols, technician information). The assay can be thought of as a hybridization.</p></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/assay_biomaterial.html">assay_biomaterial</a></td>
+				  <td class="detail" align="right">0</td>
+				  <td class="detail" align="right">3</td>
+				  <td class="detail" align="right">5</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"><p>A biomaterial can be hybridized many times (technical replicates), or combined with other biomaterials in a single hybridization (for two-channel arrays).</p></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/assay_project.html">assay_project</a></td>
+				  <td class="detail" align="right">0</td>
+				  <td class="detail" align="right">2</td>
+				  <td class="detail" align="right">3</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"><p>Link assays to projects.</p></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/assayprop.html">assayprop</a></td>
+				  <td class="detail" align="right">0</td>
+				  <td class="detail" align="right">2</td>
+				  <td class="detail" align="right">5</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"><p>Extra assay properties that are not accounted for in assay.</p></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/biomaterial.html">biomaterial</a></td>
+				  <td class="detail" align="right">7</td>
+				  <td class="detail" align="right">3</td>
+				  <td class="detail" align="right">6</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"><p>A biomaterial represents the MAGE concept of BioSource, BioSample, and LabeledExtract. It is essentially some biological material (tissue, cells, serum) that may have been processed. Processed biomaterials should be traceable back to raw biomaterials via the biomaterialrelationship table.</p></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/biomaterial_dbxref.html">biomaterial_dbxref</a></td>
+				  <td class="detail" align="right">0</td>
+				  <td class="detail" align="right">2</td>
+				  <td class="detail" align="right">3</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/biomaterial_relationship.html">biomaterial_relationship</a></td>
+				  <td class="detail" align="right">0</td>
+				  <td class="detail" align="right">3</td>
+				  <td class="detail" align="right">4</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"><p>Relate biomaterials to one another. This is a way to track a series of treatments or material splits/merges, for instance.</p></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/biomaterial_treatment.html">biomaterial_treatment</a></td>
+				  <td class="detail" align="right">0</td>
+				  <td class="detail" align="right">3</td>
+				  <td class="detail" align="right">6</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"><p>Link biomaterials to treatments. Treatments have an order of operations (rank), and associated measurements (unittype_id, value).</p></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/biomaterialprop.html">biomaterialprop</a></td>
+				  <td class="detail" align="right">0</td>
+				  <td class="detail" align="right">2</td>
+				  <td class="detail" align="right">5</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"><p>Extra biomaterial properties that are not accounted for in biomaterial.</p></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/cell_line.html">cell_line</a></td>
+				  <td class="detail" align="right">9</td>
+				  <td class="detail" align="right">1</td>
+				  <td class="detail" align="right">6</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/cell_line_cvterm.html">cell_line_cvterm</a></td>
+				  <td class="detail" align="right">1</td>
+				  <td class="detail" align="right">3</td>
+				  <td class="detail" align="right">5</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/cell_line_cvtermprop.html">cell_line_cvtermprop</a></td>
+				  <td class="detail" align="right">0</td>
+				  <td class="detail" align="right">2</td>
+				  <td class="detail" align="right">5</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/cell_line_dbxref.html">cell_line_dbxref</a></td>
+				  <td class="detail" align="right">0</td>
+				  <td class="detail" align="right">2</td>
+				  <td class="detail" align="right">4</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/cell_line_feature.html">cell_line_feature</a></td>
+				  <td class="detail" align="right">0</td>
+				  <td class="detail" align="right">3</td>
+				  <td class="detail" align="right">4</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/cell_line_library.html">cell_line_library</a></td>
+				  <td class="detail" align="right">0</td>
+				  <td class="detail" align="right">3</td>
+				  <td class="detail" align="right">4</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/cell_line_pub.html">cell_line_pub</a></td>
+				  <td class="detail" align="right">0</td>
+				  <td class="detail" align="right">2</td>
+				  <td class="detail" align="right">3</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/cell_line_relationship.html">cell_line_relationship</a></td>
+				  <td class="detail" align="right">0</td>
+				  <td class="detail" align="right">3</td>
+				  <td class="detail" align="right">4</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/cell_line_synonym.html">cell_line_synonym</a></td>
+				  <td class="detail" align="right">0</td>
+				  <td class="detail" align="right">3</td>
+				  <td class="detail" align="right">6</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/cell_lineprop.html">cell_lineprop</a></td>
+				  <td class="detail" align="right">1</td>
+				  <td class="detail" align="right">2</td>
+				  <td class="detail" align="right">5</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/cell_lineprop_pub.html">cell_lineprop_pub</a></td>
+				  <td class="detail" align="right">0</td>
+				  <td class="detail" align="right">2</td>
+				  <td class="detail" align="right">3</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/chadoprop.html">chadoprop</a></td>
+				  <td class="detail" align="right">0</td>
+				  <td class="detail" align="right">1</td>
+				  <td class="detail" align="right">4</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"><p>This table is different from other prop tables in the database, as it is for storing information about the database itself, like schema version</p></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/channel.html">channel</a></td>
+				  <td class="detail" align="right">2</td>
+				  <td class="detail" align="right">0</td>
+				  <td class="detail" align="right">3</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"><p>Different array platforms can record signals from one or more channels (cDNA arrays typically use two CCD, but Affymetrix uses only one).</p></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/contact.html">contact</a></td>
+				  <td class="detail" align="right">15</td>
+				  <td class="detail" align="right">1</td>
+				  <td class="detail" align="right">4</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"><p>Model persons, institutes, groups, organizations, etc.</p></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/contact_relationship.html">contact_relationship</a></td>
+				  <td class="detail" align="right">0</td>
+				  <td class="detail" align="right">3</td>
+				  <td class="detail" align="right">4</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"><p>Model relationships between contacts</p></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/contactprop.html">contactprop</a></td>
+				  <td class="detail" align="right">0</td>
+				  <td class="detail" align="right">2</td>
+				  <td class="detail" align="right">5</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"><p>A contact can have any number of slot-value property tags attached to it. This is an alternative to hardcoding a list of columns in the relational schema, and is completely extensible.</p></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/control.html">control</a></td>
+				  <td class="detail" align="right">0</td>
+				  <td class="detail" align="right">3</td>
+				  <td class="detail" align="right">8</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/cv.html">cv</a></td>
+				  <td class="detail" align="right">3</td>
+				  <td class="detail" align="right">0</td>
+				  <td class="detail" align="right">3</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"><p>A controlled vocabulary or ontology. A cv is composed of cvterms (AKA terms, classes, types, universals - relations and properties are also stored in cvterm) and the relationships between them.</p></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/cvprop.html">cvprop</a></td>
+				  <td class="detail" align="right">0</td>
+				  <td class="detail" align="right">2</td>
+				  <td class="detail" align="right">5</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"><p>Additional extensible properties can be attached to a cv using this table. A notable example would be the cv version</p></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/cvterm.html">cvterm</a></td>
+				  <td class="detail" align="right">122</td>
+				  <td class="detail" align="right">2</td>
+				  <td class="detail" align="right">7</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"><p>A term, class, universal or type within an ontology or controlled vocabulary. This table is also used for relations and properties. cvterms constitute nodes in the graph defined by the collection of cvterms and cvterm_relationships.</p></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/cvterm_dbxref.html">cvterm_dbxref</a></td>
+				  <td class="detail" align="right">0</td>
+				  <td class="detail" align="right">2</td>
+				  <td class="detail" align="right">4</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"><p>In addition to the primary identifier (cvterm.dbxref_id) a cvterm can have zero or more secondary identifiers/dbxrefs, which may refer to records in external databases. The exact semantics of cvterm_dbxref are not fixed. For example: the dbxref could be a pubmed ID that is pertinent to the cvterm, or it could be an equivalent or similar term in another ontology. For example, GO cvterms are typically linked to InterPro IDs, even though the nature of the relationship between them is largely one of statistical association. The dbxref may be have data records attached in the same database instance, or it could be a "hanging" dbxref pointing to some external database. NOTE: If the desired objective is to link two cvterms together, and the nature of the relation is known and holds for all instances of the subject cvterm then consider instead using cvterm_relationship together with a well-defined relation.</p></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/cvterm_relationship.html">cvterm_relationship</a></td>
+				  <td class="detail" align="right">0</td>
+				  <td class="detail" align="right">3</td>
+				  <td class="detail" align="right">4</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"><p>A relationship linking two cvterms. Each cvterm_relationship constitutes an edge in the graph defined by the collection of cvterms and cvterm_relationships. The meaning of the cvterm_relationship depends on the definition of the cvterm R refered to by type_id. However, in general the definitions are such that the statement "all SUBJs REL some OBJ" is true. The cvterm_relationship statement is about the subject, not the object. For example "insect wing part_of thorax".</p></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/cvtermpath.html">cvtermpath</a></td>
+				  <td class="detail" align="right">0</td>
+				  <td class="detail" align="right">4</td>
+				  <td class="detail" align="right">6</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"><p>The reflexive transitive closure of the cvterm_relationship relation.</p></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/cvtermprop.html">cvtermprop</a></td>
+				  <td class="detail" align="right">0</td>
+				  <td class="detail" align="right">2</td>
+				  <td class="detail" align="right">5</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"><p>Additional extensible properties can be attached to a cvterm using this table. Corresponds to -AnnotationProperty- in W3C OWL format.</p></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/cvtermsynonym.html">cvtermsynonym</a></td>
+				  <td class="detail" align="right">0</td>
+				  <td class="detail" align="right">2</td>
+				  <td class="detail" align="right">4</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"><p>A cvterm actually represents a distinct class or concept. A concept can be refered to by different phrases or names. In addition to the primary name (cvterm.name) there can be a number of alternative aliases or synonyms. For example, "T cell" as a synonym for "T lymphocyte".</p></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/db.html">db</a></td>
+				  <td class="detail" align="right">3</td>
+				  <td class="detail" align="right">0</td>
+				  <td class="detail" align="right">5</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"><p>A database authority. Typical databases in bioinformatics are FlyBase, GO, UniProt, NCBI, MGI, etc. The authority is generally known by this shortened form, which is unique within the bioinformatics and biomedical realm. To Do - add support for URIs, URNs (e.g. LSIDs). We can do this by treating the URL as a URI - however, some applications may expect this to be resolvable - to be decided.</p></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/dbprop.html">dbprop</a></td>
+				  <td class="detail" align="right">0</td>
+				  <td class="detail" align="right">2</td>
+				  <td class="detail" align="right">5</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"><p>An external database can have any number of slot-value property tags attached to it. This is an alternative to hardcoding a list of columns in the relational schema, and is completely extensible. There is a unique constraint, dbprop_c1, for the combination of db_id, rank, and type_id. Multivalued property-value pairs must be differentiated by rank.</p></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/dbxref.html">dbxref</a></td>
+				  <td class="detail" align="right">26</td>
+				  <td class="detail" align="right">1</td>
+				  <td class="detail" align="right">5</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"><p>A unique, global, public, stable identifier. Not necessarily an external reference - can reference data items inside the particular chado instance being used. Typically a row in a table can be uniquely identified with a primary identifier (called dbxref_id); a table may also have secondary identifiers (in a linking table <T>_dbxref). A dbxref is generally written as <DB>:<ACCESSION> or as <DB>:<ACCESSION>:<VERSION>.</p></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/dbxrefprop.html">dbxrefprop</a></td>
+				  <td class="detail" align="right">0</td>
+				  <td class="detail" align="right">2</td>
+				  <td class="detail" align="right">5</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"><p>Metadata about a dbxref. Note that this is not defined in the dbxref module, as it depends on the cvterm table. This table has a structure analagous to cvtermprop.</p></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/eimage.html">eimage</a></td>
+				  <td class="detail" align="right">1</td>
+				  <td class="detail" align="right">0</td>
+				  <td class="detail" align="right">4</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/element.html">element</a></td>
+				  <td class="detail" align="right">3</td>
+				  <td class="detail" align="right">4</td>
+				  <td class="detail" align="right">5</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"><p>Represents a feature of the array. This is typically a region of the array coated or bound to DNA.</p></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/element_relationship.html">element_relationship</a></td>
+				  <td class="detail" align="right">0</td>
+				  <td class="detail" align="right">3</td>
+				  <td class="detail" align="right">6</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"><p>Sometimes we want to combine measurements from multiple elements to get a composite value. Affymetrix combines many probes to form a probeset measurement, for instance.</p></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/elementresult.html">elementresult</a></td>
+				  <td class="detail" align="right">2</td>
+				  <td class="detail" align="right">2</td>
+				  <td class="detail" align="right">4</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"><p>An element on an array produces a measurement when hybridized to a biomaterial (traceable through quantification_id). This is the base data from which tables that actually contain data inherit.</p></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/elementresult_relationship.html">elementresult_relationship</a></td>
+				  <td class="detail" align="right">0</td>
+				  <td class="detail" align="right">3</td>
+				  <td class="detail" align="right">6</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"><p>Sometimes we want to combine measurements from multiple elements to get a composite value. Affymetrix combines many probes to form a probeset measurement, for instance.</p></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/environment.html">environment</a></td>
+				  <td class="detail" align="right">5</td>
+				  <td class="detail" align="right">0</td>
+				  <td class="detail" align="right">3</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"><p>The environmental component of a phenotype description.</p></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/environment_cvterm.html">environment_cvterm</a></td>
+				  <td class="detail" align="right">0</td>
+				  <td class="detail" align="right">2</td>
+				  <td class="detail" align="right">3</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/expression.html">expression</a></td>
+				  <td class="detail" align="right">6</td>
+				  <td class="detail" align="right">0</td>
+				  <td class="detail" align="right">4</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"><p>The expression table is essentially a bridge table.</p></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/expression_cvterm.html">expression_cvterm</a></td>
+				  <td class="detail" align="right">1</td>
+				  <td class="detail" align="right">3</td>
+				  <td class="detail" align="right">5</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/expression_cvtermprop.html">expression_cvtermprop</a></td>
+				  <td class="detail" align="right">0</td>
+				  <td class="detail" align="right">2</td>
+				  <td class="detail" align="right">5</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"><p>Extensible properties for expression to cvterm associations. Examples: qualifiers.</p></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/expression_image.html">expression_image</a></td>
+				  <td class="detail" align="right">0</td>
+				  <td class="detail" align="right">2</td>
+				  <td class="detail" align="right">3</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/expression_pub.html">expression_pub</a></td>
+				  <td class="detail" align="right">0</td>
+				  <td class="detail" align="right">2</td>
+				  <td class="detail" align="right">3</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/expressionprop.html">expressionprop</a></td>
+				  <td class="detail" align="right">0</td>
+				  <td class="detail" align="right">2</td>
+				  <td class="detail" align="right">5</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/feature.html">feature</a></td>
+				  <td class="detail" align="right">30</td>
+				  <td class="detail" align="right">3</td>
+				  <td class="detail" align="right">13</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"><p>A feature is a biological sequence or a section of a biological sequence, or a collection of such sections. Examples include genes, exons, transcripts, regulatory regions, polypeptides, protein domains, chromosome sequences, sequence variations, cross-genome match regions such as hits and HSPs and so on; see the Sequence Ontology for more. The combination of organism_id, uniquename and type_id should be unique.</p></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/feature_contact.html">feature_contact</a></td>
+				  <td class="detail" align="right">0</td>
+				  <td class="detail" align="right">2</td>
+				  <td class="detail" align="right">3</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"><p>Links contact(s) with a feature. Used to indicate a particular person or organization responsible for discovery or that can provide more information on a particular feature.</p></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/feature_cvterm.html">feature_cvterm</a></td>
+				  <td class="detail" align="right">3</td>
+				  <td class="detail" align="right">3</td>
+				  <td class="detail" align="right">6</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"><p>Associate a term from a cv with a feature, for example, GO annotation.</p></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/feature_cvterm_dbxref.html">feature_cvterm_dbxref</a></td>
+				  <td class="detail" align="right">0</td>
+				  <td class="detail" align="right">2</td>
+				  <td class="detail" align="right">3</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"><p>Additional dbxrefs for an association. Rows in the feature_cvterm table may be backed up by dbxrefs. For example, a feature_cvterm association that was inferred via a protein-protein interaction may be backed by by refering to the dbxref for the alternate protein. Corresponds to the WITH column in a GO gene association file (but can also be used for other analagous associations). See http://www.geneontology.org/doc/GO.annotation.shtml#file for more details.</p></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/feature_cvterm_pub.html">feature_cvterm_pub</a></td>
+				  <td class="detail" align="right">0</td>
+				  <td class="detail" align="right">2</td>
+				  <td class="detail" align="right">3</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"><p>Secondary pubs for an association. Each feature_cvterm association is supported by a single primary publication. Additional secondary pubs can be added using this linking table (in a GO gene association file, these corresponding to any IDs after the pipe symbol in the publications column.</p></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/feature_cvtermprop.html">feature_cvtermprop</a></td>
+				  <td class="detail" align="right">0</td>
+				  <td class="detail" align="right">2</td>
+				  <td class="detail" align="right">5</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"><p>Extensible properties for feature to cvterm associations. Examples: GO evidence codes; qualifiers; metadata such as the date on which the entry was curated and the source of the association. See the featureprop table for meanings of type_id, value and rank.</p></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/feature_dbxref.html">feature_dbxref</a></td>
+				  <td class="detail" align="right">0</td>
+				  <td class="detail" align="right">2</td>
+				  <td class="detail" align="right">4</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"><p>Links a feature to dbxrefs.</p></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/feature_expression.html">feature_expression</a></td>
+				  <td class="detail" align="right">1</td>
+				  <td class="detail" align="right">3</td>
+				  <td class="detail" align="right">4</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/feature_expressionprop.html">feature_expressionprop</a></td>
+				  <td class="detail" align="right">0</td>
+				  <td class="detail" align="right">2</td>
+				  <td class="detail" align="right">5</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"><p>Extensible properties for feature_expression (comments, for example). Modeled on feature_cvtermprop.</p></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/feature_genotype.html">feature_genotype</a></td>
+				  <td class="detail" align="right">0</td>
+				  <td class="detail" align="right">4</td>
+				  <td class="detail" align="right">7</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/feature_phenotype.html">feature_phenotype</a></td>
+				  <td class="detail" align="right">0</td>
+				  <td class="detail" align="right">2</td>
+				  <td class="detail" align="right">3</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"><p>Linking table between features and phenotypes.</p></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/feature_pub.html">feature_pub</a></td>
+				  <td class="detail" align="right">1</td>
+				  <td class="detail" align="right">2</td>
+				  <td class="detail" align="right">3</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"><p>Provenance. Linking table between features and publications that mention them.</p></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/feature_pubprop.html">feature_pubprop</a></td>
+				  <td class="detail" align="right">0</td>
+				  <td class="detail" align="right">2</td>
+				  <td class="detail" align="right">5</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"><p>Property or attribute of a feature_pub link.</p></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/feature_relationship.html">feature_relationship</a></td>
+				  <td class="detail" align="right">2</td>
+				  <td class="detail" align="right">3</td>
+				  <td class="detail" align="right">6</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"><p>Features can be arranged in graphs, e.g. "exon part_of transcript part_of gene"; If type is thought of as a verb, the each arc or edge makes a statement <a href="./null">Subject Verb Object</a>. The object can also be thought of as parent (containing feature), and subject as child (contained feature or subfeature). We include the relationship rank/order, because even though most of the time we can order things implicitly by sequence coordinates, we can not always do this - e.g. transpliced genes. It is also useful for quickly getting implicit introns.</p></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/feature_relationship_pub.html">feature_relationship_pub</a></td>
+				  <td class="detail" align="right">0</td>
+				  <td class="detail" align="right">2</td>
+				  <td class="detail" align="right">3</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"><p>Provenance. Attach optional evidence to a feature_relationship in the form of a publication.</p></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/feature_relationshipprop.html">feature_relationshipprop</a></td>
+				  <td class="detail" align="right">1</td>
+				  <td class="detail" align="right">2</td>
+				  <td class="detail" align="right">5</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"><p>Extensible properties for feature_relationships. Analagous structure to featureprop. This table is largely optional and not used with a high frequency. Typical scenarios may be if one wishes to attach additional data to a feature_relationship - for example to say that the feature_relationship is only true in certain contexts.</p></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/feature_relationshipprop_pub.html">feature_relationshipprop_pub</a></td>
+				  <td class="detail" align="right">0</td>
+				  <td class="detail" align="right">2</td>
+				  <td class="detail" align="right">3</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"><p>Provenance for feature_relationshipprop.</p></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/feature_synonym.html">feature_synonym</a></td>
+				  <td class="detail" align="right">0</td>
+				  <td class="detail" align="right">3</td>
+				  <td class="detail" align="right">6</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"><p>Linking table between feature and synonym.</p></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/featureloc.html">featureloc</a></td>
+				  <td class="detail" align="right">1</td>
+				  <td class="detail" align="right">2</td>
+				  <td class="detail" align="right">12</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"><p>The location of a feature relative to another feature. Important: interbase coordinates are used. This is vital as it allows us to represent zero-length features e.g. splice sites, insertion points without an awkward fuzzy system. Features typically have exactly ONE location, but this need not be the case. Some features may not be localized (e.g. a gene that has been characterized genetically but no sequence or molecular information is available). Note on multiple locations: Each feature can have 0 or more locations. Multiple locations do NOT indicate non-contiguous locations (if a feature such as a transcript has a non-contiguous location, then the subfeatures such as exons should always be manifested). Instead, multiple featurelocs for a feature designate alternate locations or grouped locations; for instance, a feature designating a blast hit or hsp will have two locations, one on the query feature, one on the subject feature. Features representing sequence variation could have alternate locations instantiated on a feature on the mutant strain. The column:rank is used to differentiate these different locations. Reflexive locations should never be stored - this is for -proper- (i.e. non-self) locations only; nothing should be located relative to itself.</p></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/featureloc_pub.html">featureloc_pub</a></td>
+				  <td class="detail" align="right">0</td>
+				  <td class="detail" align="right">2</td>
+				  <td class="detail" align="right">3</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"><p>Provenance of featureloc. Linking table between featurelocs and publications that mention them.</p></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/featuremap.html">featuremap</a></td>
+				  <td class="detail" align="right">8</td>
+				  <td class="detail" align="right">1</td>
+				  <td class="detail" align="right">4</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/featuremap_contact.html">featuremap_contact</a></td>
+				  <td class="detail" align="right">0</td>
+				  <td class="detail" align="right">2</td>
+				  <td class="detail" align="right">3</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"><p>Links contact(s) with a featuremap. Used to indicate a particular person or organization responsible for constrution of or that can provide more information on a particular featuremap.</p></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/featuremap_dbxref.html">featuremap_dbxref</a></td>
+				  <td class="detail" align="right">0</td>
+				  <td class="detail" align="right">2</td>
+				  <td class="detail" align="right">4</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/featuremap_organism.html">featuremap_organism</a></td>
+				  <td class="detail" align="right">0</td>
+				  <td class="detail" align="right">2</td>
+				  <td class="detail" align="right">3</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"><p>Links a featuremap to the organism(s) with which it is associated.</p></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/featuremap_pub.html">featuremap_pub</a></td>
+				  <td class="detail" align="right">0</td>
+				  <td class="detail" align="right">2</td>
+				  <td class="detail" align="right">3</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/featuremapprop.html">featuremapprop</a></td>
+				  <td class="detail" align="right">0</td>
+				  <td class="detail" align="right">2</td>
+				  <td class="detail" align="right">5</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"><p>A featuremap can have any number of slot-value property tags attached to it. This is an alternative to hardcoding a list of columns in the relational schema, and is completely extensible.</p></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/featurepos.html">featurepos</a></td>
+				  <td class="detail" align="right">1</td>
+				  <td class="detail" align="right">3</td>
+				  <td class="detail" align="right">5</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/featureposprop.html">featureposprop</a></td>
+				  <td class="detail" align="right">0</td>
+				  <td class="detail" align="right">2</td>
+				  <td class="detail" align="right">5</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"><p>Property or attribute of a featurepos record.</p></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/featureprop.html">featureprop</a></td>
+				  <td class="detail" align="right">1</td>
+				  <td class="detail" align="right">2</td>
+				  <td class="detail" align="right">5</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"><p>A feature can have any number of slot-value property tags attached to it. This is an alternative to hardcoding a list of columns in the relational schema, and is completely extensible.</p></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/featureprop_pub.html">featureprop_pub</a></td>
+				  <td class="detail" align="right">0</td>
+				  <td class="detail" align="right">2</td>
+				  <td class="detail" align="right">3</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"><p>Provenance. Any featureprop assignment can optionally be supported by a publication.</p></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/featurerange.html">featurerange</a></td>
+				  <td class="detail" align="right">0</td>
+				  <td class="detail" align="right">6</td>
+				  <td class="detail" align="right">8</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"><p>In cases where the start and end of a mapped feature is a range, leftendf and rightstartf are populated. leftstartf_id, leftendf_id, rightstartf_id, rightendf_id are the ids of features with respect to which the feature is being mapped. These may be cytological bands.</p></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/genotype.html">genotype</a></td>
+				  <td class="detail" align="right">8</td>
+				  <td class="detail" align="right">1</td>
+				  <td class="detail" align="right">5</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"><p>Genetic context. A genotype is defined by a collection of features, mutations, balancers, deficiencies, haplotype blocks, or engineered constructs.</p></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/genotypeprop.html">genotypeprop</a></td>
+				  <td class="detail" align="right">0</td>
+				  <td class="detail" align="right">2</td>
+				  <td class="detail" align="right">5</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/library.html">library</a></td>
+				  <td class="detail" align="right">12</td>
+				  <td class="detail" align="right">2</td>
+				  <td class="detail" align="right">8</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/library_contact.html">library_contact</a></td>
+				  <td class="detail" align="right">0</td>
+				  <td class="detail" align="right">2</td>
+				  <td class="detail" align="right">3</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"><p>Links contact(s) with a library. Used to indicate a particular person or organization responsible for creation of or that can provide more information on a particular library.</p></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/library_cvterm.html">library_cvterm</a></td>
+				  <td class="detail" align="right">0</td>
+				  <td class="detail" align="right">3</td>
+				  <td class="detail" align="right">4</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"><p>The table library_cvterm links a library to controlled vocabularies which describe the library. For instance, there might be a link to the anatomy cv for "head" or "testes" for a head or testes library.</p></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/library_dbxref.html">library_dbxref</a></td>
+				  <td class="detail" align="right">0</td>
+				  <td class="detail" align="right">2</td>
+				  <td class="detail" align="right">4</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"><p>Links a library to dbxrefs.</p></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/library_expression.html">library_expression</a></td>
+				  <td class="detail" align="right">1</td>
+				  <td class="detail" align="right">3</td>
+				  <td class="detail" align="right">4</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"><p>Links a library to expression statements.</p></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/library_expressionprop.html">library_expressionprop</a></td>
+				  <td class="detail" align="right">0</td>
+				  <td class="detail" align="right">2</td>
+				  <td class="detail" align="right">5</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"><p>Attributes of a library_expression relationship.</p></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/library_feature.html">library_feature</a></td>
+				  <td class="detail" align="right">1</td>
+				  <td class="detail" align="right">2</td>
+				  <td class="detail" align="right">3</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"><p>library_feature links a library to the clones which are contained in the library. Examples of such linked features might be "cDNA_clone" or "genomic_clone".</p></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/library_featureprop.html">library_featureprop</a></td>
+				  <td class="detail" align="right">0</td>
+				  <td class="detail" align="right">2</td>
+				  <td class="detail" align="right">5</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"><p>Attributes of a library_feature relationship.</p></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/library_pub.html">library_pub</a></td>
+				  <td class="detail" align="right">0</td>
+				  <td class="detail" align="right">2</td>
+				  <td class="detail" align="right">3</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"><p>Attribution for a library.</p></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/library_relationship.html">library_relationship</a></td>
+				  <td class="detail" align="right">1</td>
+				  <td class="detail" align="right">3</td>
+				  <td class="detail" align="right">4</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"><p>Relationships between libraries.</p></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/library_relationship_pub.html">library_relationship_pub</a></td>
+				  <td class="detail" align="right">0</td>
+				  <td class="detail" align="right">2</td>
+				  <td class="detail" align="right">3</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"><p>Provenance of library_relationship.</p></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/library_synonym.html">library_synonym</a></td>
+				  <td class="detail" align="right">0</td>
+				  <td class="detail" align="right">3</td>
+				  <td class="detail" align="right">6</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"><p>Linking table between library and synonym.</p></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/libraryprop.html">libraryprop</a></td>
+				  <td class="detail" align="right">1</td>
+				  <td class="detail" align="right">2</td>
+				  <td class="detail" align="right">5</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"><p>Tag-value properties - follows standard chado model.</p></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/libraryprop_pub.html">libraryprop_pub</a></td>
+				  <td class="detail" align="right">0</td>
+				  <td class="detail" align="right">2</td>
+				  <td class="detail" align="right">3</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"><p>Attribution for libraryprop.</p></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/magedocumentation.html">magedocumentation</a></td>
+				  <td class="detail" align="right">0</td>
+				  <td class="detail" align="right">2</td>
+				  <td class="detail" align="right">5</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/mageml.html">mageml</a></td>
+				  <td class="detail" align="right">1</td>
+				  <td class="detail" align="right">0</td>
+				  <td class="detail" align="right">3</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"><p>This table is for storing extra bits of MAGEml in a denormalized form. More normalization would require many more tables.</p></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/nd_experiment.html">nd_experiment</a></td>
+				  <td class="detail" align="right">10</td>
+				  <td class="detail" align="right">2</td>
+				  <td class="detail" align="right">3</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"><p>This is the core table for the natural diversity module, representing each individual assay that is undertaken (this is usually <em>not</em> an entire experiment). Each nd_experiment should give rise to a single genotype or phenotype and be described via 1 (or more) protocols. Collections of assays that relate to each other should be linked to the same record in the project table.</p></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/nd_experiment_analysis.html">nd_experiment_analysis</a></td>
+				  <td class="detail" align="right">0</td>
+				  <td class="detail" align="right">3</td>
+				  <td class="detail" align="right">4</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"><p>An analysis that is used in an experiment</p></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/nd_experiment_contact.html">nd_experiment_contact</a></td>
+				  <td class="detail" align="right">0</td>
+				  <td class="detail" align="right">2</td>
+				  <td class="detail" align="right">3</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/nd_experiment_dbxref.html">nd_experiment_dbxref</a></td>
+				  <td class="detail" align="right">0</td>
+				  <td class="detail" align="right">2</td>
+				  <td class="detail" align="right">3</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"><p>Cross-reference experiment to accessions, images, etc</p></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/nd_experiment_genotype.html">nd_experiment_genotype</a></td>
+				  <td class="detail" align="right">0</td>
+				  <td class="detail" align="right">2</td>
+				  <td class="detail" align="right">3</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"><p>Linking table: experiments to the genotypes they produce. There is a one-to-one relationship between an experiment and a genotype since each genotype record should point to one experiment. Add a new experiment_id for each genotype record.</p></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/nd_experiment_phenotype.html">nd_experiment_phenotype</a></td>
+				  <td class="detail" align="right">0</td>
+				  <td class="detail" align="right">2</td>
+				  <td class="detail" align="right">3</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"><p>Linking table: experiments to the phenotypes they produce. There is a one-to-one relationship between an experiment and a phenotype since each phenotype record should point to one experiment. Add a new experiment_id for each phenotype record.</p></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/nd_experiment_project.html">nd_experiment_project</a></td>
+				  <td class="detail" align="right">0</td>
+				  <td class="detail" align="right">2</td>
+				  <td class="detail" align="right">3</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"><p>Used to group together related nd_experiment records. All nd_experiments should be linked to at least one project.</p></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/nd_experiment_protocol.html">nd_experiment_protocol</a></td>
+				  <td class="detail" align="right">0</td>
+				  <td class="detail" align="right">2</td>
+				  <td class="detail" align="right">3</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"><p>Linking table: experiments to the protocols they involve.</p></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/nd_experiment_pub.html">nd_experiment_pub</a></td>
+				  <td class="detail" align="right">0</td>
+				  <td class="detail" align="right">2</td>
+				  <td class="detail" align="right">3</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"><p>Linking nd_experiment(s) to publication(s)</p></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/nd_experiment_stock.html">nd_experiment_stock</a></td>
+				  <td class="detail" align="right">2</td>
+				  <td class="detail" align="right">3</td>
+				  <td class="detail" align="right">4</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"><p>Part of a stock or a clone of a stock that is used in an experiment</p></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/nd_experiment_stock_dbxref.html">nd_experiment_stock_dbxref</a></td>
+				  <td class="detail" align="right">0</td>
+				  <td class="detail" align="right">2</td>
+				  <td class="detail" align="right">3</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"><p>Cross-reference experiment_stock to accessions, images, etc</p></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/nd_experiment_stockprop.html">nd_experiment_stockprop</a></td>
+				  <td class="detail" align="right">0</td>
+				  <td class="detail" align="right">2</td>
+				  <td class="detail" align="right">5</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"><p>Property/value associations for experiment_stocks. This table can store the properties such as treatment</p></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/nd_experimentprop.html">nd_experimentprop</a></td>
+				  <td class="detail" align="right">0</td>
+				  <td class="detail" align="right">2</td>
+				  <td class="detail" align="right">5</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"><p>An nd_experiment can have any number of slot-value property tags attached to it. This is an alternative to hardcoding a list of columns in the relational schema, and is completely extensible. There is a unique constraint, stockprop_c1, for the combination of stock_id, rank, and type_id. Multivalued property-value pairs must be differentiated by rank.</p></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/nd_geolocation.html">nd_geolocation</a></td>
+				  <td class="detail" align="right">2</td>
+				  <td class="detail" align="right">0</td>
+				  <td class="detail" align="right">6</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"><p>The geo-referencable location of the stock. NOTE: This entity is subject to change as a more general and possibly more OpenGIS-compliant geolocation module may be introduced into Chado.</p></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/nd_geolocationprop.html">nd_geolocationprop</a></td>
+				  <td class="detail" align="right">0</td>
+				  <td class="detail" align="right">2</td>
+				  <td class="detail" align="right">5</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"><p>Property/value associations for geolocations. This table can store the properties such as location and environment</p></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/nd_protocol.html">nd_protocol</a></td>
+				  <td class="detail" align="right">3</td>
+				  <td class="detail" align="right">1</td>
+				  <td class="detail" align="right">3</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"><p>A protocol can be anything that is done as part of the experiment.</p></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/nd_protocol_reagent.html">nd_protocol_reagent</a></td>
+				  <td class="detail" align="right">0</td>
+				  <td class="detail" align="right">3</td>
+				  <td class="detail" align="right">4</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/nd_protocolprop.html">nd_protocolprop</a></td>
+				  <td class="detail" align="right">0</td>
+				  <td class="detail" align="right">2</td>
+				  <td class="detail" align="right">5</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"><p>Property/value associations for protocol.</p></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/nd_reagent.html">nd_reagent</a></td>
+				  <td class="detail" align="right">4</td>
+				  <td class="detail" align="right">2</td>
+				  <td class="detail" align="right">4</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"><p>A reagent such as a primer, an enzyme, an adapter oligo, a linker oligo. Reagents are used in genotyping experiments, or in any other kind of experiment.</p></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/nd_reagent_relationship.html">nd_reagent_relationship</a></td>
+				  <td class="detail" align="right">0</td>
+				  <td class="detail" align="right">3</td>
+				  <td class="detail" align="right">4</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"><p>Relationships between reagents. Some reagents form a group. i.e., they are used all together or not at all. Examples are adapter/linker/enzyme experiment reagents.</p></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/nd_reagentprop.html">nd_reagentprop</a></td>
+				  <td class="detail" align="right">0</td>
+				  <td class="detail" align="right">2</td>
+				  <td class="detail" align="right">5</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/organism.html">organism</a></td>
+				  <td class="detail" align="right">14</td>
+				  <td class="detail" align="right">1</td>
+				  <td class="detail" align="right">8</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"><p>The organismal taxonomic classification. Note that phylogenies are represented using the phylogeny module, and taxonomies can be represented using the cvterm module or the phylogeny module.</p></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/organism_cvterm.html">organism_cvterm</a></td>
+				  <td class="detail" align="right">1</td>
+				  <td class="detail" align="right">3</td>
+				  <td class="detail" align="right">5</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"><p>organism to cvterm associations. Examples: taxonomic name</p></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/organism_cvtermprop.html">organism_cvtermprop</a></td>
+				  <td class="detail" align="right">0</td>
+				  <td class="detail" align="right">2</td>
+				  <td class="detail" align="right">5</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"><p>Extensible properties for organism to cvterm associations. Examples: qualifiers</p></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/organism_dbxref.html">organism_dbxref</a></td>
+				  <td class="detail" align="right">0</td>
+				  <td class="detail" align="right">2</td>
+				  <td class="detail" align="right">3</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"><p>Links an organism to a dbxref.</p></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/organism_pub.html">organism_pub</a></td>
+				  <td class="detail" align="right">0</td>
+				  <td class="detail" align="right">2</td>
+				  <td class="detail" align="right">3</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"><p>Attribution for organism.</p></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/organism_relationship.html">organism_relationship</a></td>
+				  <td class="detail" align="right">0</td>
+				  <td class="detail" align="right">3</td>
+				  <td class="detail" align="right">5</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"><p>Specifies relationships between organisms that are not taxonomic. For example, in breeding, relationships such as "sterile_with", "incompatible_with", or "fertile_with" would be appropriate. Taxonomic relatinoships should be housed in the phylogeny tables.</p></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/organismprop.html">organismprop</a></td>
+				  <td class="detail" align="right">1</td>
+				  <td class="detail" align="right">2</td>
+				  <td class="detail" align="right">5</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"><p>Tag-value properties - follows standard chado model.</p></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/organismprop_pub.html">organismprop_pub</a></td>
+				  <td class="detail" align="right">0</td>
+				  <td class="detail" align="right">2</td>
+				  <td class="detail" align="right">5</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"><p>Attribution for organismprop.</p></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/phendesc.html">phendesc</a></td>
+				  <td class="detail" align="right">0</td>
+				  <td class="detail" align="right">4</td>
+				  <td class="detail" align="right">6</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"><p>A summary of a <em>set</em> of phenotypic statements for any one gcontext made in any one publication.</p></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/phenotype.html">phenotype</a></td>
+				  <td class="detail" align="right">7</td>
+				  <td class="detail" align="right">4</td>
+				  <td class="detail" align="right">8</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"><p>A phenotypic statement, or a single atomic phenotypic observation, is a controlled sentence describing observable effects of non-wild type function. E.g. Obs=eye, attribute=color, cvalue=red.</p></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/phenotype_comparison.html">phenotype_comparison</a></td>
+				  <td class="detail" align="right">1</td>
+				  <td class="detail" align="right">8</td>
+				  <td class="detail" align="right">9</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"><p>Comparison of phenotypes e.g., genotype1/environment1/phenotype1 "non-suppressible" with respect to genotype2/environment2/phenotype2.</p></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/phenotype_comparison_cvterm.html">phenotype_comparison_cvterm</a></td>
+				  <td class="detail" align="right">0</td>
+				  <td class="detail" align="right">3</td>
+				  <td class="detail" align="right">5</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/phenotype_cvterm.html">phenotype_cvterm</a></td>
+				  <td class="detail" align="right">0</td>
+				  <td class="detail" align="right">2</td>
+				  <td class="detail" align="right">4</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"><p>phenotype to cvterm associations.</p></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/phenotypeprop.html">phenotypeprop</a></td>
+				  <td class="detail" align="right">0</td>
+				  <td class="detail" align="right">2</td>
+				  <td class="detail" align="right">5</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"><p>A phenotype can have any number of slot-value property tags attached to it. This is an alternative to hardcoding a list of columns in the relational schema, and is completely extensible. There is a unique constraint, phenotypeprop_c1, for the combination of phenotype_id, rank, and type_id. Multivalued property-value pairs must be differentiated by rank.</p></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/phenstatement.html">phenstatement</a></td>
+				  <td class="detail" align="right">0</td>
+				  <td class="detail" align="right">5</td>
+				  <td class="detail" align="right">6</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"><p>Phenotypes are things like "larval lethal". Phenstatements are things like "dpp-1 is recessive larval lethal". So essentially phenstatement is a linking table expressing the relationship between genotype, environment, and phenotype.</p></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/phylonode.html">phylonode</a></td>
+				  <td class="detail" align="right">7</td>
+				  <td class="detail" align="right">4</td>
+				  <td class="detail" align="right">9</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"><p>This is the most pervasive  element in the phylogeny module, cataloging the "phylonodes" of  tree graphs. Edges are implied by the parent_phylonode_id  reflexive closure. For all nodes in a nested set implementation the left and right index will be <em>between</em> the parents left and right indexes.</p></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/phylonode_dbxref.html">phylonode_dbxref</a></td>
+				  <td class="detail" align="right">0</td>
+				  <td class="detail" align="right">2</td>
+				  <td class="detail" align="right">3</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"><p>For example, for orthology, paralogy group identifiers; could also be used for NCBI taxonomy; for sequences, refer to phylonode_feature, feature associated dbxrefs.</p></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/phylonode_organism.html">phylonode_organism</a></td>
+				  <td class="detail" align="right">0</td>
+				  <td class="detail" align="right">2</td>
+				  <td class="detail" align="right">3</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"><p>This linking table should only be used for nodes in taxonomy trees; it provides a mapping between the node and an organism. One node can have zero or one organisms, one organism can have zero or more nodes (although typically it should only have one in the standard NCBI taxonomy tree).</p></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/phylonode_pub.html">phylonode_pub</a></td>
+				  <td class="detail" align="right">0</td>
+				  <td class="detail" align="right">2</td>
+				  <td class="detail" align="right">3</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/phylonode_relationship.html">phylonode_relationship</a></td>
+				  <td class="detail" align="right">0</td>
+				  <td class="detail" align="right">4</td>
+				  <td class="detail" align="right">6</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"><p>This is for relationships that are not strictly hierarchical; for example, horizontal gene transfer. Most phylogenetic trees are strictly hierarchical, nevertheless it is here for completeness.</p></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/phylonodeprop.html">phylonodeprop</a></td>
+				  <td class="detail" align="right">0</td>
+				  <td class="detail" align="right">2</td>
+				  <td class="detail" align="right">5</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/phylotree.html">phylotree</a></td>
+				  <td class="detail" align="right">4</td>
+				  <td class="detail" align="right">3</td>
+				  <td class="detail" align="right">6</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"><p>Global anchor for phylogenetic tree.</p></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/phylotree_pub.html">phylotree_pub</a></td>
+				  <td class="detail" align="right">0</td>
+				  <td class="detail" align="right">2</td>
+				  <td class="detail" align="right">3</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"><p>Tracks citations global to the tree e.g. multiple sequence alignment supporting tree construction.</p></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/phylotreeprop.html">phylotreeprop</a></td>
+				  <td class="detail" align="right">0</td>
+				  <td class="detail" align="right">2</td>
+				  <td class="detail" align="right">5</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"><p>A phylotree can have any number of slot-value property tags attached to it. This is an alternative to hardcoding a list of columns in the relational schema, and is completely extensible.</p></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/project.html">project</a></td>
+				  <td class="detail" align="right">11</td>
+				  <td class="detail" align="right">0</td>
+				  <td class="detail" align="right">3</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"><p>Standard Chado flexible property table for projects.</p></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/project_analysis.html">project_analysis</a></td>
+				  <td class="detail" align="right">0</td>
+				  <td class="detail" align="right">2</td>
+				  <td class="detail" align="right">4</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"><p>Links an analysis to a project that may contain multiple analyses. The rank column can be used to specify a simple ordering in which analyses were executed.</p></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/project_contact.html">project_contact</a></td>
+				  <td class="detail" align="right">0</td>
+				  <td class="detail" align="right">2</td>
+				  <td class="detail" align="right">3</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"><p>Linking table for associating projects and contacts.</p></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/project_dbxref.html">project_dbxref</a></td>
+				  <td class="detail" align="right">0</td>
+				  <td class="detail" align="right">2</td>
+				  <td class="detail" align="right">4</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"><p>project_dbxref links a project to dbxrefs.</p></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/project_feature.html">project_feature</a></td>
+				  <td class="detail" align="right">0</td>
+				  <td class="detail" align="right">2</td>
+				  <td class="detail" align="right">3</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"><p>This table is intended associate records in the feature table with a project.</p></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/project_pub.html">project_pub</a></td>
+				  <td class="detail" align="right">0</td>
+				  <td class="detail" align="right">2</td>
+				  <td class="detail" align="right">3</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"><p>Linking table for associating projects and publications.</p></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/project_relationship.html">project_relationship</a></td>
+				  <td class="detail" align="right">0</td>
+				  <td class="detail" align="right">3</td>
+				  <td class="detail" align="right">4</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"><p>Linking table for relating projects to each other. For example, a given project could be composed of several smaller subprojects</p></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/project_stock.html">project_stock</a></td>
+				  <td class="detail" align="right">0</td>
+				  <td class="detail" align="right">2</td>
+				  <td class="detail" align="right">3</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"><p>This table is intended associate records in the stock table with a project.</p></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/projectprop.html">projectprop</a></td>
+				  <td class="detail" align="right">0</td>
+				  <td class="detail" align="right">2</td>
+				  <td class="detail" align="right">5</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/protocol.html">protocol</a></td>
+				  <td class="detail" align="right">6</td>
+				  <td class="detail" align="right">3</td>
+				  <td class="detail" align="right">9</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"><p>Procedural notes on how data was prepared and processed.</p></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/protocolparam.html">protocolparam</a></td>
+				  <td class="detail" align="right">0</td>
+				  <td class="detail" align="right">3</td>
+				  <td class="detail" align="right">7</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"><p>Parameters related to a protocol. For example, if the protocol is a soak, this might include attributes of bath temperature and duration.</p></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/pub.html">pub</a></td>
+				  <td class="detail" align="right">47</td>
+				  <td class="detail" align="right">1</td>
+				  <td class="detail" align="right">14</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"><p>A documented provenance artefact - publications, documents, personal communication.</p></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/pub_dbxref.html">pub_dbxref</a></td>
+				  <td class="detail" align="right">0</td>
+				  <td class="detail" align="right">2</td>
+				  <td class="detail" align="right">4</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"><p>Handle links to repositories, e.g. Pubmed, Biosis, zoorec, OCLC, Medline, ISSN, coden...</p></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/pub_relationship.html">pub_relationship</a></td>
+				  <td class="detail" align="right">0</td>
+				  <td class="detail" align="right">3</td>
+				  <td class="detail" align="right">4</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"><p>Handle relationships between publications, e.g. when one publication makes others obsolete, when one publication contains errata with respect to other publication(s), or when one publication also appears in another pub.</p></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/pubauthor.html">pubauthor</a></td>
+				  <td class="detail" align="right">1</td>
+				  <td class="detail" align="right">1</td>
+				  <td class="detail" align="right">7</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"><p>An author for a publication. Note the denormalisation (hence lack of _ in table name) - this is deliberate as it is in general too hard to assign IDs to authors.</p></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/pubauthor_contact.html">pubauthor_contact</a></td>
+				  <td class="detail" align="right">0</td>
+				  <td class="detail" align="right">2</td>
+				  <td class="detail" align="right">3</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"><p>An author on a publication may have a corresponding entry in the contact table and this table can link the two.</p></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/pubprop.html">pubprop</a></td>
+				  <td class="detail" align="right">0</td>
+				  <td class="detail" align="right">2</td>
+				  <td class="detail" align="right">5</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"><p>Property-value pairs for a pub. Follows standard chado pattern.</p></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/quantification.html">quantification</a></td>
+				  <td class="detail" align="right">4</td>
+				  <td class="detail" align="right">4</td>
+				  <td class="detail" align="right">8</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"><p>Quantification is the transformation of an image acquisition to numeric data. This typically involves statistical procedures.</p></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/quantification_relationship.html">quantification_relationship</a></td>
+				  <td class="detail" align="right">0</td>
+				  <td class="detail" align="right">3</td>
+				  <td class="detail" align="right">4</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"><p>There may be multiple rounds of quantification, this allows us to keep an audit trail of what values went where.</p></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/quantificationprop.html">quantificationprop</a></td>
+				  <td class="detail" align="right">0</td>
+				  <td class="detail" align="right">2</td>
+				  <td class="detail" align="right">5</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"><p>Extra quantification properties that are not accounted for in quantification.</p></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/stock.html">stock</a></td>
+				  <td class="detail" align="right">13</td>
+				  <td class="detail" align="right">3</td>
+				  <td class="detail" align="right">8</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"><p>Any stock can be globally identified by the combination of organism, uniquename and stock type. A stock is the physical entities, either living or preserved, held by collections. Stocks belong to a collection; they have IDs, type, organism, description and may have a genotype.</p></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/stock_cvterm.html">stock_cvterm</a></td>
+				  <td class="detail" align="right">1</td>
+				  <td class="detail" align="right">3</td>
+				  <td class="detail" align="right">6</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"><p>stock_cvterm links a stock to cvterms. This is for secondary cvterms; primary cvterms should use stock.type_id.</p></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/stock_cvtermprop.html">stock_cvtermprop</a></td>
+				  <td class="detail" align="right">0</td>
+				  <td class="detail" align="right">2</td>
+				  <td class="detail" align="right">5</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"><p>Extensible properties for stock to cvterm associations. Examples: GO evidence codes; qualifiers; metadata such as the date on which the entry was curated and the source of the association. See the stockprop table for meanings of type_id, value and rank.</p></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/stock_dbxref.html">stock_dbxref</a></td>
+				  <td class="detail" align="right">1</td>
+				  <td class="detail" align="right">2</td>
+				  <td class="detail" align="right">4</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"><p>stock_dbxref links a stock to dbxrefs. This is for secondary identifiers; primary identifiers should use stock.dbxref_id.</p></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/stock_dbxrefprop.html">stock_dbxrefprop</a></td>
+				  <td class="detail" align="right">0</td>
+				  <td class="detail" align="right">2</td>
+				  <td class="detail" align="right">5</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"><p>A stock_dbxref can have any number of slot-value property tags attached to it. This is useful for storing properties related to dbxref annotations of stocks, such as evidence codes, and references, and metadata, such as create/modify dates. This is an alternative to hardcoding a list of columns in the relational schema, and is completely extensible. There is a unique constraint, stock_dbxrefprop_c1, for the combination of stock_dbxref_id, rank, and type_id. Multivalued property-value pairs must be differentiated by rank.</p></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/stock_feature.html">stock_feature</a></td>
+				  <td class="detail" align="right">0</td>
+				  <td class="detail" align="right">3</td>
+				  <td class="detail" align="right">5</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"><p>Links a stock to a feature.</p></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/stock_featuremap.html">stock_featuremap</a></td>
+				  <td class="detail" align="right">0</td>
+				  <td class="detail" align="right">3</td>
+				  <td class="detail" align="right">4</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"><p>Links a featuremap to a stock.</p></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/stock_genotype.html">stock_genotype</a></td>
+				  <td class="detail" align="right">0</td>
+				  <td class="detail" align="right">2</td>
+				  <td class="detail" align="right">3</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"><p>Simple table linking a stock to a genotype. Features with genotypes can be linked to stocks thru feature_genotype -&gt; genotype -&gt; stock_genotype -&gt; stock.</p></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/stock_library.html">stock_library</a></td>
+				  <td class="detail" align="right">0</td>
+				  <td class="detail" align="right">2</td>
+				  <td class="detail" align="right">3</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"><p>Links a stock with a library.</p></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/stock_pub.html">stock_pub</a></td>
+				  <td class="detail" align="right">0</td>
+				  <td class="detail" align="right">2</td>
+				  <td class="detail" align="right">3</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"><p>Provenance. Linking table between stocks and, for example, a stocklist computer file.</p></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/stock_relationship.html">stock_relationship</a></td>
+				  <td class="detail" align="right">2</td>
+				  <td class="detail" align="right">3</td>
+				  <td class="detail" align="right">6</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/stock_relationship_cvterm.html">stock_relationship_cvterm</a></td>
+				  <td class="detail" align="right">0</td>
+				  <td class="detail" align="right">3</td>
+				  <td class="detail" align="right">4</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"><p>For germplasm maintenance and pedigree data, stock_relationship. type_id will record cvterms such as "is a female parent of", "a parent for mutation", "is a group_id of", "is a source_id of", etc The cvterms for higher categories such as "generative", "derivative" or "maintenance" can be stored in table stock_relationship_cvterm</p></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/stock_relationship_pub.html">stock_relationship_pub</a></td>
+				  <td class="detail" align="right">0</td>
+				  <td class="detail" align="right">2</td>
+				  <td class="detail" align="right">3</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"><p>Provenance. Attach optional evidence to a stock_relationship in the form of a publication.</p></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/stockcollection.html">stockcollection</a></td>
+				  <td class="detail" align="right">3</td>
+				  <td class="detail" align="right">2</td>
+				  <td class="detail" align="right">5</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"><p>The lab or stock center distributing the stocks in their collection.</p></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/stockcollection_db.html">stockcollection_db</a></td>
+				  <td class="detail" align="right">0</td>
+				  <td class="detail" align="right">2</td>
+				  <td class="detail" align="right">3</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"><p>Stock collections may be respresented by an external online database. This table associates a stock collection with a database where its member stocks can be found. Individual stock that are part of this collction should have entries in the stock_dbxref table with the same db_id record</p></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/stockcollection_stock.html">stockcollection_stock</a></td>
+				  <td class="detail" align="right">0</td>
+				  <td class="detail" align="right">2</td>
+				  <td class="detail" align="right">3</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"><p>stockcollection_stock links a stock collection to the stocks which are contained in the collection.</p></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/stockcollectionprop.html">stockcollectionprop</a></td>
+				  <td class="detail" align="right">0</td>
+				  <td class="detail" align="right">2</td>
+				  <td class="detail" align="right">5</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"><p>The table stockcollectionprop contains the value of the stock collection such as website/email URLs; the value of the stock collection order URLs.</p></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/stockprop.html">stockprop</a></td>
+				  <td class="detail" align="right">1</td>
+				  <td class="detail" align="right">2</td>
+				  <td class="detail" align="right">5</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"><p>A stock can have any number of slot-value property tags attached to it. This is an alternative to hardcoding a list of columns in the relational schema, and is completely extensible. There is a unique constraint, stockprop_c1, for the combination of stock_id, rank, and type_id. Multivalued property-value pairs must be differentiated by rank.</p></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/stockprop_pub.html">stockprop_pub</a></td>
+				  <td class="detail" align="right">0</td>
+				  <td class="detail" align="right">2</td>
+				  <td class="detail" align="right">3</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"><p>Provenance. Any stockprop assignment can optionally be supported by a publication.</p></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/study.html">study</a></td>
+				  <td class="detail" align="right">3</td>
+				  <td class="detail" align="right">3</td>
+				  <td class="detail" align="right">6</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/study_assay.html">study_assay</a></td>
+				  <td class="detail" align="right">0</td>
+				  <td class="detail" align="right">2</td>
+				  <td class="detail" align="right">3</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/studydesign.html">studydesign</a></td>
+				  <td class="detail" align="right">2</td>
+				  <td class="detail" align="right">1</td>
+				  <td class="detail" align="right">3</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/studydesignprop.html">studydesignprop</a></td>
+				  <td class="detail" align="right">0</td>
+				  <td class="detail" align="right">2</td>
+				  <td class="detail" align="right">5</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/studyfactor.html">studyfactor</a></td>
+				  <td class="detail" align="right">1</td>
+				  <td class="detail" align="right">2</td>
+				  <td class="detail" align="right">5</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/studyfactorvalue.html">studyfactorvalue</a></td>
+				  <td class="detail" align="right">0</td>
+				  <td class="detail" align="right">2</td>
+				  <td class="detail" align="right">6</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/studyprop.html">studyprop</a></td>
+				  <td class="detail" align="right">1</td>
+				  <td class="detail" align="right">2</td>
+				  <td class="detail" align="right">5</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/studyprop_feature.html">studyprop_feature</a></td>
+				  <td class="detail" align="right">0</td>
+				  <td class="detail" align="right">3</td>
+				  <td class="detail" align="right">4</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/synonym.html">synonym</a></td>
+				  <td class="detail" align="right">3</td>
+				  <td class="detail" align="right">1</td>
+				  <td class="detail" align="right">4</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"><p>A synonym for a feature. One feature can have multiple synonyms, and the same synonym can apply to multiple features.</p></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/tableinfo.html">tableinfo</a></td>
+				  <td class="detail" align="right">2</td>
+				  <td class="detail" align="right">0</td>
+				  <td class="detail" align="right">8</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/treatment.html">treatment</a></td>
+				  <td class="detail" align="right">1</td>
+				  <td class="detail" align="right">3</td>
+				  <td class="detail" align="right">6</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"><p>A biomaterial may undergo multiple treatments. Examples of treatments: apoxia, fluorophore and biotin labeling.</p></td>
+				  </tr>
+				  			</table>
+            </div>
+            <!-- /.box-body -->
+          </div>			
+      </section>
+      <!-- /.content -->
+	  <script>
+          var config = {
+	          pagination: true
+          }
+	  </script>    
+  </div>
+  <!-- /.content-wrapper -->
+  <footer class="main-footer">
+    <div>
+      <div class="pull-right hidden-xs">
+        <a href="https://github.com/schemaspy/schemaspy" title="GitHub for SchemaSpy"><i class="fa fa-github-square fa-2x"></i></a>
+        <a href="http://stackoverflow.com/questions/tagged/schemaspy" title="StackOverflow for SchemaSpy"><i class="fa fa-stack-overflow fa-2x"></i></a>
+      </div>
+      <strong>Generated by <a href="http://schemaspy.org/" class="logo-text"><i class="fa fa-database"></i> SchemaSpy @project.version@</a></strong>
+    </div>
+    <!-- /.container -->
+  </footer>
+</div>
+<!-- ./wrapper -->
+
+<!-- jQuery 2.2.3 -->
+<script src="bower/admin-lte/plugins/jQuery/jquery-2.2.3.min.js"></script>
+<script src="bower/admin-lte/plugins/jQueryUI/jquery-ui.min.js"></script>
+<!-- Bootstrap 3.3.5 -->
+<script src="bower/admin-lte/bootstrap/js/bootstrap.min.js"></script>
+<!-- DataTables -->
+<script src="bower/datatables.net/jquery.dataTables.min.js"></script>
+<script src="bower/datatables.net-bs/js/dataTables.bootstrap.min.js"></script>
+<script src="bower/datatables.net-buttons/dataTables.buttons.min.js"></script>
+<script src="bower/datatables.net-buttons-bs/js/buttons.bootstrap.min.js"></script>
+<script src="bower/datatables.net-buttons/buttons.html5.min.js"></script>
+<script src="bower/datatables.net-buttons/buttons.print.min.js"></script>
+<script src="bower/datatables.net-buttons/buttons.colVis.min.js"></script>
+
+<!-- SlimScroll -->
+<script src="bower/admin-lte/plugins/slimScroll/jquery.slimscroll.min.js"></script>
+<!-- FastClick -->
+<script src="bower/admin-lte/plugins/fastclick/fastclick.js"></script>
+<!-- Salvattore -->
+<script src="bower/salvattore/salvattore.min.js"></script>
+<!-- AnchorJS -->
+<script src="bower/anchor-js/anchor.min.js"></script>
+<!-- CodeMirror -->
+<script src="bower/codemirror/codemirror.js"></script>
+<script src="bower/codemirror/sql.js"></script>
+<!-- AdminLTE App -->
+<script src="bower/admin-lte/dist/js/app.min.js"></script>
+<script src="main.js"></script>
+<script src="schemaSpy.js"></script>
+</body>
+</html>

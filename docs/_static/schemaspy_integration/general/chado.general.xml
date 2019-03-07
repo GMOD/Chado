@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<database name="chado" schema="general" type="PostgreSQL - 9.3.18">
+   <tables>
+      <table name="tableinfo" remarks="" schema="general" type="TABLE">
+         <column autoUpdated="false" defaultValue="nextval('general.tableinfo_tableinfo_id_seq'::regclass)" digits="0" id="0" name="tableinfo_id" nullable="false" remarks="" size="19" type="bigserial">
+            <child column="tableinfo_id" foreignKey="control_tableinfo_id_fkey" implied="false" onDeleteCascade="true" schema="mage" table="control"/>
+            <child column="tableinfo_id" foreignKey="magedocumentation_tableinfo_id_fkey" implied="false" onDeleteCascade="true" schema="mage" table="magedocumentation"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="1" name="name" nullable="false" remarks="" size="30" type="varchar"/>
+         <column autoUpdated="false" digits="0" id="2" name="primary_key_column" nullable="true" remarks="" size="30" type="varchar"/>
+         <column autoUpdated="false" defaultValue="0" digits="0" id="3" name="is_view" nullable="false" remarks="" size="10" type="int4"/>
+         <column autoUpdated="false" digits="0" id="4" name="view_on_table_id" nullable="true" remarks="" size="19" type="int8"/>
+         <column autoUpdated="false" digits="0" id="5" name="superclass_table_id" nullable="true" remarks="" size="19" type="int8"/>
+         <column autoUpdated="false" defaultValue="1" digits="0" id="6" name="is_updateable" nullable="false" remarks="" size="10" type="int4"/>
+         <column autoUpdated="false" defaultValue="now()" digits="0" id="7" name="modification_date" nullable="false" remarks="" size="13" type="date"/>
+         <primaryKey column="tableinfo_id" sequenceNumberInPK="1"/>
+         <index name="tableinfo_pkey" unique="true">
+            <column ascending="true" name="tableinfo_id"/>
+         </index>
+         <index name="tableinfo_c1" unique="true">
+            <column ascending="true" name="name"/>
+         </index>
+      </table>
+   </tables>
+</database>

@@ -1,0 +1,8 @@
+organism_relationship
+organismprop_pub
+organism_pub
+organism_dbxref
+organism_cvtermprop
+organism_cvterm
+organismprop
+organism

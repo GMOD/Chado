@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>chado.mage Module</title>
+  <!-- Tell the browser to be responsive to screen width -->
+  <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+  <link rel="icon" type="image/png" sizes="16x16" href="../favicon.ico">
+  <!-- Bootstrap 3.3.5 -->
+  <link rel="stylesheet" href="bower/admin-lte/bootstrap/css/bootstrap.min.css">
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="bower/font-awesome/css/font-awesome.min.css">
+  <!-- Ionicons -->
+  <link rel="stylesheet" href="bower/ionicons/css/ionicons.min.css">
+  <!-- DataTables -->
+  <link rel="stylesheet" href="bower/datatables.net-bs/css/dataTables.bootstrap.min.css">
+  <link rel="stylesheet" href="bower/datatables.net-buttons-bs/css/buttons.bootstrap.min.css">
+  <!-- Code Mirror -->
+  <link rel="stylesheet" href="bower/codemirror/codemirror.css">
+  <!-- Fonts -->
+  <link href='fonts/indieflower/indie-flower.css' rel='stylesheet' type='text/css'>
+  <link href='fonts/source-sans-pro/source-sans-pro.css' rel='stylesheet' type='text/css'>
+
+  <!-- Theme style -->
+  <link rel="stylesheet" href="bower/admin-lte/dist/css/AdminLTE.min.css">
+  <!-- Salvattore -->
+  <link rel="stylesheet" href="bower/salvattore/salvattore.css">
+  <!-- AdminLTE Skins. Choose a skin from the css/skins
+       folder instead of downloading all of them to reduce the load. -->
+  <link rel="stylesheet" href="bower/admin-lte/dist/css/skins/_all-skins.min.css">
+  <!-- SchemaSpy -->
+  <link rel="stylesheet" href="schemaSpy.css">
+  <!-- GMOD Chado Specific CSS -->
+  <link rel="stylesheet" href="../main.css">
+  
+  <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+  <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+  <!--[if lt IE 9]>
+  <script src="bower/html5shiv/html5shiv.min.js"></script>
+  <script src="bower/respond/respond.min.js"></script>
+  <![endif]-->
+</head>
+<!-- ADD THE CLASS layout-top-nav TO REMOVE THE SIDEBAR. -->
+<!-- Skins: skin-black, black-light, green-light, red-light, yellow-light, purple-light, blue-light -->
+<body class="hold-transition skin-black layout-top-nav">
+<div class="wrapper">
+  <header class="main-header">
+    <nav class="navbar navbar-static-top">
+      <div class="container">
+        <div class="navbar-header">
+          <a href="../index.html" class="navbar-brand" style="padding:0;">
+            <img src="../GMOD-cogs.png" class="gmod-logo" />
+            <span class="gmod-title">Chado</span>
+          </a>
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar-collapse">
+            <i class="fa fa-bars"></i>
+          </button>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-collapse pull-left" id="navbar-collapse">
+          <ul class="nav navbar-nav">
+            <li>
+              <a href="../index.html" title="All Chado Tables.">
+                All Tables</span>
+              </a>
+            </li>
+            <li>
+              <a href="../constraints.html" title="All Constraints in Chado.">
+                All Constraints
+              </a>
+            </li>
+            <li>
+              <a href="index.html" title="Tables in this module.">
+                Module Tables <span class="sr-only">(current)</span>
+              </a>
+            </li>            
+            <li>
+              <a href="columns.html" title="Columns in this module.">
+                Module Columns
+              </a>
+            </li>
+            <li>
+              <a href="constraints.html" title="Constraints defined by this module.">
+                Module Constraints
+              </a>
+            </li>
+            <li>
+              <a href="relationships.html" title="Diagram of table relationships">
+                Module Relationships
+              </a>
+            </li>
+          </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+        <!-- Navbar Right Menu -->
+
+      </div>
+      <!-- /.container-fluid -->
+    </nav>
+  </header>
+  <!-- Main content -->
+  <!-- Full Width Column -->
+  <div class="content-wrapper">
+    
+    <div class="box box-solid">
+      <div class="box-body">
+        <p><span class="version-label">Schema Version:</span> 1.3 
+          <span class="version-label">Module</span>: chado.mage</p>
+      </div>
+    </div>
+		
+    
+      <!-- Main content -->
+      <section class="content">
+		<div class="row">
+		  <div class="col-md-3 col-sm-6 col-xs-12">
+			  <div class="info-box">
+				  <span class="info-box-icon bg-aqua"><i class="fa fa-table"></i></span>
+				  <div class="info-box-content">
+					  <span class="info-box-text">TABLES</span>
+					  <span class="info-box-number">36</span>
+				  </div>
+				  <!-- /.info-box-content -->
+			  </div>
+			  <!-- /.info-box -->
+		  </div>
+		  <!-- /.col -->
+		  <div class="col-md-3 col-sm-6 col-xs-12">
+			  <div class="info-box">
+				  <span class="info-box-icon bg-red"><i class="fa fa-table"></i></span>
+				  <div class="info-box-content">
+					  <span class="info-box-text">VIEWS</span>
+					  <span class="info-box-number">0</span>
+				  </div>
+				  <!-- /.info-box-content -->
+			  </div>
+			  <!-- /.info-box -->
+		  </div>
+		  <!-- /.col -->
+
+		  <!-- fix for small devices only -->
+		  <div class="clearfix visible-sm-block"></div>
+
+		  <div class="col-md-3 col-sm-6 col-xs-12">
+			  <div class="info-box">
+				  <span class="info-box-icon bg-green"><span class="glyphicon glyphicon-list-alt" aria-hidden="true"></span></span>
+
+				  <div class="info-box-content">
+					  <span class="info-box-text">COLUMNS</span>
+					  <span class="info-box-number">204</span>
+				  </div>
+				  <!-- /.info-box-content -->
+			  </div>
+			  <!-- /.info-box -->
+		  </div>
+		  <!-- /.col -->
+		  <div class="col-md-3 col-sm-6 col-xs-12">
+			  <div class="info-box">
+				  <span class="info-box-icon bg-yellow"><i class="ion ion-key"></i></span>
+
+				  <div class="info-box-content">
+					  <span class="info-box-text">Constraints</span>
+					  <span class="info-box-number">91</span>
+				  </div>
+				  <!-- /.info-box-content -->
+			  </div>
+			  <!-- /.info-box -->
+		  </div>
+		  <!-- /.col -->
+		</div>
+
+		<!-- Use this to include module documentation at a later date.
+		<div class="box box-primary">           
+	       <div class="box-header with-border">
+	         <h3 class="box-title">chado.mage Module</h3>
+	         <span class="label label-primary pull-right"><i class="fa fa-cog fa-2x"></i></span>
+	     
+	       </div>
+	       <div class="box-body">
+	         <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus eget urna eget enim rhoncus feugiat suscipit vitae orci. Vivamus malesuada lacinia ante, nec feugiat tellus pellentesque ut. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque scelerisque at felis eu sodales. Aenean dapibus, nisl sit amet rutrum sollicitudin, eros ex cursus quam, sit amet laoreet dui sem in eros. Nunc sodales risus ut velit tempus dictum. Aenean scelerisque ipsum id nulla hendrerit, vel ultricies ante pretium. Quisque rutrum semper velit, vel porta elit accumsan vestibulum. Nullam et condimentum ex, ac malesuada lacus.</p>
+			<p>Donec euismod neque vel dui varius feugiat. Vestibulum porta eu turpis eu volutpat. Vestibulum quis purus non leo aliquam condimentum in eu diam. Nunc varius felis id leo faucibus fringilla. Suspendisse mattis sagittis elit sed porta. Aenean rutrum mauris nec consectetur fermentum. Phasellus quis efficitur mi. Pellentesque eleifend tincidunt ultricies. Aliquam aliquam dolor et sapien dictum imperdiet vel non nunc. Duis auctor magna nec mauris laoreet ullamcorper. Curabitur id bibendum libero. Suspendisse porta varius ipsum, eu dignissim tellus malesuada a. Donec lobortis risus sapien, quis sagittis leo tempus vel. Aliquam erat volutpat. Sed in sem non neque interdum sollicitudin in ac nulla. Nam quis libero in enim aliquam auctor.</p>
+			<p>Curabitur dignissim consectetur purus, vel molestie dui viverra non. Etiam mi libero, tristique semper vehicula a, ultrices ac odio. Vivamus vehicula risus at ex luctus sollicitudin nec nec nulla. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris sit amet elit a neque congue blandit ut at dui. Etiam fringilla rutrum finibus. Phasellus eu elementum dolor. Curabitur sed eleifend risus, ut viverra nisi. Vivamus vel urna eu metus dictum mollis vitae ut orci. Donec consectetur interdum vulputate. Aenean in rutrum neque, vel viverra eros. Pellentesque nec rhoncus sem. Nulla dictum, justo ac pretium fringilla, turpis sem molestie lectus, quis vulputate mi risus eget tortor. Donec eu tellus ante.</p>
+			<p>Suspendisse augue eros, hendrerit ac venenatis vitae, convallis et libero. In quis justo ligula. Mauris mollis placerat arcu ut semper. Aenean auctor rutrum aliquet. Nam cursus turpis et convallis ornare. Cras elementum purus non malesuada imperdiet. Nulla commodo tellus vel enim maximus, vitae maximus velit venenatis. Cras sit amet risus in velit congue elementum.</p>
+			<p>Nam augue tellus, vulputate eget elementum vitae, blandit id massa. Suspendisse sagittis, erat sed finibus aliquam, nibh magna molestie neque, molestie fermentum turpis metus ac quam. Phasellus consequat magna sit amet eros vestibulum tristique. Fusce ullamcorper, mauris sed tincidunt fringilla, erat odio lobortis lorem, eu iaculis massa mauris id quam. Aliquam volutpat mi ut ligula porttitor venenatis. Suspendisse non interdum urna. Pellentesque venenatis ex eros, nec pharetra sem eleifend ultricies.</p>                     
+	       </div>
+		</div> -->
+        
+		<div class="box box-primary">
+            <div class="box-header with-border">
+              <h3 class="box-title">chado.mage Tables</h3>			  
+			  <span class="label label-primary pull-right"><i class="fa fa-database fa-2x"></i></span>
+            </div><!-- /.box-header -->
+            <div class="box-body">
+            <table id="database_objects" class="table table-bordered table-striped dataTable" role="grid">
+				<thead>
+					<tr>
+					  <th valign="bottom">Table / View</th>
+					  <th align="right" valign="bottom">Referenced</th>
+					  <th align="right" valign="bottom">Foreign Keys</th>
+					  <th align="right" valign="bottom">Columns</th>
+					  <th align="right" valign="bottom">Type</th>
+					  <th class="toggle">Comments</th>
+					</tr>
+				</thead>
+				<tbody>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/acquisition.html">acquisition</a></td>
+				  <td class="detail" align="right">4</td>
+				  <td class="detail" align="right">3</td>
+				  <td class="detail" align="right">7</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"><p>This represents the scanning of hybridized material. The output of this process is typically a digital image of an array.</p></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/acquisition_relationship.html">acquisition_relationship</a></td>
+				  <td class="detail" align="right">0</td>
+				  <td class="detail" align="right">3</td>
+				  <td class="detail" align="right">6</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"><p>Multiple monochrome images may be merged to form a multi-color image. Red-green images of 2-channel hybridizations are an example of this.</p></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/acquisitionprop.html">acquisitionprop</a></td>
+				  <td class="detail" align="right">0</td>
+				  <td class="detail" align="right">2</td>
+				  <td class="detail" align="right">5</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"><p>Parameters associated with image acquisition.</p></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/arraydesign.html">arraydesign</a></td>
+				  <td class="detail" align="right">3</td>
+				  <td class="detail" align="right">5</td>
+				  <td class="detail" align="right">18</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"><p>General properties about an array. An array is a template used to generate physical slides, etc. It contains layout information, as well as global array properties, such as material (glass, nylon) and spot dimensions (in rows/columns).</p></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/arraydesignprop.html">arraydesignprop</a></td>
+				  <td class="detail" align="right">0</td>
+				  <td class="detail" align="right">2</td>
+				  <td class="detail" align="right">5</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"><p>Extra array design properties that are not accounted for in arraydesign.</p></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/assay.html">assay</a></td>
+				  <td class="detail" align="right">7</td>
+				  <td class="detail" align="right">4</td>
+				  <td class="detail" align="right">10</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"><p>An assay consists of a physical instance of an array, combined with the conditions used to create the array (protocols, technician information). The assay can be thought of as a hybridization.</p></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/assay_biomaterial.html">assay_biomaterial</a></td>
+				  <td class="detail" align="right">0</td>
+				  <td class="detail" align="right">3</td>
+				  <td class="detail" align="right">5</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"><p>A biomaterial can be hybridized many times (technical replicates), or combined with other biomaterials in a single hybridization (for two-channel arrays).</p></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/assay_project.html">assay_project</a></td>
+				  <td class="detail" align="right">0</td>
+				  <td class="detail" align="right">2</td>
+				  <td class="detail" align="right">3</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"><p>Link assays to projects.</p></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/assayprop.html">assayprop</a></td>
+				  <td class="detail" align="right">0</td>
+				  <td class="detail" align="right">2</td>
+				  <td class="detail" align="right">5</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"><p>Extra assay properties that are not accounted for in assay.</p></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/biomaterial.html">biomaterial</a></td>
+				  <td class="detail" align="right">7</td>
+				  <td class="detail" align="right">3</td>
+				  <td class="detail" align="right">6</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"><p>A biomaterial represents the MAGE concept of BioSource, BioSample, and LabeledExtract. It is essentially some biological material (tissue, cells, serum) that may have been processed. Processed biomaterials should be traceable back to raw biomaterials via the biomaterialrelationship table.</p></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/biomaterial_dbxref.html">biomaterial_dbxref</a></td>
+				  <td class="detail" align="right">0</td>
+				  <td class="detail" align="right">2</td>
+				  <td class="detail" align="right">3</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/biomaterial_relationship.html">biomaterial_relationship</a></td>
+				  <td class="detail" align="right">0</td>
+				  <td class="detail" align="right">3</td>
+				  <td class="detail" align="right">4</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"><p>Relate biomaterials to one another. This is a way to track a series of treatments or material splits/merges, for instance.</p></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/biomaterial_treatment.html">biomaterial_treatment</a></td>
+				  <td class="detail" align="right">0</td>
+				  <td class="detail" align="right">3</td>
+				  <td class="detail" align="right">6</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"><p>Link biomaterials to treatments. Treatments have an order of operations (rank), and associated measurements (unittype_id, value).</p></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/biomaterialprop.html">biomaterialprop</a></td>
+				  <td class="detail" align="right">0</td>
+				  <td class="detail" align="right">2</td>
+				  <td class="detail" align="right">5</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"><p>Extra biomaterial properties that are not accounted for in biomaterial.</p></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/channel.html">channel</a></td>
+				  <td class="detail" align="right">2</td>
+				  <td class="detail" align="right">0</td>
+				  <td class="detail" align="right">3</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"><p>Different array platforms can record signals from one or more channels (cDNA arrays typically use two CCD, but Affymetrix uses only one).</p></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/control.html">control</a></td>
+				  <td class="detail" align="right">0</td>
+				  <td class="detail" align="right">3</td>
+				  <td class="detail" align="right">8</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/element.html">element</a></td>
+				  <td class="detail" align="right">3</td>
+				  <td class="detail" align="right">4</td>
+				  <td class="detail" align="right">5</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"><p>Represents a feature of the array. This is typically a region of the array coated or bound to DNA.</p></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/element_relationship.html">element_relationship</a></td>
+				  <td class="detail" align="right">0</td>
+				  <td class="detail" align="right">3</td>
+				  <td class="detail" align="right">6</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"><p>Sometimes we want to combine measurements from multiple elements to get a composite value. Affymetrix combines many probes to form a probeset measurement, for instance.</p></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/elementresult.html">elementresult</a></td>
+				  <td class="detail" align="right">2</td>
+				  <td class="detail" align="right">2</td>
+				  <td class="detail" align="right">4</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"><p>An element on an array produces a measurement when hybridized to a biomaterial (traceable through quantification_id). This is the base data from which tables that actually contain data inherit.</p></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/elementresult_relationship.html">elementresult_relationship</a></td>
+				  <td class="detail" align="right">0</td>
+				  <td class="detail" align="right">3</td>
+				  <td class="detail" align="right">6</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"><p>Sometimes we want to combine measurements from multiple elements to get a composite value. Affymetrix combines many probes to form a probeset measurement, for instance.</p></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/magedocumentation.html">magedocumentation</a></td>
+				  <td class="detail" align="right">0</td>
+				  <td class="detail" align="right">2</td>
+				  <td class="detail" align="right">5</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/mageml.html">mageml</a></td>
+				  <td class="detail" align="right">1</td>
+				  <td class="detail" align="right">0</td>
+				  <td class="detail" align="right">3</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"><p>This table is for storing extra bits of MAGEml in a denormalized form. More normalization would require many more tables.</p></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/protocol.html">protocol</a></td>
+				  <td class="detail" align="right">6</td>
+				  <td class="detail" align="right">3</td>
+				  <td class="detail" align="right">9</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"><p>Procedural notes on how data was prepared and processed.</p></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/protocolparam.html">protocolparam</a></td>
+				  <td class="detail" align="right">0</td>
+				  <td class="detail" align="right">3</td>
+				  <td class="detail" align="right">7</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"><p>Parameters related to a protocol. For example, if the protocol is a soak, this might include attributes of bath temperature and duration.</p></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/quantification.html">quantification</a></td>
+				  <td class="detail" align="right">4</td>
+				  <td class="detail" align="right">4</td>
+				  <td class="detail" align="right">8</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"><p>Quantification is the transformation of an image acquisition to numeric data. This typically involves statistical procedures.</p></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/quantification_relationship.html">quantification_relationship</a></td>
+				  <td class="detail" align="right">0</td>
+				  <td class="detail" align="right">3</td>
+				  <td class="detail" align="right">4</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"><p>There may be multiple rounds of quantification, this allows us to keep an audit trail of what values went where.</p></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/quantificationprop.html">quantificationprop</a></td>
+				  <td class="detail" align="right">0</td>
+				  <td class="detail" align="right">2</td>
+				  <td class="detail" align="right">5</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"><p>Extra quantification properties that are not accounted for in quantification.</p></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/study.html">study</a></td>
+				  <td class="detail" align="right">3</td>
+				  <td class="detail" align="right">3</td>
+				  <td class="detail" align="right">6</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/study_assay.html">study_assay</a></td>
+				  <td class="detail" align="right">0</td>
+				  <td class="detail" align="right">2</td>
+				  <td class="detail" align="right">3</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/studydesign.html">studydesign</a></td>
+				  <td class="detail" align="right">2</td>
+				  <td class="detail" align="right">1</td>
+				  <td class="detail" align="right">3</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/studydesignprop.html">studydesignprop</a></td>
+				  <td class="detail" align="right">0</td>
+				  <td class="detail" align="right">2</td>
+				  <td class="detail" align="right">5</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/studyfactor.html">studyfactor</a></td>
+				  <td class="detail" align="right">1</td>
+				  <td class="detail" align="right">2</td>
+				  <td class="detail" align="right">5</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/studyfactorvalue.html">studyfactorvalue</a></td>
+				  <td class="detail" align="right">0</td>
+				  <td class="detail" align="right">2</td>
+				  <td class="detail" align="right">6</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/studyprop.html">studyprop</a></td>
+				  <td class="detail" align="right">1</td>
+				  <td class="detail" align="right">2</td>
+				  <td class="detail" align="right">5</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/studyprop_feature.html">studyprop_feature</a></td>
+				  <td class="detail" align="right">0</td>
+				  <td class="detail" align="right">3</td>
+				  <td class="detail" align="right">4</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"></td>
+				  </tr>
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/treatment.html">treatment</a></td>
+				  <td class="detail" align="right">1</td>
+				  <td class="detail" align="right">3</td>
+				  <td class="detail" align="right">6</td>
+				  <td class="detail" align="right">Table</td>
+				  <td class="comment detail" style="display: table-cell;"><p>A biomaterial may undergo multiple treatments. Examples of treatments: apoxia, fluorophore and biotin labeling.</p></td>
+				  </tr>
+				  			</table>
+            </div>
+            <!-- /.box-body -->
+          </div>			
+      </section>
+      <!-- /.content -->
+	  <script>
+          var config = {
+	          pagination: true
+          }
+	  </script>    
+  </div>
+  <!-- /.content-wrapper -->
+  <footer class="main-footer">
+    <div>
+      <div class="pull-right hidden-xs">
+        <a href="https://github.com/schemaspy/schemaspy" title="GitHub for SchemaSpy"><i class="fa fa-github-square fa-2x"></i></a>
+        <a href="http://stackoverflow.com/questions/tagged/schemaspy" title="StackOverflow for SchemaSpy"><i class="fa fa-stack-overflow fa-2x"></i></a>
+      </div>
+      <strong>Generated by <a href="http://schemaspy.org/" class="logo-text"><i class="fa fa-database"></i> SchemaSpy @project.version@</a></strong>
+    </div>
+    <!-- /.container -->
+  </footer>
+</div>
+<!-- ./wrapper -->
+
+<!-- jQuery 2.2.3 -->
+<script src="bower/admin-lte/plugins/jQuery/jquery-2.2.3.min.js"></script>
+<script src="bower/admin-lte/plugins/jQueryUI/jquery-ui.min.js"></script>
+<!-- Bootstrap 3.3.5 -->
+<script src="bower/admin-lte/bootstrap/js/bootstrap.min.js"></script>
+<!-- DataTables -->
+<script src="bower/datatables.net/jquery.dataTables.min.js"></script>
+<script src="bower/datatables.net-bs/js/dataTables.bootstrap.min.js"></script>
+<script src="bower/datatables.net-buttons/dataTables.buttons.min.js"></script>
+<script src="bower/datatables.net-buttons-bs/js/buttons.bootstrap.min.js"></script>
+<script src="bower/datatables.net-buttons/buttons.html5.min.js"></script>
+<script src="bower/datatables.net-buttons/buttons.print.min.js"></script>
+<script src="bower/datatables.net-buttons/buttons.colVis.min.js"></script>
+
+<!-- SlimScroll -->
+<script src="bower/admin-lte/plugins/slimScroll/jquery.slimscroll.min.js"></script>
+<!-- FastClick -->
+<script src="bower/admin-lte/plugins/fastclick/fastclick.js"></script>
+<!-- Salvattore -->
+<script src="bower/salvattore/salvattore.min.js"></script>
+<!-- AnchorJS -->
+<script src="bower/anchor-js/anchor.min.js"></script>
+<!-- CodeMirror -->
+<script src="bower/codemirror/codemirror.js"></script>
+<script src="bower/codemirror/sql.js"></script>
+<!-- AdminLTE App -->
+<script src="bower/admin-lte/dist/js/app.min.js"></script>
+<script src="main.js"></script>
+<script src="schemaSpy.js"></script>
+</body>
+</html>
