@@ -44,7 +44,7 @@ Once Flyway is configured properly, running ``flyway info`` should report a conn
     | Category  | Version | Description           | Type     | Installed On        | State    |
     +-----------+---------+-----------------------+----------+---------------------+----------+
     |           | 1       |  Flyway Baseline      | BASELINE | 2018-12-20 14:31:32 | Baseline |
-    | Versioned | 1.1     | try1                  | SQL      |                     | Pending  |
+    | Versioned | 1.3.3.001 | add stock biomat table | SQL      |                     | Pending  |
     +-----------+---------+-----------------------+----------+---------------------+----------+
 
 .. note::
