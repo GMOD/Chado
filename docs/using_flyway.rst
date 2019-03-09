@@ -29,7 +29,7 @@ First, follow the `instructions for installing Flyway <https://flywaydb.org/gets
   flyway.validateOnMigrate=false
 
 
-Once Flyway is configured properly, running ``flyway info`` should report a connected database.  The first step is to run ``flyway baseline``.  This tells Flyway what version of Chado to start at.  Chado switched to Flyway prior to ``1.4``, so specifying ``flyway baseline 1.3``, or just ``flyway baseline`` (``1.0``) should be appropriate for your pre-existing database.  Now, running ``flyway info`` should list all of the migrations available to your database with their state as **Pending**.
+Once Flyway is configured properly, running ``flyway info`` should report a connected database.  The first step is to run ``flyway baseline``.  This tells Flyway what version of Chado to start at.  Chado switched to Flyway prior to ``1.4``, so specifying ``flyway baselineVersion=1.3 baseline``, or just ``flyway baseline`` (defaults to ``1.0``) should be appropriate for your pre-existing database.  Now, running ``flyway info`` should list all of the migrations available to your database with their state as **Pending**.
 
 
 .. code-block:: bash
