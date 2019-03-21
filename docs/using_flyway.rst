@@ -29,7 +29,7 @@ First, follow the `instructions for installing Flyway <https://flywaydb.org/gets
 
     For managing multiple development Chado databases on a single machine, we recommend placing your application-specific ``flyway.conf`` in the application root directory and then running Flyway commands from there.
 
-Here is an example configuration file where the PostgreSQL server is on the same machine as Flyway and Chado is installed inside a database named `drupal` and a schema named `chado` (a typical arrangement for a Tripal-installed instance of Chado):
+Here is an example configuration file where the PostgreSQL server is on the same machine as Flyway (i.e. localhost) and Chado is installed inside a database named ``drupal`` and a schema named ``chado`` (a typical arrangement for a Tripal-installed instance of Chado):
 
 .. code-block:: bash
 
@@ -40,7 +40,7 @@ Here is an example configuration file where the PostgreSQL server is on the same
   flyway.locations=filesystem:/path/to/Chado/chado/migrations
   flyway.validateOnMigrate=false
 
-For your setup, replace 'drupal' in the `flyway.url` setting with the name of the database where Chado is installed, and change the `flyway.schemas` setting to the schema where Chado is installed.  If Chado was installed using the Perl-based installer this will be `public`.
+For your setup, replace ``drupal`` in the ``flyway.url`` setting with the name of the database where Chado is installed, and change the ``flyway.schemas`` setting to the schema where Chado is installed.  If Chado was installed using the Perl-based installer this will be ``public``.
 
 Once Flyway is configured properly, running ``flyway info`` should report a connected database.  The first step is to run ``flyway baseline``.  This tells Flyway what version of Chado to start at.  Chado switched to Flyway prior to ``1.4``, so specifying ``flyway baselineVersion=1.3 baseline``, or just ``flyway baseline`` (defaults to ``1.0``) should be appropriate for your pre-existing database.  Now, running ``flyway info`` should list all of the migrations available to your database with their state as **Pending**.
 
