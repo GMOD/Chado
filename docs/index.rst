@@ -14,11 +14,12 @@ Chado is a relational database schema that underlies many GMOD installations. It
   :caption: Contents:
 
   installation
+  using_flyway
   modules
   best_practices
+  schema_definition
+  contributing
 
-
-`API <_static/schemaspy_integration/index.html>`_
 
 Mailing List
 ============

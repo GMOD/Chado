@@ -10,9 +10,12 @@ env:
   global:
     - GH_REF: https://github.com/GMOD/Chado.git
 
-addons:
-  postgresql: "9.6"
-
+matrix:
+  include:
+    - addons:
+        postgresql: 9.4
+    - addons:
+        postgresql: 9.6
 script:
   - psql -U postgres -d postgres -q -a -f ./chado/schemas/1.31/default_schema.sql > log.txt
   - export HOST_IP_ADDRESS="$(/sbin/ip route|awk '/default/ { print $3 }')"
@@ -34,21 +37,12 @@ after_success:
   - rm -rf docs/_static/schemaspy_integration
   - mv chado-docs docs/_static/schemaspy_integration
 
-# I was struggling with pushing to GH via a vanilla script
-# deploy:
-#   - provider: script
-#     script: bash ./deploy.sh
-#     skip_cleanup: true
-#     on:
-#       branch: integrate_schemaspy
-#       #when finished should run on master only, for now, integrate_schemaspy to test
-
-
 deploy:
   provider: pages
   skip-cleanup: true
   github-token: $GITHUB_TOKEN
   keep-history: true
   on:
-    branch: integrate_schemaspy
+    branch: 1.4
+    #change above to master once we're off 1.4 dev branch
   target-branch: rtd

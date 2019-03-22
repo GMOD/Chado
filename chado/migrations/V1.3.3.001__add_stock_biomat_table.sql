@@ -7,8 +7,8 @@ CREATE TABLE IF NOT EXISTS biomaterial_project (
     FOREIGN KEY (project_id) REFERENCES project(project_id) ON DELETE CASCADE
 );
 
-CREATE INDEX IF NOT EXISTS biomaterial_project_idx1 ON biomaterial_project USING btree (biomaterial_id);
-CREATE INDEX IF NOT EXISTS  biomaterial_project_idx2 ON biomaterial_project USING btree (project_id);
+CREATE INDEX  biomaterial_project_idx1 ON biomaterial_project USING btree (biomaterial_id);
+CREATE INDEX  biomaterial_project_idx2 ON biomaterial_project USING btree (project_id);
 
 COMMENT ON TABLE project_stock IS 'This table is intended associate records in the biomaterial table with a project.';
 
@@ -25,7 +25,7 @@ CREATE TABLE IF NOT EXISTS stock_biomaterial (
     FOREIGN KEY (stock_id) REFERENCES stock(stock_id) ON DELETE CASCADE
 );
 
-CREATE INDEX IF NOT EXISTS stock_biomaterial_idx1 ON stock_biomaterial USING btree (biomaterial_id);
-CREATE INDEX IF NOT EXISTS stock_biomaterial_idx2 ON stock_biomaterial USING btree (stock_id);
+CREATE INDEX  stock_biomaterial_idx1 ON stock_biomaterial USING btree (biomaterial_id);
+CREATE INDEX  stock_biomaterial_idx2 ON stock_biomaterial USING btree (stock_id);
 
 COMMENT ON TABLE stock_biomaterial IS 'Associates records in the biomaterial table with a stock.';
