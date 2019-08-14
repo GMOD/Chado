@@ -1,7 +1,7 @@
 Chado Best Practices
 =======================
 
-Chado is a generic `schema <http://gmod.org/wiki/Glossary#Database_Schema>`_, which means anyone writing software to query or write to chado (either `middleware <http://gmod.org/wiki/GMOD_Middleware>`_ or applications) should be aware of the different ways in which data can be  stored. We want to strike a nice balance between ﬂexibility and extensibility on the one hand, and strong typing and rigor on the other. We want to avoid the situation we have with GenBank entries where there are a dozen ways of representing a gene model, but we need to be able to cope with the constant surprises biology throws at us in an attempt to confound our nice computable models. This page on Best Practices represents the collective wisdom of those who use
+Chado is a generic `schema <http://gmod.org/wiki/Glossary#Database_Schema>`_, which means anyone writing software to query or write to Chado (either `middleware <http://gmod.org/wiki/GMOD_Middleware>`_ or applications) should be aware of the different ways in which data can be  stored. We want to strike a nice balance between ﬂexibility and extensibility on the one hand, and strong typing and rigor on the other. We want to avoid the situation we have with GenBank entries where there are a dozen ways of representing a gene model, but we need to be able to cope with the constant surprises biology throws at us in an attempt to confound our nice computable models. This page on Best Practices represents the collective wisdom of those who use
 Chado on a daily basis and are also familiar with its theoretical underpinnings.
 
 See also:
