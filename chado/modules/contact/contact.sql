@@ -34,17 +34,22 @@ CREATE TABLE contactprop (
     type_id bigint NOT NULL,
     value text,
     rank integer DEFAULT 0 NOT NULL,
+    cvalue_id bigint,
     CONSTRAINT contactprop_c1 UNIQUE (contact_id, type_id, rank),    
     FOREIGN KEY (contact_id) REFERENCES contact(contact_id) ON DELETE CASCADE,
-    FOREIGN KEY (type_id) REFERENCES cvterm(cvterm_id) ON DELETE CASCADE
+    FOREIGN KEY (type_id) REFERENCES cvterm(cvterm_id) ON DELETE CASCADE,
+    FOREIGN KEY (cvalue_id) REFERENCES cvterm (cvterm_id) ON DELETE SET NULL
 );
 
 CREATE INDEX contactprop_idx1 ON contactprop USING btree (contact_id);
 CREATE INDEX contactprop_idx2 ON contactprop USING btree (type_id);
+CREATE INDEX contactprop_idx3 ON contactprop USING btree (cvalue_id);
 
 COMMENT ON TABLE contactprop IS 'A contact can have any number of slot-value property 
 tags attached to it. This is an alternative to hardcoding a list of columns in the 
 relational schema, and is completely extensible.';
+
+COMMENT ON COLUMN contactprop.cvalue_id IS 'The value of the property if that value should be the name of a controlled vocabulary term.  It is preferred that a property either use the value or cvalue_id column but not both.  For example, if the property type is "color" then the cvalue_id could be a term named "green".';
 
 
 -- ================================================

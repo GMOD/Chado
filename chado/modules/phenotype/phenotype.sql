@@ -98,9 +98,14 @@ create table phenotypeprop (
        foreign key (type_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
        value text null,
        rank int not null default 0,
+       cvalue_id bigint,
+  FOREIGN KEY (cvalue_id) REFERENCES cvterm (cvterm_id) ON DELETE SET NULL,
        constraint phenotypeprop_c1 unique (phenotype_id,type_id,rank)
 );
 create index phenotypeprop_idx1 on phenotypeprop (phenotype_id);
 create index phenotypeprop_idx2 on phenotypeprop (type_id);
+create index phenotypeprop_idx3 on phenotypeprop (cvalue_id);
 
 COMMENT ON TABLE phenotypeprop IS 'A phenotype can have any number of slot-value property tags attached to it. This is an alternative to hardcoding a list of columns in the relational schema, and is completely extensible. There is a unique constraint, phenotypeprop_c1, for the combination of phenotype_id, rank, and type_id. Multivalued property-value pairs must be differentiated by rank.';
+
+COMMENT ON COLUMN phenotypeprop.cvalue_id IS 'The value of the property if that value should be the name of a controlled vocabulary term.  It is preferred that a property either use the value or cvalue_id column but not both.  For example, if the property type is "color" then the cvalue_id could be a term named "green".';

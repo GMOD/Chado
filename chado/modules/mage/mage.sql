@@ -168,12 +168,16 @@ create table arraydesignprop (
     foreign key (type_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
     value text null,
     rank int not null default 0,
+    cvalue_id bigint,
+  FOREIGN KEY (cvalue_id) REFERENCES cvterm (cvterm_id) ON DELETE SET NULL,
     constraint arraydesignprop_c1 unique (arraydesign_id,type_id,rank)
 );
 create index arraydesignprop_idx1 on arraydesignprop (arraydesign_id);
 create index arraydesignprop_idx2 on arraydesignprop (type_id);
+create index arraydesignprop_idx3 on arraydesignprop (cvalue_id);
 
 COMMENT ON TABLE arraydesignprop IS 'Extra array design properties that are not accounted for in arraydesign.';
+COMMENT ON COLUMN arraydesignprop.cvalue_id IS 'The value of the property if that value should be the name of a controlled vocabulary term.  It is preferred that a property either use the value or cvalue_id column but not both.  For example, if the property type is "color" then the cvalue_id could be a term named "green".';
 
 -- ================================================
 -- TABLE: assay
@@ -219,12 +223,18 @@ create table assayprop (
     foreign key (type_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
     value text null,
     rank int not null default 0,
+    cvalue_id bigint,
+  FOREIGN KEY (cvalue_id) REFERENCES cvterm (cvterm_id) ON DELETE SET NULL,
     constraint assayprop_c1 unique (assay_id,type_id,rank)
 );
 create index assayprop_idx1 on assayprop (assay_id);
 create index assayprop_idx2 on assayprop (type_id);
+create index assayprop_idx3 on assayprop (cvalue_id);
 
 COMMENT ON TABLE assayprop IS 'Extra assay properties that are not accounted for in assay.';
+
+COMMENT ON COLUMN assayprop.cvalue_id IS 'The value of the property if that value should be the name of a controlled vocabulary term.  It is preferred that a property either use the value or cvalue_id column but not both.  For example, if the property type is "color" then the cvalue_id could be a term named "green".';
+
 
 -- ================================================
 -- TABLE: assay_project
@@ -301,12 +311,17 @@ create table biomaterialprop (
     foreign key (type_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
     value text null,
     rank int not null default 0,
+    cvalue_id bigint,
+  FOREIGN KEY (cvalue_id) REFERENCES cvterm (cvterm_id) ON DELETE SET NULL,
     constraint biomaterialprop_c1 unique (biomaterial_id,type_id,rank)
 );
 create index biomaterialprop_idx1 on biomaterialprop (biomaterial_id);
 create index biomaterialprop_idx2 on biomaterialprop (type_id);
+create index biomaterialprop_idx3 on biomaterialprop (cvalue_id);
 
 COMMENT ON TABLE biomaterialprop IS 'Extra biomaterial properties that are not accounted for in biomaterial.';
+COMMENT ON COLUMN biomaterialprop.cvalue_id IS 'The value of the property if that value should be the name of a controlled vocabulary term.  It is preferred that a property either use the value or cvalue_id column but not both.  For example, if the property type is "color" then the cvalue_id could be a term named "green".';
+
 
 -- ================================================
 -- TABLE: biomaterial_dbxref
@@ -429,12 +444,16 @@ create table acquisitionprop (
     foreign key (type_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
     value text null,
     rank int not null default 0,
+    cvalue_id bigint,
+  FOREIGN KEY (cvalue_id) REFERENCES cvterm (cvterm_id) ON DELETE SET NULL,
     constraint acquisitionprop_c1 unique (acquisition_id,type_id,rank)
 );
 create index acquisitionprop_idx1 on acquisitionprop (acquisition_id);
 create index acquisitionprop_idx2 on acquisitionprop (type_id);
+CREATE INDEX acquisitionprop_idx3 ON acquisitionprop (cvalue_id);
 
 COMMENT ON TABLE acquisitionprop IS 'Parameters associated with image acquisition.';
+COMMENT ON COLUMN acquisitionprop.cvalue_id IS 'The value of the property if that value should be the name of a controlled vocabulary term.  It is preferred that a property either use the value or cvalue_id column but not both.  For example, if the property type is "color" then the cvalue_id could be a term named "green".';
 
 -- ================================================
 -- TABLE: acquisition_relationship
@@ -499,12 +518,17 @@ create table quantificationprop (
     foreign key (type_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
     value text null,
     rank int not null default 0,
+    cvalue_id bigint,
+  FOREIGN KEY (cvalue_id) REFERENCES cvterm (cvterm_id) ON DELETE SET NULL,
     constraint quantificationprop_c1 unique (quantification_id,type_id,rank)
 );
 create index quantificationprop_idx1 on quantificationprop (quantification_id);
 create index quantificationprop_idx2 on quantificationprop (type_id);
+create index quantificationprop_idx3 on quantificationprop (cvalue_id);
 
 COMMENT ON TABLE quantificationprop IS 'Extra quantification properties that are not accounted for in quantification.';
+COMMENT ON COLUMN quantificationprop.cvalue_id IS 'The value of the property if that value should be the name of a controlled vocabulary term.  It is preferred that a property either use the value or cvalue_id column but not both.  For example, if the property type is "color" then the cvalue_id could be a term named "green".';
+
 
 -- ================================================
 -- TABLE: quantification_relationship
@@ -713,12 +737,16 @@ create table studydesignprop (
     foreign key (type_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
     value text null,
     rank int not null default 0,
+    cvalue_id bigint,
+  FOREIGN KEY (cvalue_id) REFERENCES cvterm (cvterm_id) ON DELETE SET NULL,
     constraint studydesignprop_c1 unique (studydesign_id,type_id,rank)
 );
 create index studydesignprop_idx1 on studydesignprop (studydesign_id);
 create index studydesignprop_idx2 on studydesignprop (type_id);
+create index studydesignprop_idx3 on studydesignprop (cvalue_id);
 
 COMMENT ON TABLE studydesignprop IS NULL;
+COMMENT ON COLUMN studydesignprop.cvalue_id IS 'The value of the property if that value should be the name of a controlled vocabulary term.  It is preferred that a property either use the value or cvalue_id column but not both.  For example, if the property type is "color" then the cvalue_id could be a term named "green".';
 
 -- ================================================
 -- TABLE: studyfactor
@@ -799,12 +827,16 @@ create table studyprop (
         foreign key (type_id) references cvterm (cvterm_id) on delete cascade,  
     value text null,
     rank int not null default 0,
+    cvalue_id bigint,
+  FOREIGN KEY (cvalue_id) REFERENCES cvterm (cvterm_id) ON DELETE SET NULL,
     unique (study_id,type_id,rank)
 );
 
 create index studyprop_idx1 on studyprop (study_id);
 create index studyprop_idx2 on studyprop (type_id);
+create index studyprop_idx3 on studyprop (cvalue_id);
 
+COMMENT ON COLUMN studyprop.cvalue_id IS 'The value of the property if that value should be the name of a controlled vocabulary term.  It is preferred that a property either use the value or cvalue_id column but not both.  For example, if the property type is "color" then the cvalue_id could be a term named "green".';
 
 --studyprop_feature
 CREATE TABLE studyprop_feature (

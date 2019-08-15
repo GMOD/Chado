@@ -129,13 +129,17 @@ create table pubprop (
     foreign key (type_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
     value text not null,
     rank integer,
-
+    cvalue_id bigint,
+    FOREIGN KEY (cvalue_id) REFERENCES cvterm (cvterm_id) ON DELETE SET NULL,
     constraint pubprop_c1 unique (pub_id,type_id,rank)
 );
 create index pubprop_idx1 on pubprop (pub_id);
 create index pubprop_idx2 on pubprop (type_id);
+CREATE INDEX pubprop_idx3 ON pubprop (cvalue_id);
 
 COMMENT ON TABLE pubprop IS 'Property-value pairs for a pub. Follows standard chado pattern.';
+
+COMMENT ON COLUMN pubprop.cvalue_id IS 'The value of the property if that value should be the name of a controlled vocabulary term.  It is preferred that a property either use the value or cvalue_id column but not both.  For example, if the property type is "color" then the cvalue_id could be a term named "green".';
 
 -- ================================================
 -- TABLE: pubauthor_contact
