@@ -1,7 +1,7 @@
 language: java
 
 jdk:
-  - oraclejdk9
+  - openjdk11
 
 services:
   - postgresql
@@ -13,10 +13,6 @@ matrix:
     - addons:
         postgresql: 9.6
 script:
-  # Trying to workaround an SSL cert issue with travis builds on oraclejdk9
-  # see https://github.com/travis-ci/travis-ci/issues/9368
-  - rm "${JAVA_HOME}/lib/security/cacerts"
-  - ln -s /etc/ssl/certs/java/cacerts "${JAVA_HOME}/lib/security/cacerts"
   - psql -U postgres -d postgres -q -a -f ./schemas/1.31/default_schema.sql > log.txt
   - export HOST_IP_ADDRESS="$(/sbin/ip route|awk '/default/ { print $3 }')"
   - gradle build
