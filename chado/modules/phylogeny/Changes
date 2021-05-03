@@ -1,8 +1,0 @@
-
-2005-07-25      [cjm] - removed phylonode.phylonode_idx - not required
-                      - added examples
-                      - removed NOT NULL from phylonode.type_id
-                      - removed NOT NULL from phylonode.feature_id
-                      - removed NOT NULL from phylotree.type_id
-                      - added functions
-                

@@ -1,9 +1,0 @@
-DECLARE FUNCTION store_analysis (program VARCHAR,
-                                 programversion VARCHAR,
-                                 sourcename VARCHAR)
- RETURNS INT;
-
-COMMENT ON FUNCTION store_analysis(VARCHAR,VARCHAR,VARCHAR) IS
-'Updates or inserts an analysis';
-
-

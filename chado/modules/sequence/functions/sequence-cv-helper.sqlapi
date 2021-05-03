@@ -1,7 +1,0 @@
-COMMENT ON FUNCTION get_cv_id_for_feature() IS 'return cv_id for SO';
-COMMENT ON FUNCTION get_cv_id_for_featureprop() IS 'return cv_id for SOFP';
-COMMENT ON FUNCTION get_cv_id_for_feature_relationship() IS 'return cv_id for OBO_REL';
-
-COMMENT ON FUNCTION get_feature_type_id(VARCHAR) IS 'gets cvterm_id for a feature type by name - eg exon';
-COMMENT ON FUNCTION get_featureprop_type_id(VARCHAR) IS 'gets cvterm_id for a featureprop type by name - eg anticodon';
-COMMENT ON FUNCTION get_feature_relationship_type_id(VARCHAR) IS 'gets cvterm_id for a feature_relationship type by name - eg part_of';

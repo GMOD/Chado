@@ -1,4 +1,0 @@
-sequence/gff-bridge/sequence-gff-funcs.pgsql
-sequence/functions/feature_subalignments.plpgsql
-sequence/functions/get_sub_feature_ids.plpgsql
-sequence/apollo-bridge/apollo-triggers.sql
