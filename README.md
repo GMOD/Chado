@@ -4,6 +4,20 @@ Chado is a modular schema for handling all kinds of biological
 data.  It is intended to be used as both a primary datastore schema as
 well as a warehouse-style schema.
 
+##Particpation in a study of open source software
+
+Please note that this repository is participating in a study into sustainability
+ of open source projects. Data will be gathered about this repository for
+ approximately the next 12 months, starting from [insert date here].
+
+Data collected will include number of contributors, number of PRs, time taken to
+ close/merge these PRs, and issues closed.
+
+For more information, please visit
+[our informational page](https://sustainable-open-science-and-software.github.io/) or download our [participant information sheet](https://sustainable-open-science-and-software.github.io/assets/PIS_sustainable_software.pdf).
+
+More info: https://sustainable-open-science-and-software.github.io/readme_notice
+
 ## Introduction
 
 Chado was originally conceived as the next generation Flybase
