@@ -4,7 +4,7 @@ Chado is a modular schema for handling all kinds of biological
 data.  It is intended to be used as both a primary datastore schema as
 well as a warehouse-style schema.
 
-##Particpation in a study of open source software
+## Particpation in a study of open source software
 
 Please note that this repository is participating in a study into sustainability
  of open source projects. Data will be gathered about this repository for
