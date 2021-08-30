@@ -4,7 +4,7 @@ create table db_relationship (
     subject_id bigint not null,
     object_id bigint not null,
     primary key (db_relationship_id),
-    foreign key (type_id) references db (db_id) on delete cascade INITIALLY DEFERRED,
+    foreign key (type_id) references db (cvterm_id) on delete cascade INITIALLY DEFERRED,
     foreign key (subject_id) references db (db_id) on delete cascade INITIALLY DEFERRED,
     foreign key (object_id) references db (db_id) on delete cascade INITIALLY DEFERRED,
     constraint db_relationship_c1 unique (subject_id,object_id,type_id)
