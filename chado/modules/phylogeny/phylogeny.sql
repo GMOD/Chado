@@ -72,10 +72,13 @@ create table phylotreeprop (
   primary key (phylotreeprop_id),
   foreign key (phylotree_id) references phylotree (phylotree_id) on delete cascade INITIALLY DEFERRED,
   foreign key (type_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
+  cvalue_id bigint,
+  FOREIGN KEY (cvalue_id) REFERENCES cvterm (cvterm_id) ON DELETE SET NULL,
   constraint phylotreeprop_c1 unique (phylotree_id,type_id,rank)
 );
 create index phylotreeprop_idx1 on phylotreeprop (phylotree_id);
 create index phylotreeprop_idx2 on phylotreeprop (type_id);
+create index phylotreeprop_idx3 on phylotreeprop (cvalue_id);
 
 COMMENT ON TABLE phylotreeprop IS 'A phylotree can have any number of slot-value property 
 tags attached to it. This is an alternative to hardcoding a list of columns in the 
@@ -93,6 +96,9 @@ phylotree can have multiple values for any particular property type
 these are ordered in a list using rank, counting from zero. For
 properties that are single-valued rather than multi-valued, the
 default 0 value should be used';
+
+COMMENT ON COLUMN phylotreeprop.cvalue_id IS 'The value of the property if that value should be the name of a controlled vocabulary term.  It is preferred that a property either use the value or cvalue_id column but not both.  For example, if the property type is "color" then the cvalue_id could be a term named "green".';
+
 
 COMMENT ON INDEX phylotreeprop_c1 IS 'For any one phylotree, multivalued
 property-value pairs must be differentiated by rank.';
@@ -210,12 +216,18 @@ create table phylonodeprop (
 -- It is not clear how useful the rank concept is here, leave it in for now.
        rank int not null default 0,
 
+       cvalue_id bigint,
+  FOREIGN KEY (cvalue_id) REFERENCES cvterm (cvterm_id) ON DELETE SET NULL,
        unique(phylonode_id, type_id, value, rank)
 );
 create index phylonodeprop_idx1 on phylonodeprop (phylonode_id);
 create index phylonodeprop_idx2 on phylonodeprop (type_id);
+create index phylonodeprop_idx3 on phylonodeprop (cvalue_id);
 
 COMMENT ON COLUMN phylonodeprop.type_id IS 'type_id could designate phylonode hierarchy relationships, for example: species taxonomy (kingdom, order, family, genus, species), "ortholog/paralog", "fold/superfold", etc.';
+
+COMMENT ON COLUMN phylonodeprop.cvalue_id IS 'The value of the property if that value should be the name of a controlled vocabulary term.  It is preferred that a property either use the value or cvalue_id column but not both.  For example, if the property type is "color" then the cvalue_id could be a term named "green".';
+
 
 -- ================================================
 -- TABLE: phylonode_relationship

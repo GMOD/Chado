@@ -1,8 +1,48 @@
-language: generic
-  
+language: java
+
+jdk:
+  - openjdk11
+
 services:
-  - postgres
+  - postgresql
 
-run:
+env:
+  global:
+    - GH_REF: https://github.com/GMOD/Chado.git
 
-  - psql -U postgres -d postgres -a -f ./chado/schemas/1.31/default_schema.sql
+matrix:
+  include:
+    - addons:
+        postgresql: 9.4
+    - addons:
+        postgresql: 9.6
+script:
+  - psql -U postgres -d postgres -q -a -f ./chado/schemas/1.31/default_schema.sql > log.txt
+  - export HOST_IP_ADDRESS="$(/sbin/ip route|awk '/default/ { print $3 }')"
+  - gradle build
+  - gradle flywayBaseline
+  - gradle flywayInfo
+  - gradle flywayMigrate
+  - gradle flywayInfo
+
+after_success:
+# build the schemaspy documentation
+  - git checkout rtd
+  - git clone https://github.com/laceysanderson/chado-docs.git
+  - curl -L https://github.com/schemaspy/schemaspy/releases/download/v6.0.0/schemaspy-6.0.0.jar > ./schemaspy-6.0.0.jar
+  - curl https://jdbc.postgresql.org/download/postgresql-42.2.5.jar > ./postgres_driver.jar
+  - cd chado-docs
+  - ./build/build_docs.sh -d postgres -u postgres -p '' -s ../schemaspy-6.0.0.jar -g ../postgres_driver.jar -c ../
+  - cd ..
+  - rm -rf docs/_static/schemaspy_integration
+  - mv chado-docs docs/_static/schemaspy_integration
+
+deploy:
+  provider: pages
+  skip-cleanup: true
+  github-token: $GITHUB_TOKEN
+  keep-history: true
+  on:
+    branch: 1.4
+    #change above to master once we're off 1.4 dev branch
+  target-branch: rtd

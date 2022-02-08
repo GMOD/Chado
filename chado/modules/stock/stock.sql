@@ -78,16 +78,20 @@ create table stockprop (
        foreign key (type_id) references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
        value text null,
        rank int not null default 0,
+       cvalue_id bigint,
+       FOREIGN KEY (cvalue_id) REFERENCES cvterm (cvterm_id) ON DELETE SET NULL,
        constraint stockprop_c1 unique (stock_id,type_id,rank)
 );
 create index stockprop_idx1 on stockprop (stock_id);
 create index stockprop_idx2 on stockprop (type_id);
+CREATE INDEX stockprop_idx3 ON stockprop (cvalue_id);
 
 COMMENT ON TABLE stockprop IS 'A stock can have any number of
 slot-value property tags attached to it. This is an alternative to
 hardcoding a list of columns in the relational schema, and is
 completely extensible. There is a unique constraint, stockprop_c1, for
 the combination of stock_id, rank, and type_id. Multivalued property-value pairs must be differentiated by rank.';
+COMMENT ON COLUMN stockprop.cvalue_id IS 'The value of the property if that value should be the name of a controlled vocabulary term.  It is preferred that a property either use the value or cvalue_id column but not both.  For example, if the property type is "color" then the cvalue_id could be a term named "green".';
 
 
 -- ================================================
@@ -319,16 +323,19 @@ create table stockcollectionprop (
     foreign key (type_id) references cvterm (cvterm_id),
     value text null,
     rank int not null default 0,
+    cvalue_id bigint,
+    FOREIGN KEY (cvalue_id) REFERENCES cvterm (cvterm_id) ON DELETE SET NULL,
     constraint stockcollectionprop_c1 unique (stockcollection_id,type_id,rank)
 );
 create index stockcollectionprop_idx1 on stockcollectionprop (stockcollection_id);
 create index stockcollectionprop_idx2 on stockcollectionprop (type_id);
+CREATE INDEX stockcollectionprop_idx3 ON stockcollectionprop (cvalue_id);
 
 COMMENT ON TABLE stockcollectionprop IS 'The table stockcollectionprop
 contains the value of the stock collection such as website/email URLs;
 the value of the stock collection order URLs.';
 COMMENT ON COLUMN stockcollectionprop.type_id IS 'The cv for the type_id is "stockcollection property type".';
-
+COMMENT ON COLUMN stockcollectionprop.cvalue_id IS 'The value of the property if that value should be the name of a controlled vocabulary term.  It is preferred that a property either use the value or cvalue_id column but not both.  For example, if the property type is "color" then the cvalue_id could be a term named "green".';
 
 -- ================================================
 -- TABLE: stockcollection_stock

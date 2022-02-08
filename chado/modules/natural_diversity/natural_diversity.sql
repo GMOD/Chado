@@ -93,17 +93,23 @@ CREATE TABLE nd_experimentprop (
     type_id bigint NOT NULL references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED ,
     value text null,
     rank int NOT NULL default 0,
+    cvalue_id bigint,
+  FOREIGN KEY (cvalue_id) REFERENCES cvterm (cvterm_id) ON DELETE SET NULL,
     constraint nd_experimentprop_c1 unique (nd_experiment_id,type_id,rank)
 );
 
 CREATE INDEX nd_experimentprop_idx1 ON nd_experimentprop (nd_experiment_id);
 CREATE INDEX nd_experimentprop_idx2 ON nd_experimentprop (type_id);
+CREATE INDEX nd_experimentprop_idx3 ON nd_experimentprop (cvalue_id);
 
 COMMENT ON TABLE nd_experimentprop IS 'An nd_experiment can have any number of
 slot-value property tags attached to it. This is an alternative to
 hardcoding a list of columns in the relational schema, and is
 completely extensible. There is a unique constraint, stockprop_c1, for
 the combination of stock_id, rank, and type_id. Multivalued property-value pairs must be differentiated by rank.';
+
+COMMENT ON COLUMN nd_experimentprop.cvalue_id IS 'The value of the property if that value should be the name of a controlled vocabulary term.  It is preferred that a property either use the value or cvalue_id column but not both.  For example, if the property type is "color" then the cvalue_id could be a term named "green".';
+
 
 -- ================================================
 -- TABLE: nd_experiment_pub
@@ -132,10 +138,13 @@ CREATE TABLE nd_geolocationprop (
     type_id bigint NOT NULL references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
     value text null,
     rank int NOT NULL DEFAULT 0,
+    cvalue_id bigint,
+  FOREIGN KEY (cvalue_id) REFERENCES cvterm (cvterm_id) ON DELETE SET NULL,
     constraint nd_geolocationprop_c1 unique (nd_geolocation_id,type_id,rank)
 );
 CREATE INDEX nd_geolocationprop_idx1 ON nd_geolocationprop (nd_geolocation_id);
 CREATE INDEX nd_geolocationprop_idx2 ON nd_geolocationprop (type_id);
+CREATE INDEX nd_geolocationprop_idx3 ON nd_geolocationprop (cvalue_id);
 
 COMMENT ON TABLE nd_geolocationprop IS 'Property/value associations for geolocations. This table can store the properties such as location and environment';
 
@@ -144,6 +153,9 @@ COMMENT ON COLUMN nd_geolocationprop.type_id IS 'The name of the property as a r
 COMMENT ON COLUMN nd_geolocationprop.value IS 'The value of the property.';
 
 COMMENT ON COLUMN nd_geolocationprop.rank IS 'The rank of the property value, if the property has an array of values.';
+
+COMMENT ON COLUMN nd_geolocationprop.cvalue_id IS 'The value of the property if that value should be the name of a controlled vocabulary term.  It is preferred that a property either use the value or cvalue_id column but not both.  For example, if the property type is "color" then the cvalue_id could be a term named "green".';
+
 
 -- ================================================
 -- TABLE: nd_protocol
@@ -206,11 +218,14 @@ CREATE TABLE nd_protocolprop (
     type_id bigint NOT NULL references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
     value text null,
     rank int DEFAULT 0 NOT NULL,
+    cvalue_id bigint,
+  FOREIGN KEY (cvalue_id) REFERENCES cvterm (cvterm_id) ON DELETE SET NULL,
     constraint nd_protocolprop_c1 unique (nd_protocol_id,type_id,rank)
 );
 
 CREATE INDEX nd_protocolprop_idx1 ON nd_protocolprop (nd_protocol_id);
 CREATE INDEX nd_protocolprop_idx2 ON nd_protocolprop (type_id);
+CREATE INDEX nd_protocolprop_idx3 ON nd_protocolprop (cvalue_id);
 
 COMMENT ON TABLE nd_protocolprop IS 'Property/value associations for protocol.';
 
@@ -221,6 +236,9 @@ COMMENT ON COLUMN nd_protocolprop.type_id IS 'The name of the property as a refe
 COMMENT ON COLUMN nd_protocolprop.value IS 'The value of the property.';
 
 COMMENT ON COLUMN nd_protocolprop.rank IS 'The rank of the property value, if the property has an array of values.';
+
+COMMENT ON COLUMN nd_protocolprop.cvalue_id IS 'The value of the property if that value should be the name of a controlled vocabulary term.  It is preferred that a property either use the value or cvalue_id column but not both.  For example, if the property type is "color" then the cvalue_id could be a term named "green".';
+
 
 -- ================================================
 -- TABLE: nd_experiment_stock
@@ -319,11 +337,16 @@ CREATE TABLE nd_reagentprop (
     type_id bigint NOT NULL references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
     value text null,
     rank int DEFAULT 0 NOT NULL,
+    cvalue_id bigint,
+  FOREIGN KEY (cvalue_id) REFERENCES cvterm (cvterm_id) ON DELETE SET NULL,
     constraint nd_reagentprop_c1 unique (nd_reagent_id,type_id,rank)
 );
 
 CREATE INDEX nd_reagentprop_idx1 ON nd_reagentprop (nd_reagent_id);
 CREATE INDEX nd_reagentprop_idx2 ON nd_reagentprop (type_id);
+CREATE INDEX nd_reagentprop_idx3 ON nd_reagentprop (cvalue_id);
+
+COMMENT ON COLUMN nd_reagentprop.cvalue_id IS 'The value of the property if that value should be the name of a controlled vocabulary term.  It is preferred that a property either use the value or cvalue_id column but not both.  For example, if the property type is "color" then the cvalue_id could be a term named "green".';
 
 -- ================================================
 -- TABLE: nd_experiment_stockprop
@@ -335,11 +358,14 @@ CREATE TABLE nd_experiment_stockprop (
     type_id bigint NOT NULL references cvterm (cvterm_id) on delete cascade INITIALLY DEFERRED,
     value text null,
     rank int DEFAULT 0 NOT NULL,
+    cvalue_id bigint,
+  FOREIGN KEY (cvalue_id) REFERENCES cvterm (cvterm_id) ON DELETE SET NULL,
     constraint nd_experiment_stockprop_c1 unique (nd_experiment_stock_id,type_id,rank)
 );
 
 CREATE INDEX nd_experiment_stockprop_idx1 ON nd_experiment_stockprop (nd_experiment_stock_id);
 CREATE INDEX nd_experiment_stockprop_idx2 ON nd_experiment_stockprop (type_id);
+CREATE INDEX nd_experiment_stockprop_idx3 ON nd_experiment_stockprop (cvalue_id);
 
 COMMENT ON TABLE nd_experiment_stockprop IS 'Property/value associations for experiment_stocks. This table can store the properties such as treatment';
 
@@ -350,6 +376,8 @@ COMMENT ON COLUMN nd_experiment_stockprop.type_id IS 'The name of the property a
 COMMENT ON COLUMN nd_experiment_stockprop.value IS 'The value of the property.';
 
 COMMENT ON COLUMN nd_experiment_stockprop.rank IS 'The rank of the property value, if the property has an array of values.';
+
+COMMENT ON COLUMN nd_experiment_stockprop.cvalue_id IS 'The value of the property if that value should be the name of a controlled vocabulary term.  It is preferred that a property either use the value or cvalue_id column but not both.  For example, if the property type is "color" then the cvalue_id could be a term named "green".';
 
 -- ================================================
 -- TABLE: nd_experiment_stock_dbxref
