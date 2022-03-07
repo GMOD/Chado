@@ -1,4 +1,0 @@
-
-COMMENT ON FUNCTION store_db (VARCHAR) IS 'stores a db and retrieves its id';
-  
-COMMENT ON FUNCTION store_dbxref (VARCHAR,VARCHAR) IS 'stores a dbxref by db.name and accession';
