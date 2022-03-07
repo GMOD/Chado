@@ -63,6 +63,11 @@ You can search previous issues submitted to this repository and add your own her
 
 - https://github.com/GMOD/Chado/issues
 
+If you are looking for the original JavaTools + XMLTools that used to be in this repository,
+they were moved into a separate repository via [PR #100](https://github.com/GMOD/Chado/pull/100). They can now be found here:
+
+- https://github.com/GMOD/chado_tools
+
 ## Particpation in a study of open source software
 
 Please note that this repository is participating in a study into sustainability
