@@ -84,7 +84,7 @@ Please read the included [chado/INSTALL.Chado.md](./chado/INSTALL.Chado.md) docu
 install the Chado schema.
 
 ### Using the Chado Docker Image
-#### Locally building the Docker Image
+#### Locally Build the Docker Image
 To build the docker image run the following:
 ```bash
 
@@ -105,6 +105,23 @@ As a test, you can run the `flyway info` command after starting the container:
 ```bash
 flyway info
 ```
+
+You can explore the Chado tables using the `psql` command in the following way:
+
+```bash
+psql -U postgres -h localhost -d chado
+```
+You will be prompted for a password. The default password is `chadotest`
+
+##### Testing Chado
+You can test any Git branch of Chado by navigating to the Chado directory in the image and changing the branch:
+```bash
+cd Chado/chado
+git checkout <branch>
+```
+If the branch has any FlyWay migrations you can test those by running the apporopriate flyway commands.
+
+
 
 ## Chado Support
 
