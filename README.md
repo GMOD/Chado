@@ -1,8 +1,72 @@
 # Chado
 
-Chado is a modular schema for handling all kinds of biological
-data.  It is intended to be used as both a primary datastore schema as
-well as a warehouse-style schema.
+## What is Chado?
+
+- A flexible, fairly abstract schema for handling all kinds of biological data
+   - capable of representing many of the general classes of data frequently encountered in modern biology such as sequence, sequence comparisons, phenotypes, genotypes, ontologies, publications, and phylogeny
+- intended to be used as both a primary datastore schema as well as a warehouse-style schema
+- designed for use with all organisms + projects (e.g there are instances for virus, bacterial, plant + animal data)
+- Controlled vocabularies (CVs) are used throughout Chado to type primary data and metadata providing a lot of flexibility
+- originally conceived as the next generation Flybase database, combining the sequence annotation database gadfly with the Harvard and Cambridge databases
+
+## Documentation
+
+- For wiki documentation on the various modules, see http://www.gmod.org.
+- All documentation will be moving over to our ReadtheDocs: https://chado.readthedocs.io/en/rtd/
+- You can browse the full schema using SchemaSpy: https://chado.readthedocs.io/en/rtd/_static/schemaspy_integration/index.html
+
+### Citation
+
+If you use Chado in your research or integrate it into a tool you're building, please cite:
+
+> Christopher J. Mungall, David B. Emmert, The FlyBase Consortium, A Chado case study: an ontology-based modular schema for representing genome-associated biological information, Bioinformatics, Volume 23, Issue 13, July 2007, Pages i337–i346, https://doi.org/10.1093/bioinformatics/btm189
+
+## Installation
+
+Please read the included [chado/INSTALL.Chado.md](./chado/INSTALL.Chado.md) document for instructions on how to install the Chado schema.
+
+### Running the Docker Image
+
+```
+git clone https://github.com/GMOD/Chado.git
+docker build --tag=GMOD/Chado:latest ./
+docker run -it -d GMOD/Chado:latest
+```
+
+## Contributing to Chado
+
+The Chado schema is open-source and community developed! Please feel free to open an issue on this repository with any suggestions, issues, or concerns you may have! 
+
+You can see the full guide for contributors here: 
+    https://chado.readthedocs.io/en/rtd/contributing.html
+
+tl;dr
+
+ - All PRs MUST be linked to an issue.
+ - Issues must be open for 2 weeks before a PR is made.
+ - PRs should be made from the GMOD:1.4 branch
+ - PRs require a number of reviews for approval and can include reviews from outside the PMC. As such, your PR will be approaved faster if you get others from the community to review it ;-) 
+ 
+## Chado Support
+
+Please see our website and linked documentation for more information on Chado and the GMOD project:
+
+- http://www.gmod.org/
+- https://chado.readthedocs.io/en/rtd/
+- https://chado.readthedocs.io/en/rtd/_static/schemaspy_integration/index.html
+
+You can send questions to the Chado mailing list:
+
+- gmod-schema@lists.sourceforge.net
+
+You can search previous issues submitted to this repository and add your own here:
+
+- https://github.com/GMOD/Chado/issues
+
+If you are looking for the original JavaTools + XMLTools that used to be in this repository,
+they were moved into a separate repository via [PR #100](https://github.com/GMOD/Chado/pull/100). They can now be found here:
+
+- https://github.com/GMOD/chado_tools
 
 ## Particpation in a study of open source software
 
@@ -17,109 +81,6 @@ For more information, please visit
 [our informational page](https://sustainable-open-science-and-software.github.io/) or download our [participant information sheet](https://sustainable-open-science-and-software.github.io/assets/PIS_sustainable_software.pdf).
 
 More info: https://sustainable-open-science-and-software.github.io/readme_notice
-
-## Introduction
-
-Chado was originally conceived as the next generation Flybase
-database, combining the sequence annotation database gadfly with the
-Harvard and Cambridge databases.  We have avoided organism or
-project specificity in the schema, and we hope it will be of use to
-other projects.
-
-The modules currently in chado are:
-
-Module                     | Description
--------------------------- | ------------------------------
-Audit                      | database audits
-Companalysis               | data from computational analysis
-Contact                    | people and groups
-Controlled Vocabulary (cv) | controlled vocabularies and ontologies
-Expression                 | summarized RNA and protein expresssion
-General                    | identifiers
-Genetic                    | genetic data and genotypes
-Library                    | descriptions of molecular libraries
-Mage                       | microarray data
-Map                        | maps without sequence
-Organism                   | species
-Phenotype                  | phenotypic data
-Phylogeny                  | phylogenetic trees
-Publication (pub)          | publications and references
-Sequence                   | sequences and sequence features
-Stock                      | specimens and biological collections
-WWW                        | generic classes for web interfaces
-
-For documentation on the various modules, see http://www.gmod.org.
-
-Other modules are possible; the existing modules cover a very large
-variety of use cases.
-
-Chado has a fairly abstract schema, and ontologies and controlled
-vocabularies (CVs) are utilised where their use is favourable to
-relational modeling.  In particular, the sequence ontology (SO) is vital to
-the sequence module.
-
-Some (but not all) of the use cases we have discussed are:
-
-* Central dogma genome annotations
-
-* Genes that break the central dogma (of which there are many
-  Annotated in fly, including polycistronic transcripts, transplicing,
-  selenocysteine readthroughs, rna editing, ....)
-
-* Sequence variation data, including SNPs, transposable element
-  insertions, indels, ... how this relates to phenotypes, how these
-  effect the central dogma....
-
-* Non-wildtype data, including representing a wildtype transcriptome
-  and proteome on a non wildtype genome; implicit and explicit central
-  dogma examples for mutant strains
-
-* Complex phenotypic data
-
-* Ontologies structured as graphs; querying over graph ontologies
-  non-recursively by pre-computing the closure
-
-* Sequence ontology
-
-* Comparative data
-
-* Genetic interactions
-
-* Transgene constructs, complex genetic experiments and their results
-
-The core schema is DBMS independent.  The SQL table create files can
-be found in the chado/modules directory.  The main Chado developers
-are currently using PostgreSQL.
-
-
-## Installation
-
-Please read the included [chado/INSTALL.Chado.md](./chado/INSTALL.Chado.md) document for instructions on how to
-install the Chado schema.
-
-### Running the Docker Image
-
-```bash
-
-docker build -t chado .
-docker run -it -d chado
-```
-
-
-## Chado Support
-
-Please see our website for more information on Chado and the GMOD project:
-
-    http://www.gmod.org/
-
-You can send questions to the Chado mailing list:
-
-    gmod-schema@lists.sourceforge.net
-
-You can browse the schema CVS repository here:
-
-    http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/gmod/schema/
-
 
 ## Authors
 
