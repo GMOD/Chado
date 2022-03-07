@@ -13,7 +13,7 @@
 
 - For wiki documentation on the various modules, see http://www.gmod.org.
 - All documentation will be moving over to our ReadtheDocs: https://chado.readthedocs.io/en/rtd/
-- You can browse the full schema using SchemaSpy :https://chado.readthedocs.io/en/rtd/_static/schemaspy_integration/index.html
+- You can browse the full schema using SchemaSpy: https://chado.readthedocs.io/en/rtd/_static/schemaspy_integration/index.html
 
 ### Citation
 
