@@ -29,16 +29,17 @@ RUN cd / \
    && git clone https://github.com/GMOD/Chado.git  \
    && cd Chado \
    && git checkout ${CHADO_BRANCH}
-   
+
 RUN /etc/init.d/postgresql start \
    && su -c "createdb chado" - postgres \
-   && su -c "psql chado < /Chado/chado/schemas/${CHADO_VERSION}/default_schema.sql" - postgres \
-   && su - postgres \
-   && psql -c "ALTER USER postgres PASSWORD 'chad0$test';" \
-   && exit \
+   && su -c "psql chado < /Chado/schemas/${CHADO_VERSION}/default_schema.sql" - postgres \
+   && su -c "psql -c \"ALTER USER postgres PASSWORD 'chadotest';\"" - postgres \
    && /etc/init.d/postgresql stop;
 
 ADD flyway.conf flyway.conf
+ADD entrypoint.sh entrypoint.sh
+ADD motd /etc/motd
 
-#ENTRYPOINT["sh","/entrypoint.sh"]
-CMD ["/etc/init.d/postgresql", "start"]
+RUN echo '[ ! -z "$TERM" -a -r /etc/motd ] && cat /etc/issue && cat /etc/motd' >> /etc/bash.bashrc
+
+ENTRYPOINT ["sh", "entrypoint.sh"]

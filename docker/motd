@@ -1,0 +1,10 @@
+   ________  _____    ____  ____
+  / ____/ / / /   |  / __ \/ __ \
+ / /   / /_/ / /| | / / / / / / /
+/ /___/ __  / ___ |/ /_/ / /_/ /
+\____/_/ /_/_/  |_/_____/\____/
+
+This Chado docker image uses default security settings for
+PostgreSQL and has a hard-coded password for the postgres
+user.  Do not use this image for a production service without
+first correcting
