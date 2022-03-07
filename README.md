@@ -113,13 +113,34 @@ psql -U postgres -h localhost -d chado
 ```
 You will be prompted for a password. The default password is `chadotest`
 
-##### Testing Chado
-You can test any Git branch of Chado by navigating to the Chado directory in the image and changing the branch:
+##### Testing a Pull Request
+You can test any pull request or other Git branch of Chado by navigating to the Chado directory in the image and changing the branch:
 ```bash
 cd Chado/chado
 git checkout <branch>
 ```
-If the branch has any FlyWay migrations you can test those by running the apporopriate flyway commands.
+If the branch has any FlyWay migrations you can test those by running these flyway commans:
+
+Use this command to see what needs to be applied
+```bash
+flyway info
+```
+
+For testing of a PR you can set the baseline to the current installation of Chado provided by the image:
+```bash
+flyway baseline
+```
+
+To update Chado you can apply the Flyway migrations:
+```bash
+flyway migrate
+```
+
+As long as no errors occured you will see success for all updates:
+
+```bash
+flyway info
+```
 
 
 
