@@ -36,7 +36,7 @@ RUN /etc/init.d/postgresql start \
    && su -c "psql -c \"ALTER USER postgres PASSWORD 'chadotest';\"" - postgres \
    && /etc/init.d/postgresql stop;
 
-ADD flyway.conf flyway.conf
+ADD flyway.conf /root/flyway.conf
 ADD entrypoint.sh entrypoint.sh
 ADD motd /etc/motd
 
