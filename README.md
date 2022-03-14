@@ -91,14 +91,14 @@ To build the docker image run the following:
 cd docker
 make v<version>
 ```
-Replace `<version>` with a specific version of Chado that you want to use (e.g.  `1.4`).  This will create a Docker image with the tag: `gmod/chado:<version>` where <version> is the same version used above (e.g. `gmod/chado:1.4`).
+Replace `<version>` with a specific version of Chado that you want to use (e.g.  `1.31`).  This will create a Docker image with the tag: `gmod/chado:<version>` where <version> is the same version used above (e.g. `gmod/chado:1.31`).
 
 #### Using the Chado Docker
 You can start and work within the Chado container by using the following command.
 ```bash
 docker run -it gmod/chado:<version>
 ```
-Replace `<version>` with the specific version of Chado that you want to use (e.g. `1.4`). This will start the PostgreSQL server and give you access to a bash terminal.
+Replace `<version>` with the specific version of Chado that you want to use (e.g. `1.31`). This will start the PostgreSQL server and give you access to a bash terminal.
 
 As a test, you can run the `flyway info` command after starting the container:
 
