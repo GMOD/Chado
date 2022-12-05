@@ -83,13 +83,65 @@ are currently using PostgreSQL.
 Please read the included [chado/INSTALL.Chado.md](./chado/INSTALL.Chado.md) document for instructions on how to
 install the Chado schema.
 
-### Running the Docker Image
-
+### Using the Chado Docker Image
+#### Locally Build the Docker Image
+To build the docker image run the following:
 ```bash
 
-docker build -t chado .
-docker run -it -d chado
+cd docker
+make v<version>
 ```
+Replace `<version>` with a specific version of Chado that you want to use (e.g.  `1.31`).  This will create a Docker image with the tag: `gmod/chado:<version>` where <version> is the same version used above (e.g. `gmod/chado:1.31`).
+
+#### Using the Chado Docker
+You can start and work within the Chado container by using the following command.
+```bash
+docker run -it gmod/chado:<version>
+```
+Replace `<version>` with the specific version of Chado that you want to use (e.g. `1.31`). This will start the PostgreSQL server and give you access to a bash terminal.
+
+As a test, you can run the `flyway info` command after starting the container:
+
+```bash
+flyway info
+```
+
+You can explore the Chado tables using the `psql` command in the following way:
+
+```bash
+psql -U postgres -h localhost -d chado
+```
+You will be prompted for a password. The default password is `chadotest`
+
+##### Testing a Pull Request
+You can test any pull request or other Git branch of Chado by navigating to the Chado directory in the image and changing the branch:
+```bash
+cd Chado/chado
+git checkout <branch>
+```
+If the branch has any FlyWay migrations you can test those by running these flyway commans:
+
+Use this command to see what needs to be applied
+```bash
+flyway info
+```
+
+For testing of a PR you can set the baseline to the current installation of Chado provided by the image:
+```bash
+flyway baseline
+```
+
+To update Chado you can apply the Flyway migrations:
+```bash
+flyway migrate
+```
+
+As long as no errors occured you will see success for all updates:
+
+```bash
+flyway info
+```
+
 
 
 ## Chado Support
