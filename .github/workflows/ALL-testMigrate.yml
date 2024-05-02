@@ -27,11 +27,12 @@ jobs:
         run: |
           docker build --tag gmod/chado:local \
           --file docker/Dockerfile \
-          --build-arg PGSQL_VERSION="${{ matrix.pgsql-version }}" ./
+          --build-arg PGSQL_VERSION="${{ matrix.pgsql-version }}" \
+          --build-arg APPLY_MIGRATIONS=0 ./
       # Just spin up docker the good ol' fashion way
       # then run flyway baseline and migrate.
-      - name: Run Flyway Baseline then migrate
+      - name: Run Flyway Migrate
         run: |
           docker run --name=chadodocker -tid gmod/chado:local
-          docker exec chadodocker flyway baseline
+          sleep 30
           docker exec chadodocker flyway migrate
