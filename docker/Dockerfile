@@ -40,6 +40,7 @@ RUN cp flyway.toml /root/flyway.toml \
    && cp motd /etc/motd
 
 RUN /etc/init.d/postgresql start \
+   && sleep 30 \
    && flyway baseline \
    && if [ "$APPLY_MIGRATIONS" > "1" ] ; then \
      flyway migrate; \
