@@ -85,20 +85,21 @@ install the Chado schema.
 
 ### Using the Chado Docker Image
 #### Locally Build the Docker Image
-To build the docker image run the following:
+To build the docker image using the default values, run the following command:
 ```bash
-
-cd docker
-make v<version>
+docker build --tag gmod/chado:local --file docker/Dockerfile ./
 ```
-Replace `<version>` with a specific version of Chado that you want to use (e.g.  `1.31`).  This will create a Docker image with the tag: `gmod/chado:<version>` where <version> is the same version used above (e.g. `gmod/chado:1.31`).
+If you would like to build a docker that uses a specific version of PostgreSQL then you can run the following command instead. In this case you will replace `<version>` with the version of PostgreSQL. We currently support 12, 13, 14, 15, and 16.
+```bash
+docker build --tag gmod/chado:local --file docker/Dockerfile --build-arg PGSQL_VERSION=<version> ./
+```
 
 #### Using the Chado Docker
 You can start and work within the Chado container by using the following command.
 ```bash
-docker run -it gmod/chado:<version>
+docker run -it gmod/chado:local
 ```
-Replace `<version>` with the specific version of Chado that you want to use (e.g. `1.31`). This will start the PostgreSQL server and give you access to a bash terminal.
+This will start the PostgreSQL server and give you access to a bash terminal within the docker container.
 
 As a test, you can run the `flyway info` command after starting the container:
 
@@ -114,33 +115,27 @@ psql -U postgres -h localhost -d chado
 You will be prompted for a password. The default password is `chadotest`
 
 ##### Testing a Pull Request
-You can test any pull request or other Git branch of Chado by navigating to the Chado directory in the image and changing the branch:
+When you build the image as shown above, it actually uses the current code in your Chado clone.
+In order to allow you to modify the migrations while running the container, you will mount your current directory inside the container using the following approach. This way you can edit the files locally and they will be automatically updated within the container and available to flyway.
 ```bash
-cd Chado/chado
-git checkout <branch>
+docker build --tag gmod/chado:local --file docker/Dockerfile --build-arg PGSQL_VERSION=<version> ./
+docker run -it -rm --volume=$(pwd):/Chado gmod/chado:local
 ```
-If the branch has any FlyWay migrations you can test those by running these flyway commans:
+You can test FlyWay migrations by running these flyway commands:
 
-Use this command to see what needs to be applied
-```bash
-flyway info
-```
+  - See what migrations need to be applied:
 
-For testing of a PR you can set the baseline to the current installation of Chado provided by the image:
-```bash
-flyway baseline
-```
+  ```bash
+  flyway info
+  ```
 
-To update Chado you can apply the Flyway migrations:
-```bash
-flyway migrate
-```
+  - Run the migrations available:
 
-As long as no errors occured you will see success for all updates:
+  ```bash
+  flyway migrate
+  ```
 
-```bash
-flyway info
-```
+The migrations have been applied correctly if you do not see any red errors. However, it is good practice to run `flyway info` again to confirm.
 
 
 
