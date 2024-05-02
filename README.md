@@ -118,7 +118,8 @@ You will be prompted for a password. The default password is `chadotest`
 When you build the image as shown above, it actually uses the current code in your Chado clone.
 In order to allow you to modify the migrations while running the container, you will mount your current directory inside the container using the following approach. This way you can edit the files locally and they will be automatically updated within the container and available to flyway.
 ```bash
-docker build --tag gmod/chado:local --file docker/Dockerfile --build-arg PGSQL_VERSION=<version> ./
+docker build --tag gmod/chado:local --file docker/Dockerfile \
+    --build-arg PGSQL_VERSION=<version> ./
 docker run -it -rm --volume=$(pwd):/Chado gmod/chado:local
 ```
 You can test FlyWay migrations by running these flyway commands:
