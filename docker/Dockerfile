@@ -1,6 +1,7 @@
 FROM ubuntu:24.04
 
 ARG CHADO_VERSION='1.31'
+ARG PGSQL_VERSION='16'
 
 RUN apt-get update
 
@@ -15,7 +16,9 @@ RUN apt-get install -y wget \
                        vim \
                        uuid-dev
 
-RUN apt-get install -y postgresql-all
+RUN  apt-get install -y postgresql-common \
+   && /usr/share/postgresql-common/pgdg/apt.postgresql.org.sh -y \
+   && apt-get install -y postgresql-${PGSQL_VERSION}
 
 RUN cd /usr/local \
    && wget -qO- https://repo1.maven.org/maven2/org/flywaydb/flyway-commandline/10.12.0/flyway-commandline-10.12.0-linux-x64.tar.gz | tar xvz \
