@@ -8,6 +8,15 @@ jobs:
   run-tests:
     runs-on: ubuntu-latest
 
+    strategy:
+      fail-fast: false
+      matrix:
+        pgsql-version:
+          - "12"
+          - "13"
+          - "14"
+          - "15"
+          - "16"
     steps:
       # Check out the repo
       - name: Checkout Repository
@@ -16,7 +25,9 @@ jobs:
       # to ensure we test the current migrations.
       - name: Build Docker Image
         run: |
-          docker build --tag gmod/chado:local --file docker/Dockerfile ./
+          docker build --tag gmod/chado:local \
+          --file docker/Dockerfile \
+          --build-arg PGSQL_VERSION="${{ matrix.pgsql-version }}" ./
       # Just spin up docker the good ol' fashion way
       # then run flyway baseline and migrate.
       - name: Run Flyway Baseline then migrate
