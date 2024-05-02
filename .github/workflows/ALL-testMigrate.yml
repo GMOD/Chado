@@ -24,4 +24,5 @@ jobs:
       # Runs the PHPUnit tests.
       - name: Run Flyway Migrations
         run: |
+          docker exec chadodocker flyway baseline
           docker exec chadodocker flyway migrate
