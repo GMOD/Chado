@@ -2,7 +2,7 @@ FROM ubuntu:24.04
 
 ARG CHADO_VERSION='1.31'
 ARG PGSQL_VERSION='16'
-ARG APPLY_MIGRATIONS=0
+ARG APPLY_MIGRATIONS='0'
 
 RUN apt-get update
 
@@ -42,7 +42,7 @@ RUN cp flyway.toml /root/flyway.toml \
 RUN /etc/init.d/postgresql start \
    && sleep 30 \
    && flyway baseline \
-   && if [ "$APPLY_MIGRATIONS" > "1" ] ; then \
+   && if [ "$APPLY_MIGRATIONS" = "1" ] ; then \
      flyway migrate; \
    fi
 
