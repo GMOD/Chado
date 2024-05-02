@@ -2,6 +2,7 @@ FROM ubuntu:24.04
 
 ARG CHADO_VERSION='1.31'
 ARG PGSQL_VERSION='16'
+ARG APPLY_MIGRATIONS=0
 
 RUN apt-get update
 
@@ -37,6 +38,12 @@ RUN cp flyway.toml /root/flyway.toml \
    && cp entrypoint.sh /usr/bin/entrypoint.sh \
    && chmod +x /usr/bin/entrypoint.sh \
    && cp motd /etc/motd
+
+RUN /etc/init.d/postgresql start \
+   && flyway baseline \
+   && if [ "$APPLY_MIGRATIONS" > "1" ] ; then \
+     flyway migrate; \
+   fi
 
 WORKDIR /Chado
 
