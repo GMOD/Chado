@@ -13,16 +13,14 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
       # Here we fully build a docker using the current checked out code
-      # to ensure we have not broken the install/build process.
+      # to ensure we test the current migrations.
       - name: Build Docker Image
         run: |
           docker build --tag gmod/chado:local --file docker/Dockerfile ./
-      # Just spin up docker the good ol' fashion way.
-      - name: Spin up Local Docker
+      # Just spin up docker the good ol' fashion way
+      # then run flyway baseline and migrate.
+      - name: Run Flyway Baseline then migrate
         run: |
           docker run --name=chadodocker -tid gmod/chado:local
-      # Runs the PHPUnit tests.
-      - name: Run Flyway Migrations
-        run: |
           docker exec chadodocker flyway baseline
           docker exec chadodocker flyway migrate
