@@ -1,0 +1,12 @@
+# More information on the parameters can be found here:
+# https://documentation.red-gate.com/flyway/flyway-cli-and-api/configuration/parameters
+
+[environments.core]
+url = "jdbc:postgresql://localhost:5432/chado"
+user = "postgres"
+password = "chadotest"
+schemas = ["public"]
+
+[flyway]
+environment = "core"
+locations = ["filesystem:/Chado"]
