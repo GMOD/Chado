@@ -83,22 +83,21 @@ are currently using PostgreSQL.
 Please read the included [chado/INSTALL.Chado.md](./chado/INSTALL.Chado.md) document for instructions on how to
 install the Chado schema.
 
+## Docker
+
+Chado has been dockerized with Flyway so that you can look around, and test migrations easily.
+The following instructions are going to show you how to pull the already build images. If you would like to build your own image locally, there are instructins for that at the very bottom.
+
 ### Using the Chado Docker Image
-#### Locally Build the Docker Image
-To build the docker image run the following:
-```bash
 
-cd docker
-make v<version>
-```
-Replace `<version>` with a specific version of Chado that you want to use (e.g.  `1.31`).  This will create a Docker image with the tag: `gmod/chado:<version>` where <version> is the same version used above (e.g. `gmod/chado:1.31`).
+You can start and work within the Chado container by using the following commands. You will want to replace the `<version>` with a current version available on Github. You can see the available options [on the github package repository](https://github.com/GMOD/Chado/pkgs/container/chado).
 
-#### Using the Chado Docker
-You can start and work within the Chado container by using the following command.
 ```bash
-docker run -it gmod/chado:<version>
+docker run -it ghcr.io/gmod/chado:<version>
 ```
-Replace `<version>` with the specific version of Chado that you want to use (e.g. `1.31`). This will start the PostgreSQL server and give you access to a bash terminal.
+If you don't have the image locally, this will pull it down from the Github package repository first and then start a container for you. PostgreSQL and flyway will be running within the container and Chado will be cloned in the current working directory.
+
+The container will be shut down once you exit the opened bash terminal. If you want the container to remain running then you would use `-dit` instead of `-it` to run docker in detached mode.
 
 As a test, you can run the `flyway info` command after starting the container:
 
@@ -113,36 +112,46 @@ psql -U postgres -h localhost -d chado
 ```
 You will be prompted for a password. The default password is `chadotest`
 
-##### Testing a Pull Request
-You can test any pull request or other Git branch of Chado by navigating to the Chado directory in the image and changing the branch:
-```bash
-cd Chado/chado
-git checkout <branch>
-```
-If the branch has any FlyWay migrations you can test those by running these flyway commans:
+### Testing a Pull Request
 
-Use this command to see what needs to be applied
-```bash
-flyway info
-```
-
-For testing of a PR you can set the baseline to the current installation of Chado provided by the image:
-```bash
-flyway baseline
-```
-
-To update Chado you can apply the Flyway migrations:
-```bash
-flyway migrate
-```
-
-As long as no errors occured you will see success for all updates:
+In order to allow you to modify the migrations while running the container, you will mount your current directory inside the container using the following approach. This way you can edit the files locally and they will be automatically updated within the container and available to flyway.
 
 ```bash
-flyway info
+git clone https://github.com/GMOD/Chado chado-pr<number>
+cd chado-pr<number>
+git checkout <prBranch>
+docker run -it -rm --volume=$(pwd):/Chado ghcr.io/gmod/chado:pr-<number>
 ```
 
+You can test FlyWay migrations by running these flyway commands:
 
+  - See what migrations need to be applied:
+
+  ```bash
+  flyway info
+  ```
+
+  - Run the migrations available:
+
+  ```bash
+  flyway migrate
+  ```
+
+The migrations have been applied correctly if you do not see any red errors. However, it is good practice to run `flyway info` again to confirm.
+
+### Locally Build the Docker Image
+
+*The following commands should be carried out in a cloned version of this repository, in the root directory.*
+
+To build the docker image using the default values, run the following command:
+```bash
+docker build --tag gmod/chado:local --file docker/Dockerfile ./
+```
+
+If you would like to build a docker that uses a specific version of PostgreSQL then you can run the following command instead. In this case you will replace `<version>` with the version of PostgreSQL. We currently support 12, 13, 14, 15, and 16.
+```bash
+docker build --tag gmod/chado:local --file docker/Dockerfile --build-arg PGSQL_VERSION=<version> ./
+```
 
 ## Chado Support
 
