@@ -3,6 +3,7 @@ FROM ubuntu:24.04
 ARG CHADO_VERSION='1.31'
 ARG PGSQL_VERSION='16'
 ARG APPLY_MIGRATIONS='0'
+ARG SCHEMA_NAME='public'
 
 RUN apt-get update
 
@@ -39,12 +40,21 @@ RUN cp flyway.toml /root/flyway.toml \
    && chmod +x /usr/bin/entrypoint.sh \
    && cp motd /etc/motd
 
+RUN if [ "$SCHEMA_NAME" != "public" ] ; then \
+      /etc/init.d/postgresql start \
+      && sleep 30 \
+      && su -c "psql -d chado -c \"ALTER SCHEMA public RENAME TO $SCHEMA_NAME; CREATE SCHEMA public;\"" - postgres \
+      && sed -i "s/public/$SCHEMA_NAME/g" /root/flyway.toml \
+      && /etc/init.d/postgresql stop; \
+   fi
+
 RUN /etc/init.d/postgresql start \
    && sleep 30 \
    && flyway baseline \
    && if [ "$APPLY_MIGRATIONS" = "1" ] ; then \
      flyway migrate; \
-   fi
+   fi \
+   && /etc/init.d/postgresql stop
 
 WORKDIR /Chado
 
