@@ -1,0 +1,39 @@
+name: "Testing Flyway Migrations: Named Schema Teacup"
+on:
+  workflow_dispatch:
+  pull_request:
+    types: [opened, synchronize]
+
+jobs:
+  run-tests:
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        pgsql-version:
+          - "12"
+          - "13"
+          - "14"
+          - "15"
+          - "16"
+    steps:
+      # Check out the repo
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+      # Here we fully build a docker using the current checked out code
+      # to ensure we test the current migrations.
+      - name: Build Docker Image
+        run: |
+          docker build --tag gmod/chado:local \
+          --file docker/Dockerfile \
+          --build-arg PGSQL_VERSION="${{ matrix.pgsql-version }}" \
+          --build-arg SCHEMA_NAME="teacup" \
+          --build-arg APPLY_MIGRATIONS=0 ./
+      # Just spin up docker the good ol' fashion way
+      # then run flyway baseline and migrate.
+      - name: Run Flyway Migrate
+        run: |
+          docker run --name=chadodocker -tid gmod/chado:local
+          sleep 30
+          docker exec chadodocker flyway migrate
