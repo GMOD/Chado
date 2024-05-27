@@ -1,4 +1,4 @@
-name: Testing Flyway Migrations
+name: "Testing Flyway Migrations: Public Schema"
 on:
   workflow_dispatch:
   pull_request:
